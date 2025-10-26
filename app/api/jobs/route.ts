@@ -21,10 +21,18 @@ export async function POST(request: NextRequest) {
     // Validate job data
     const validatedData = jobSchema.parse(jobData);
 
+    // Transform empty strings to undefined for optional fields
+    const processedData = {
+      ...validatedData,
+      companyLogo: validatedData.companyLogo || undefined,
+      applyUrl: validatedData.applyUrl || undefined,
+      applyEmail: validatedData.applyEmail || undefined,
+    };
+
     // Create job with temporary slug (will be updated with real ID-based slug)
     const job = await db.job.create({
       data: {
-        ...validatedData,
+        ...processedData,
         slug: 'temp', // Temporary, will be updated immediately
         userId: session.userId,
         status: 'ACTIVE', // Will be ACTIVE after payment
