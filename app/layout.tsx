@@ -1,11 +1,16 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { getSession } from '@/lib/auth';
 
 export const metadata: Metadata = {
-  title: 'DataCenter Jobs - Premium Data Center Career Opportunities',
+  title: 'Work In Data Center - Premium Data Center Career Opportunities',
   description: 'Find top data center jobs in operations, engineering, IT, security, and more. Post jobs and connect with qualified professionals.',
+  icons: {
+    icon: '/images/favicon.ico',
+    apple: '/images/apple-touch-icon.png',
+  },
 };
 
 export default async function RootLayout({
@@ -29,6 +34,7 @@ export default async function RootLayout({
           }
         />
         {children}
+        <Footer />
       </body>
     </html>
   );

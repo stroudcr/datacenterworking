@@ -4,18 +4,22 @@ import { GlassCard } from '@/components/GlassCard';
 import { SearchBar } from '@/components/SearchBar';
 import { SortSelect } from '@/components/SortSelect';
 import { Newsletter } from '@/components/Newsletter';
-import { JOB_CATEGORIES } from '@/lib/constants';
+import { FilterSidebar } from '@/components/FilterSidebar';
 import { Briefcase, TrendingUp, Shield } from 'lucide-react';
 
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; search?: string; sort?: string }>;
+  searchParams: Promise<{ category?: string; search?: string; sort?: string; type?: string; shift?: string; clearance?: string; certifications?: string }>;
 }) {
   const params = await searchParams;
   const category = params.category;
   const search = params.search;
   const sort = params.sort || 'latest';
+  const type = params.type;
+  const shift = params.shift;
+  const clearance = params.clearance;
+  const certifications = params.certifications;
 
   // Fetch jobs
   const jobs = await db.job.findMany({
@@ -25,6 +29,10 @@ export default async function Home({
         gte: new Date(),
       },
       ...(category && { category }),
+      ...(type && { type }),
+      ...(shift && { shift }),
+      ...(clearance && { clearance }),
+      ...(certifications && { certifications }),
       ...(search && {
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
@@ -34,9 +42,7 @@ export default async function Home({
       }),
     },
     orderBy:
-      sort === 'salary'
-        ? { salaryMax: 'desc' }
-        : sort === 'applications'
+      sort === 'applications'
         ? { applicationCount: 'desc' }
         : { createdAt: 'desc' },
     take: 50,
@@ -66,7 +72,7 @@ export default async function Home({
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
             Find Your Next{' '}
             <span className="animated-gradient bg-clip-text text-transparent">
-              Data Center Career
+              Data Center Job
             </span>
           </h1>
           <p className="text-xl text-silver-300 mb-8 max-w-2xl mx-auto">
@@ -103,11 +109,11 @@ export default async function Home({
       {/* Featured Jobs */}
       {featuredJobs.length > 0 && (
         <section className="py-12 px-4 bg-gradient-to-b from-transparent to-black/20">
-          <div className="container mx-auto max-w-6xl">
+          <div className="container mx-auto max-w-4xl">
             <h2 className="text-3xl font-bold text-white mb-8 flex items-center gap-2">
               <span className="text-amber-400">★</span> Featured Jobs
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 gap-6">
               {featuredJobs.map((job) => (
                 <JobCard key={job.id} job={job} />
               ))}
@@ -116,61 +122,43 @@ export default async function Home({
         </section>
       )}
 
-      {/* Categories */}
+      {/* Main Content with Sidebar */}
       <section className="py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <h2 className="text-2xl font-bold text-white mb-6">Browse by Category</h2>
-          <div className="flex flex-wrap gap-3">
-            <a
-              href="/"
-              className={`px-4 py-2 rounded-full transition-all ${
-                !category
-                  ? 'bg-ice-500 text-white'
-                  : 'glass text-silver-300 hover:bg-white/10'
-              }`}
-            >
-              All Jobs
-            </a>
-            {JOB_CATEGORIES.map((cat) => (
-              <a
-                key={cat}
-                href={`/?category=${encodeURIComponent(cat)}`}
-                className={`px-4 py-2 rounded-full transition-all ${
-                  category === cat
-                    ? 'bg-ice-500 text-white'
-                    : 'glass text-silver-300 hover:bg-white/10'
-                }`}
-              >
-                {cat}
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
+        <div className="container mx-auto max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
+            {/* Filter Sidebar */}
+            <FilterSidebar
+              category={category}
+              type={type}
+              shift={shift}
+              clearance={clearance}
+              certifications={certifications}
+            />
 
-      {/* Job Listings */}
-      <section className="py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
-              {category || 'All Jobs'} ({jobs.length})
-            </h2>
-            <SortSelect />
-          </div>
+            {/* Job Listings */}
+            <div>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-white">
+                  {category || type || shift || clearance || certifications || 'All Jobs'} ({jobs.length})
+                </h2>
+                <SortSelect />
+              </div>
 
-          {jobs.length === 0 ? (
-            <GlassCard className="text-center py-12">
-              <p className="text-silver-400 text-lg">
-                No jobs found. Try adjusting your filters.
-              </p>
-            </GlassCard>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {jobs.map((job) => (
-                <JobCard key={job.id} job={job} />
-              ))}
+              {jobs.length === 0 ? (
+                <GlassCard className="text-center py-12">
+                  <p className="text-silver-400 text-lg">
+                    No jobs found. Try adjusting your filters.
+                  </p>
+                </GlassCard>
+              ) : (
+                <div className="grid grid-cols-1 gap-6">
+                  {jobs.map((job) => (
+                    <JobCard key={job.id} job={job} />
+                  ))}
+                </div>
+              )}
             </div>
-          )}
+          </div>
         </div>
       </section>
 

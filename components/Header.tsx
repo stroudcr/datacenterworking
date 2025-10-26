@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Briefcase, LogOut, User, Settings } from 'lucide-react';
+import { LogOut, User, Settings } from 'lucide-react';
 import { Button } from './Button';
 
 interface HeaderProps {
@@ -20,13 +21,16 @@ export function Header({ user }: HeaderProps) {
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="p-2 rounded-lg bg-gradient-to-br from-ice-500 to-ice-600 group-hover:from-ice-600 group-hover:to-ice-700 transition-all">
-              <Briefcase className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-bold text-white">DataCenter Jobs</h1>
-              <p className="text-xs text-silver-400">Premium Data Center Careers</p>
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="px-4 py-2 rounded-lg bg-white/95 backdrop-blur-sm transition-all group-hover:bg-white">
+              <Image
+                src="/images/NavLogo.png"
+                alt="Work In Data Center"
+                width={180}
+                height={60}
+                className="h-10 w-auto"
+                priority
+              />
             </div>
           </Link>
 

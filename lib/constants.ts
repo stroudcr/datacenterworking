@@ -14,8 +14,39 @@ export const JOB_CATEGORIES = [
 export const JOB_TYPES = [
   'Full-time',
   'Part-time',
-  'Contract',
-  'Temporary',
+  'Contract / Temporary',
+  'Per Diem',
+  'Travel / Rotational',
+  'Remote',
+] as const;
+
+export const SHIFT_REQUIREMENTS = [
+  'Day Shift (standard business hours)',
+  'Evening Shift',
+  'Night Shift',
+  'Rotating Shifts',
+  'On-Call',
+  'No Shift Work',
+] as const;
+
+export const SECURITY_CLEARANCE = [
+  'None Required',
+  'Able to Obtain',
+  'Secret',
+  'Top Secret',
+  'TS/SCI',
+] as const;
+
+export const CERTIFICATIONS = [
+  'CDCP (Certified Data Centre Professional)',
+  'CDCS (Certified Data Centre Specialist)',
+  'CDCE (Certified Data Centre Expert)',
+  'Uptime Institute ATD/ATS/AOS',
+  'CCNA / CCNP / CCIE (Cisco networking)',
+  'CompTIA A+ / Network+ / Server+',
+  'PMP (Project Management Professional)',
+  'PE License (Professional Engineer)',
+  'Journeyman Electrician',
 ] as const;
 
 export const PRICING = {
@@ -27,6 +58,5 @@ export const PRICING = {
 
 export const SORT_OPTIONS = [
   { value: 'latest', label: 'Latest' },
-  { value: 'salary', label: 'Highest Salary' },
   { value: 'applications', label: 'Most Applied' },
 ] as const;

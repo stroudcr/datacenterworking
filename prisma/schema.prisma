@@ -44,17 +44,24 @@ model User {
 
 model Job {
   id              String     @id @default(cuid())
+  slug            String     @unique
   title           String
   company         String
   companyLogo     String?
   location        String
   type            String     // Full-time, Part-time, Contract
   category        String     // One of the 10 categories
+  shift           String?    // Shift requirements
+  clearance       String?    // Security clearance required
+  certifications  String?    // Required certifications
   description     String     @db.Text
   requirements    String     @db.Text
   salary          String?
   salaryMin       Int?
   salaryMax       Int?
+  hourlyRate      String?
+  hourlyRateMin   Float?
+  hourlyRateMax   Float?
   applyUrl        String?
   applyEmail      String?
   tags            String[]   // Skills/technologies
@@ -74,8 +81,13 @@ model Job {
   savedBy         SavedJob[]
   payment         Payment?
 
+  @@index([slug])
   @@index([status])
   @@index([category])
+  @@index([type])
+  @@index([shift])
+  @@index([clearance])
+  @@index([certifications])
   @@index([isFeatured])
   @@index([createdAt])
   @@index([userId])

@@ -152,7 +152,7 @@ export default async function EmployerDashboard() {
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <Link
-                            href={`/jobs/${job.id}`}
+                            href={`/jobs/${job.slug}`}
                             className="text-xl font-semibold text-white hover:text-ice-400 transition-colors"
                           >
                             {job.title}
@@ -200,7 +200,7 @@ export default async function EmployerDashboard() {
                       </div>
 
                       <div className="flex gap-2">
-                        <Link href={`/jobs/${job.id}`}>
+                        <Link href={`/jobs/${job.slug}`}>
                           <Button variant="secondary" size="sm">
                             <Eye className="w-4 h-4" />
                           </Button>

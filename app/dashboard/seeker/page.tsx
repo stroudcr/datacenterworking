@@ -170,7 +170,7 @@ export default async function SeekerDashboard() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <Link
-                          href={`/jobs/${application.job.id}`}
+                          href={`/jobs/${application.job.slug}`}
                           className="text-xl font-semibold text-white hover:text-ice-400 transition-colors"
                         >
                           {application.job.title}
@@ -203,7 +203,7 @@ export default async function SeekerDashboard() {
                       )}
                     </div>
 
-                    <Link href={`/jobs/${application.job.id}`}>
+                    <Link href={`/jobs/${application.job.slug}`}>
                       <Button variant="secondary" size="sm">
                         View Job
                       </Button>

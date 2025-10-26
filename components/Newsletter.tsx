@@ -5,22 +5,12 @@ import { GlassCard } from './GlassCard';
 import { Button } from './Button';
 import { Input } from './Input';
 import { Mail, Check } from 'lucide-react';
-import { JOB_CATEGORIES } from '@/lib/constants';
 
 export function Newsletter() {
   const [email, setEmail] = useState('');
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
-
-  const toggleCategory = (category: string) => {
-    if (selectedCategories.includes(category)) {
-      setSelectedCategories(selectedCategories.filter((c) => c !== category));
-    } else {
-      setSelectedCategories([...selectedCategories, category]);
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,7 +23,6 @@ export function Newsletter() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          categories: selectedCategories.length > 0 ? selectedCategories : JOB_CATEGORIES,
         }),
       });
 
@@ -45,7 +34,6 @@ export function Newsletter() {
 
       setSuccess(true);
       setEmail('');
-      setSelectedCategories([]);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -102,28 +90,6 @@ export function Newsletter() {
           required
           fullWidth
         />
-
-        <div>
-          <p className="text-sm text-silver-400 mb-3">
-            Select categories (optional - leave blank for all):
-          </p>
-          <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-            {JOB_CATEGORIES.map((category) => (
-              <button
-                key={category}
-                type="button"
-                onClick={() => toggleCategory(category)}
-                className={`px-3 py-2 rounded-lg text-sm transition-all ${
-                  selectedCategories.includes(category)
-                    ? 'bg-ice-500 text-white'
-                    : 'glass text-silver-300 hover:bg-white/10'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </div>
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
           {loading ? 'Subscribing...' : 'Subscribe to Alerts'}

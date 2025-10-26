@@ -161,7 +161,7 @@ export default async function AdminPanel() {
                         <td className="py-4 px-4">
                           <div>
                             <Link
-                              href={`/jobs/${job.id}`}
+                              href={`/jobs/${job.slug}`}
                               className="font-medium text-white hover:text-ice-400 transition-colors"
                             >
                               {job.title}
@@ -211,7 +211,7 @@ export default async function AdminPanel() {
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex items-center justify-end gap-2">
-                            <Link href={`/jobs/${job.id}`} target="_blank">
+                            <Link href={`/jobs/${job.slug}`} target="_blank">
                               <Button variant="ghost" size="sm">
                                 <ExternalLink className="w-4 h-4" />
                               </Button>

@@ -5,6 +5,7 @@ import { jobSchema } from '@/lib/validations';
 import { createCheckoutSession } from '@/lib/stripe';
 import { PRICING } from '@/lib/constants';
 import { addDays } from 'date-fns';
+import { generateJobSlug } from '@/lib/slugify';
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,10 +21,11 @@ export async function POST(request: NextRequest) {
     // Validate job data
     const validatedData = jobSchema.parse(jobData);
 
-    // Create job (inactive until payment)
+    // Create job with temporary slug (will be updated with real ID-based slug)
     const job = await db.job.create({
       data: {
         ...validatedData,
+        slug: 'temp', // Temporary, will be updated immediately
         userId: session.userId,
         status: 'ACTIVE', // Will be ACTIVE after payment
         isFeatured: isFeatured || false,
@@ -32,6 +34,13 @@ export async function POST(request: NextRequest) {
           ? addDays(new Date(), PRICING.FEATURED_DURATION)
           : undefined,
       },
+    });
+
+    // Generate and update slug with the real ID
+    const slug = generateJobSlug(validatedData.title, validatedData.location, job.id);
+    await db.job.update({
+      where: { id: job.id },
+      data: { slug },
     });
 
     // Create Stripe checkout session

@@ -20,7 +20,6 @@ export function SortSelect() {
       className="glass rounded-lg px-4 py-2 text-white text-sm cursor-pointer"
     >
       <option value="latest">Latest</option>
-      <option value="salary">Highest Salary</option>
       <option value="applications">Most Applied</option>
     </select>
   );

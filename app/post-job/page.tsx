@@ -2,14 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { jobSchema, type JobInput } from '@/lib/validations';
-import { JOB_CATEGORIES, JOB_TYPES, PRICING } from '@/lib/constants';
+import { JOB_CATEGORIES, JOB_TYPES, SHIFT_REQUIREMENTS, SECURITY_CLEARANCE, CERTIFICATIONS, PRICING } from '@/lib/constants';
 import { GlassCard } from '@/components/GlassCard';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
-import { Briefcase, DollarSign, Star } from 'lucide-react';
+import { JobCardPreview } from '@/components/JobCardPreview';
+import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget';
+import { QuillEditor } from '@/components/QuillEditor';
+import { Briefcase, DollarSign, Star, Eye } from 'lucide-react';
 
 export default function PostJobPage() {
   const router = useRouter();
@@ -18,15 +21,29 @@ export default function PostJobPage() {
   const [isFeatured, setIsFeatured] = useState(false);
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
+  const [compensationType, setCompensationType] = useState<'salary' | 'hourly'>('salary');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     setValue,
+    control,
   } = useForm<JobInput>({
     resolver: zodResolver(jobSchema),
   });
+
+  // Watch form values for live preview
+  const watchedTitle = useWatch({ control, name: 'title' });
+  const watchedCompany = useWatch({ control, name: 'company' });
+  const watchedCompanyLogo = useWatch({ control, name: 'companyLogo' });
+  const watchedLocation = useWatch({ control, name: 'location' });
+  const watchedType = useWatch({ control, name: 'type' });
+  const watchedCategory = useWatch({ control, name: 'category' });
+  const watchedSalary = useWatch({ control, name: 'salary' });
+  const watchedHourlyRate = useWatch({ control, name: 'hourlyRate' });
+  const watchedDescription = useWatch({ control, name: 'description' });
+  const watchedRequirements = useWatch({ control, name: 'requirements' });
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -76,7 +93,7 @@ export default function PostJobPage() {
 
   return (
     <div className="min-h-screen py-12 px-4">
-      <div className="container mx-auto max-w-3xl">
+      <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-8">
           <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-ice-500 to-ice-600 mb-4">
             <Briefcase className="w-8 h-8 text-white" />
@@ -87,7 +104,9 @@ export default function PostJobPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <div className="lg:grid lg:grid-cols-[1fr,480px] lg:gap-8 lg:items-start">
+          {/* Left Column: Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           {error && (
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400">
               {error}
@@ -116,13 +135,23 @@ export default function PostJobPage() {
                 {...register('company')}
               />
 
-              <Input
-                label="Company Logo URL"
-                placeholder="https://..."
-                fullWidth
-                error={errors.companyLogo?.message}
-                {...register('companyLogo')}
-              />
+              <div className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-silver-200">
+                  Company Logo
+                </label>
+                <CloudinaryUploadWidget
+                  onUploadSuccess={(url) => setValue('companyLogo', url)}
+                  currentUrl={watchedCompanyLogo}
+                />
+                {errors.companyLogo && (
+                  <span className="text-sm text-red-400">
+                    {errors.companyLogo.message}
+                  </span>
+                )}
+                <p className="text-xs text-silver-500 mt-1">
+                  Recommended: Square image, max 2MB (PNG, JPG, SVG)
+                </p>
+              </div>
 
               <Input
                 label="Location *"
@@ -176,36 +205,96 @@ export default function PostJobPage() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-silver-200">
+                    Shift Requirements
+                  </label>
+                  <select
+                    className="glass rounded-lg px-4 py-2.5 text-white text-sm"
+                    {...register('shift')}
+                  >
+                    <option value="">Select shift (optional)</option>
+                    {SHIFT_REQUIREMENTS.map((shift) => (
+                      <option key={shift} value={shift}>
+                        {shift}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.shift && (
+                    <span className="text-sm text-red-400">
+                      {errors.shift.message}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-silver-200">
+                    Security Clearance
+                  </label>
+                  <select
+                    className="glass rounded-lg px-4 py-2.5 text-white text-sm"
+                    {...register('clearance')}
+                  >
+                    <option value="">Select clearance (optional)</option>
+                    {SECURITY_CLEARANCE.map((clearance) => (
+                      <option key={clearance} value={clearance}>
+                        {clearance}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.clearance && (
+                    <span className="text-sm text-red-400">
+                      {errors.clearance.message}
+                    </span>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm font-medium text-silver-200">
+                    Certifications
+                  </label>
+                  <select
+                    className="glass rounded-lg px-4 py-2.5 text-white text-sm"
+                    {...register('certifications')}
+                  >
+                    <option value="">Select certification (optional)</option>
+                    {CERTIFICATIONS.map((cert) => (
+                      <option key={cert} value={cert}>
+                        {cert}
+                      </option>
+                    ))}
+                  </select>
+                  {errors.certifications && (
+                    <span className="text-sm text-red-400">
+                      {errors.certifications.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-silver-200">
                   Job Description *
                 </label>
-                <textarea
-                  className="glass rounded-lg px-4 py-2.5 text-white min-h-[150px] resize-y"
+                <QuillEditor
+                  value={watchedDescription || ''}
+                  onChange={(value) => setValue('description', value)}
                   placeholder="Describe the role, responsibilities, and what makes this opportunity great..."
-                  {...register('description')}
+                  error={errors.description?.message}
                 />
-                {errors.description && (
-                  <span className="text-sm text-red-400">
-                    {errors.description.message}
-                  </span>
-                )}
               </div>
 
               <div className="flex flex-col gap-1">
                 <label className="text-sm font-medium text-silver-200">
                   Requirements *
                 </label>
-                <textarea
-                  className="glass rounded-lg px-4 py-2.5 text-white min-h-[120px] resize-y"
+                <QuillEditor
+                  value={watchedRequirements || ''}
+                  onChange={(value) => setValue('requirements', value)}
                   placeholder="List required skills, experience, and qualifications..."
-                  {...register('requirements')}
+                  error={errors.requirements?.message}
                 />
-                {errors.requirements && (
-                  <span className="text-sm text-red-400">
-                    {errors.requirements.message}
-                  </span>
-                )}
               </div>
             </div>
           </GlassCard>
@@ -217,29 +306,87 @@ export default function PostJobPage() {
               Compensation
             </h2>
             <div className="space-y-4">
-              <Input
-                label="Salary Range (optional)"
-                placeholder="e.g., $80k-$120k"
-                fullWidth
-                {...register('salary')}
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Min Salary ($)"
-                  type="number"
-                  placeholder="80000"
-                  fullWidth
-                  {...register('salaryMin', { valueAsNumber: true })}
-                />
-                <Input
-                  label="Max Salary ($)"
-                  type="number"
-                  placeholder="120000"
-                  fullWidth
-                  {...register('salaryMax', { valueAsNumber: true })}
-                />
+              {/* Compensation Type Toggle */}
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setCompensationType('salary')}
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    compensationType === 'salary'
+                      ? 'bg-ice-500 text-white'
+                      : 'glass text-silver-300 hover:bg-white/10'
+                  }`}
+                >
+                  Annual Salary
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCompensationType('hourly')}
+                  className={`px-4 py-2 rounded-lg transition-all ${
+                    compensationType === 'hourly'
+                      ? 'bg-ice-500 text-white'
+                      : 'glass text-silver-300 hover:bg-white/10'
+                  }`}
+                >
+                  Hourly Rate
+                </button>
               </div>
+
+              {compensationType === 'salary' ? (
+                <>
+                  <Input
+                    label="Salary Range (optional)"
+                    placeholder="e.g., $80k-$120k"
+                    fullWidth
+                    {...register('salary')}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="Min Salary ($)"
+                      type="number"
+                      placeholder="80000"
+                      fullWidth
+                      {...register('salaryMin', { valueAsNumber: true })}
+                    />
+                    <Input
+                      label="Max Salary ($)"
+                      type="number"
+                      placeholder="120000"
+                      fullWidth
+                      {...register('salaryMax', { valueAsNumber: true })}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <Input
+                    label="Hourly Rate Range (optional)"
+                    placeholder="e.g., $35-$50/hr"
+                    fullWidth
+                    {...register('hourlyRate')}
+                  />
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="Min Hourly Rate ($)"
+                      type="number"
+                      placeholder="35"
+                      step="0.01"
+                      fullWidth
+                      {...register('hourlyRateMin', { valueAsNumber: true })}
+                    />
+                    <Input
+                      label="Max Hourly Rate ($)"
+                      type="number"
+                      placeholder="50"
+                      step="0.01"
+                      fullWidth
+                      {...register('hourlyRateMax', { valueAsNumber: true })}
+                    />
+                  </div>
+                </>
+              )}
             </div>
           </GlassCard>
 
@@ -313,74 +460,104 @@ export default function PostJobPage() {
               )}
             </div>
           </GlassCard>
-
-          {/* Featured Upgrade */}
-          <GlassCard>
-            <div className="flex items-start gap-4">
-              <input
-                type="checkbox"
-                id="featured"
-                checked={isFeatured}
-                onChange={(e) => setIsFeatured(e.target.checked)}
-                className="mt-1"
-              />
-              <label htmlFor="featured" className="flex-1 cursor-pointer">
-                <div className="flex items-center gap-2 mb-2">
-                  <Star className="w-5 h-5 text-amber-400 fill-current" />
-                  <span className="text-lg font-semibold text-white">
-                    Featured Job Listing
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium">
-                    +${PRICING.FEATURED_UPGRADE / 100}
-                  </span>
-                </div>
-                <ul className="text-sm text-silver-300 space-y-1 ml-7">
-                  <li>• Homepage placement for 7 days</li>
-                  <li>• Priority in search results</li>
-                  <li>• Social media promotion</li>
-                  <li>• Highlighted in email alerts</li>
-                </ul>
-              </label>
-            </div>
-          </GlassCard>
-
-          {/* Summary */}
-          <GlassCard>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-white">Order Summary</h2>
-            </div>
-            <div className="space-y-2 text-silver-300">
-              <div className="flex justify-between">
-                <span>30-Day Job Listing</span>
-                <span>${PRICING.BASE_LISTING / 100}</span>
-              </div>
-              {isFeatured && (
-                <div className="flex justify-between">
-                  <span>Featured Upgrade</span>
-                  <span>${PRICING.FEATURED_UPGRADE / 100}</span>
-                </div>
-              )}
-              <div className="border-t border-white/10 pt-2 mt-2 flex justify-between text-lg font-semibold text-white">
-                <span>Total</span>
-                <span>${totalPrice}</span>
-              </div>
-            </div>
-          </GlassCard>
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="lg"
-            fullWidth
-            disabled={loading}
-          >
-            {loading ? 'Creating...' : `Continue to Payment ($${totalPrice})`}
-          </Button>
-
-          <p className="text-center text-sm text-silver-400">
-            You'll be redirected to Stripe to complete your payment securely
-          </p>
         </form>
+
+          {/* Right Column: Preview */}
+          <div className="hidden lg:block self-start" style={{ position: 'sticky', top: '6.5rem' }}>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Eye className="w-5 h-5 text-ice-400" />
+                    <h2 className="text-xl font-semibold text-white">Live Preview</h2>
+                  </div>
+                  <p className="text-sm text-silver-400">
+                    See how your job posting will appear to candidates
+                  </p>
+                </div>
+                <JobCardPreview
+                  title={watchedTitle}
+                  company={watchedCompany}
+                  companyLogo={watchedCompanyLogo}
+                  location={watchedLocation}
+                  type={watchedType}
+                  category={watchedCategory}
+                  salary={compensationType === 'salary' ? watchedSalary : undefined}
+                  hourlyRate={compensationType === 'hourly' ? watchedHourlyRate : undefined}
+                  isFeatured={isFeatured}
+                  tags={tags}
+                />
+
+                {/* Featured Upgrade */}
+                <GlassCard>
+                  <div className="flex items-start gap-4">
+                    <input
+                      type="checkbox"
+                      id="featured"
+                      checked={isFeatured}
+                      onChange={(e) => setIsFeatured(e.target.checked)}
+                      className="mt-1"
+                    />
+                    <label htmlFor="featured" className="flex-1 cursor-pointer">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Star className="w-5 h-5 text-amber-400 fill-current" />
+                        <span className="text-lg font-semibold text-white">
+                          Featured Job Listing
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium">
+                          +${PRICING.FEATURED_UPGRADE / 100}
+                        </span>
+                      </div>
+                      <ul className="text-sm text-silver-300 space-y-1 ml-7">
+                        <li>• Homepage placement for 7 days</li>
+                        <li>• Priority in search results</li>
+                        <li>• Social media promotion</li>
+                        <li>• Highlighted in email alerts</li>
+                      </ul>
+                    </label>
+                  </div>
+                </GlassCard>
+
+                {/* Order Summary */}
+                <GlassCard>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-white">Order Summary</h2>
+                  </div>
+                  <div className="space-y-2 text-silver-300">
+                    <div className="flex justify-between">
+                      <span>30-Day Job Listing</span>
+                      <span>${PRICING.BASE_LISTING / 100}</span>
+                    </div>
+                    {isFeatured && (
+                      <div className="flex justify-between">
+                        <span>Featured Upgrade</span>
+                        <span>${PRICING.FEATURED_UPGRADE / 100}</span>
+                      </div>
+                    )}
+                    <div className="border-t border-white/10 pt-2 mt-2 flex justify-between text-lg font-semibold text-white">
+                      <span>Total</span>
+                      <span>${totalPrice}</span>
+                    </div>
+                  </div>
+                </GlassCard>
+
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  fullWidth
+                  disabled={loading}
+                  onClick={handleSubmit(onSubmit)}
+                >
+                  {loading ? 'Creating...' : `Post a Job ($${totalPrice})`}
+                </Button>
+
+                <p className="text-center text-sm text-silver-400">
+                  You'll be redirected to Stripe to complete your payment securely
+                </p>
+              </div>
+            </div>
+        </div>
       </div>
     </div>
   );

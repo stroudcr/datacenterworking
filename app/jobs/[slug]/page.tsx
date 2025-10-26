@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { GlassCard } from '@/components/GlassCard';
@@ -18,18 +18,31 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { isLegacyId } from '@/lib/slugify';
 
 interface JobPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ slug: string }>;
 }
 
 export default async function JobPage({ params }: JobPageProps) {
-  const { id } = await params;
+  const { slug } = await params;
   const session = await getSession();
 
-  // Fetch job
+  // Check if this is an old-style ID URL and redirect if so
+  if (isLegacyId(slug)) {
+    const job = await db.job.findUnique({
+      where: { id: slug },
+      select: { slug: true },
+    });
+    if (job) {
+      redirect(`/jobs/${job.slug}`);
+    }
+    notFound();
+  }
+
+  // Fetch job by slug
   const job = await db.job.findUnique({
-    where: { id },
+    where: { slug },
     include: {
       user: {
         select: {
@@ -47,7 +60,7 @@ export default async function JobPage({ params }: JobPageProps) {
 
   // Increment view count
   await db.job.update({
-    where: { id },
+    where: { id: job.id },
     data: { viewCount: { increment: 1 } },
   });
 
@@ -58,7 +71,7 @@ export default async function JobPage({ params }: JobPageProps) {
     const savedJob = await db.savedJob.findUnique({
       where: {
         jobId_userId: {
-          jobId: id,
+          jobId: job.id,
           userId: session.userId,
         },
       },
@@ -69,7 +82,7 @@ export default async function JobPage({ params }: JobPageProps) {
     const application = await db.application.findUnique({
       where: {
         jobId_userId: {
-          jobId: id,
+          jobId: job.id,
           userId: session.userId,
         },
       },

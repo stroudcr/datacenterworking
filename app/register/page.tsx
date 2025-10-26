@@ -29,7 +29,7 @@ export default function RegisterPage() {
     },
   });
 
-  const onSubmit = async (data: RegisterInput) {
+  const onSubmit = async (data: RegisterInput) => {
     try {
       setLoading(true);
       setError('');
