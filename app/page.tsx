@@ -2,9 +2,8 @@ import { db } from '@/lib/db';
 import { JobCard } from '@/components/JobCard';
 import { GlassCard } from '@/components/GlassCard';
 import { SearchBar } from '@/components/SearchBar';
-import { SortSelect } from '@/components/SortSelect';
 import { Newsletter } from '@/components/Newsletter';
-import { FilterSidebar } from '@/components/FilterSidebar';
+import { JobListingsClient } from '@/components/JobListingsClient';
 import { Briefcase, TrendingUp, Shield } from 'lucide-react';
 
 export default async function Home({
@@ -125,40 +124,14 @@ export default async function Home({
       {/* Main Content with Sidebar */}
       <section className="py-12 px-4">
         <div className="container mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-8">
-            {/* Filter Sidebar */}
-            <FilterSidebar
-              category={category}
-              type={type}
-              shift={shift}
-              clearance={clearance}
-              certifications={certifications}
-            />
-
-            {/* Job Listings */}
-            <div>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-white">
-                  {category || type || shift || clearance || certifications || 'All Jobs'} ({jobs.length})
-                </h2>
-                <SortSelect />
-              </div>
-
-              {jobs.length === 0 ? (
-                <GlassCard className="text-center py-12">
-                  <p className="text-silver-400 text-lg">
-                    No jobs found. Try adjusting your filters.
-                  </p>
-                </GlassCard>
-              ) : (
-                <div className="grid grid-cols-1 gap-6">
-                  {jobs.map((job) => (
-                    <JobCard key={job.id} job={job} />
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
+          <JobListingsClient
+            jobs={jobs}
+            category={category}
+            type={type}
+            shift={shift}
+            clearance={clearance}
+            certifications={certifications}
+          />
         </div>
       </section>
 
