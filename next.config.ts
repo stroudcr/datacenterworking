@@ -1,4 +1,6 @@
 import type { NextConfig } from 'next';
+// @ts-ignore - No types available
+import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
 
 // Ensure Cloudinary cloud name is set
 if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
@@ -14,12 +16,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  experimental: {
-    serverComponentsExternalPackages: ['@prisma/client', 'prisma'],
-  },
-  outputFileTracingIncludes: {
-    '/api/**/*': ['./node_modules/.prisma/client/libquery_engine-*'],
-    '/': ['./node_modules/.prisma/client/libquery_engine-*'],
+  serverExternalPackages: ['@prisma/client', 'prisma'],
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
+    return config;
   },
 };
 

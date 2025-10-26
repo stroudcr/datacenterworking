@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate"
@@ -29,6 +29,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@prisma/nextjs-monorepo-workaround-plugin": "^6.18.0",
     "@types/bcryptjs": "^2.4.6",
     "@types/js-cookie": "^3.0.6",
     "@types/jsonwebtoken": "^9.0.7",
