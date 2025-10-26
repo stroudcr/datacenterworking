@@ -145,7 +145,7 @@ export default function PostJobPage() {
                 />
                 {errors.companyLogo && (
                   <span className="text-sm text-red-400">
-                    {errors.companyLogo.message}
+                    {errors.companyLogo.message as string}
                   </span>
                 )}
                 <p className="text-xs text-silver-500 mt-1">
@@ -178,7 +178,7 @@ export default function PostJobPage() {
                   </select>
                   {errors.type && (
                     <span className="text-sm text-red-400">
-                      {errors.type.message}
+                      {errors.type.message as string}
                     </span>
                   )}
                 </div>
@@ -199,7 +199,7 @@ export default function PostJobPage() {
                   </select>
                   {errors.category && (
                     <span className="text-sm text-red-400">
-                      {errors.category.message}
+                      {errors.category.message as string}
                     </span>
                   )}
                 </div>
@@ -223,7 +223,7 @@ export default function PostJobPage() {
                   </select>
                   {errors.shift && (
                     <span className="text-sm text-red-400">
-                      {errors.shift.message}
+                      {errors.shift.message as string}
                     </span>
                   )}
                 </div>
@@ -245,7 +245,7 @@ export default function PostJobPage() {
                   </select>
                   {errors.clearance && (
                     <span className="text-sm text-red-400">
-                      {errors.clearance.message}
+                      {errors.clearance.message as string}
                     </span>
                   )}
                 </div>
@@ -267,7 +267,7 @@ export default function PostJobPage() {
                   </select>
                   {errors.certifications && (
                     <span className="text-sm text-red-400">
-                      {errors.certifications.message}
+                      {errors.certifications.message as string}
                     </span>
                   )}
                 </div>
@@ -456,7 +456,7 @@ export default function PostJobPage() {
               )}
 
               {errors.tags && (
-                <span className="text-sm text-red-400">{errors.tags.message}</span>
+                <span className="text-sm text-red-400">{errors.tags.message as string}</span>
               )}
             </div>
           </GlassCard>

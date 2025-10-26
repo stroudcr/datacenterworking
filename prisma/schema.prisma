@@ -23,63 +23,63 @@ enum JobStatus {
 }
 
 model User {
-  id            String        @id @default(cuid())
-  email         String        @unique
-  password      String
-  name          String
-  role          UserRole
-  company       String?       // For employers
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole
+  company   String? // For employers
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  jobs          Job[]         // Posted jobs (for employers)
-  applications  Application[] // Job applications (for job seekers)
-  savedJobs     SavedJob[]    // Saved jobs (for job seekers)
-  payments      Payment[]
+  jobs         Job[] // Posted jobs (for employers)
+  applications Application[] // Job applications (for job seekers)
+  savedJobs    SavedJob[] // Saved jobs (for job seekers)
+  payments     Payment[]
 
   @@index([email])
   @@index([role])
 }
 
 model Job {
-  id              String     @id @default(cuid())
-  slug            String     @unique
-  title           String
-  company         String
-  companyLogo     String?
-  location        String
-  type            String     // Full-time, Part-time, Contract
-  category        String     // One of the 10 categories
-  shift           String?    // Shift requirements
-  clearance       String?    // Security clearance required
-  certifications  String?    // Required certifications
-  description     String     @db.Text
-  requirements    String     @db.Text
-  salary          String?
-  salaryMin       Int?
-  salaryMax       Int?
-  hourlyRate      String?
-  hourlyRateMin   Float?
-  hourlyRateMax   Float?
-  applyUrl        String?
-  applyEmail      String?
-  tags            String[]   // Skills/technologies
-  status          JobStatus  @default(ACTIVE)
-  isFeatured      Boolean    @default(false)
-  featuredUntil   DateTime?
-  expiresAt       DateTime
-  viewCount       Int        @default(0)
+  id               String    @id @default(cuid())
+  slug             String    @unique
+  title            String
+  company          String
+  companyLogo      String?
+  location         String
+  type             String // Full-time, Part-time, Contract
+  category         String // One of the 10 categories
+  shift            String? // Shift requirements
+  clearance        String? // Security clearance required
+  certifications   String? // Required certifications
+  description      String    @db.Text
+  requirements     String    @db.Text
+  salary           String?
+  salaryMin        Int?
+  salaryMax        Int?
+  hourlyRate       String?
+  hourlyRateMin    Float?
+  hourlyRateMax    Float?
+  applyUrl         String?
+  applyEmail       String?
+  tags             String[] // Skills/technologies
+  status           JobStatus @default(ACTIVE)
+  isFeatured       Boolean   @default(false)
+  featuredUntil    DateTime?
+  expiresAt        DateTime
+  viewCount        Int       @default(0)
   applicationCount Int       @default(0)
-  createdAt       DateTime   @default(now())
-  updatedAt       DateTime   @updatedAt
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
 
   // Relations
-  userId          String
-  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  applications    Application[]
-  savedBy         SavedJob[]
-  payment         Payment?
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  applications Application[]
+  savedBy      SavedJob[]
+  payment      Payment?
 
   @@index([slug])
   @@index([status])
@@ -98,13 +98,13 @@ model Application {
   jobId       String
   userId      String
   coverLetter String?  @db.Text
-  resume      String?  // URL or file path
+  resume      String? // URL or file path
   status      String   @default("pending") // pending, reviewed, accepted, rejected
   createdAt   DateTime @default(now())
 
   // Relations
-  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([jobId, userId])
   @@index([userId])
@@ -118,40 +118,40 @@ model SavedJob {
   createdAt DateTime @default(now())
 
   // Relations
-  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([jobId, userId])
   @@index([userId])
 }
 
 model Payment {
-  id                String   @id @default(cuid())
-  userId            String
-  jobId             String   @unique
-  stripeSessionId   String   @unique
-  stripePaymentId   String?  @unique
-  amount            Int      // Amount in cents
-  isFeatured        Boolean  @default(false)
-  status            String   // pending, completed, failed
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id              String   @id @default(cuid())
+  userId          String
+  jobId           String   @unique
+  stripeSessionId String   @unique
+  stripePaymentId String?  @unique
+  amount          Int // Amount in cents
+  isFeatured      Boolean  @default(false)
+  status          String // pending, completed, failed
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   // Relations
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job               Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([stripeSessionId])
 }
 
 model Newsletter {
-  id              String   @id @default(cuid())
-  email           String   @unique
-  categories      String[] // Selected categories for alerts
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id         String   @id @default(cuid())
+  email      String   @unique
+  categories String[] // Selected categories for alerts
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@index([email])
   @@index([isActive])

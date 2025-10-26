@@ -21,21 +21,37 @@ export async function POST(request: NextRequest) {
     // Validate job data
     const validatedData = jobSchema.parse(jobData);
 
-    // Transform empty strings to undefined for optional fields
-    const processedData = {
-      ...validatedData,
-      companyLogo: validatedData.companyLogo || undefined,
-      applyUrl: validatedData.applyUrl || undefined,
-      applyEmail: validatedData.applyEmail || undefined,
-    };
-
     // Create job with temporary slug (will be updated with real ID-based slug)
     const job = await db.job.create({
       data: {
-        ...processedData,
+        // Required fields
+        title: validatedData.title,
+        company: validatedData.company,
+        location: validatedData.location,
+        type: validatedData.type,
+        category: validatedData.category,
+        description: validatedData.description,
+        requirements: validatedData.requirements,
+        tags: validatedData.tags,
+
+        // Optional fields
+        companyLogo: validatedData.companyLogo || undefined,
+        shift: validatedData.shift,
+        clearance: validatedData.clearance,
+        certifications: validatedData.certifications,
+        salary: validatedData.salary,
+        salaryMin: validatedData.salaryMin,
+        salaryMax: validatedData.salaryMax,
+        hourlyRate: validatedData.hourlyRate,
+        hourlyRateMin: validatedData.hourlyRateMin,
+        hourlyRateMax: validatedData.hourlyRateMax,
+        applyUrl: validatedData.applyUrl || undefined,
+        applyEmail: validatedData.applyEmail || undefined,
+
+        // System fields
         slug: 'temp', // Temporary, will be updated immediately
         userId: session.userId,
-        status: 'ACTIVE', // Will be ACTIVE after payment
+        status: 'ACTIVE',
         isFeatured: isFeatured || false,
         expiresAt: addDays(new Date(), PRICING.LISTING_DURATION),
         featuredUntil: isFeatured
