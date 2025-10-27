@@ -92,7 +92,7 @@ export function JobCard({ job }: JobCardProps) {
               {job.tags.slice(0, 5).map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-1 rounded text-xs text-silver-400 bg-white/5"
+                  className="px-2 py-1 rounded text-xs text-silver-400 bg-white/5 inline-flex items-center"
                 >
                   {tag}
                 </span>

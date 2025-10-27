@@ -195,7 +195,7 @@ export default async function JobPage({ params }: JobPageProps) {
               {job.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-3 py-1 rounded-full bg-white/5 text-sm text-silver-400"
+                  className="px-3 py-1 rounded-full bg-white/5 text-sm text-silver-400 inline-flex items-center"
                 >
                   {tag}
                 </span>
