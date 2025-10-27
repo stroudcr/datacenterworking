@@ -48,8 +48,17 @@ export const newsletterSchema = z.object({
   categories: z.array(z.string()).min(1, 'Select at least one category'),
 });
 
+export const contactSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters'),
+  email: z.string().email('Invalid email address'),
+  inquiryType: z.enum(['general', 'job-seeker', 'employer', 'partnership', 'technical', 'feedback']),
+  subject: z.string().min(5, 'Subject must be at least 5 characters'),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(1000, 'Message must be less than 1000 characters'),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type JobInput = z.infer<typeof jobSchema>;
 export type ApplicationInput = z.infer<typeof applicationSchema>;
 export type NewsletterInput = z.infer<typeof newsletterSchema>;
+export type ContactInput = z.infer<typeof contactSchema>;
