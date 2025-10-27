@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
         // System fields
         slug: 'temp', // Temporary, will be updated immediately
         userId: session?.userId || null,
-        status: 'ACTIVE',
+        status: 'PENDING', // Will be set to ACTIVE after payment confirmation
         isFeatured: isFeatured || false,
         expiresAt: addDays(new Date(), PRICING.LISTING_DURATION),
         featuredUntil: isFeatured

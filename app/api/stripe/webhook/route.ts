@@ -44,6 +44,14 @@ export async function POST(request: NextRequest) {
         },
       });
 
+      // Activate the job now that payment is confirmed
+      if (payment.jobId) {
+        await db.job.update({
+          where: { id: payment.jobId },
+          data: { status: 'ACTIVE' },
+        });
+      }
+
       // TODO: Send management link email for guest users
       // If the job has no userId (guest posting), send an email with the management link
       if (payment.job && !payment.job.userId && payment.job.managementToken) {

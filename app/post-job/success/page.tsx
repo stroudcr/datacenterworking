@@ -108,7 +108,6 @@ export default async function PostJobSuccessPage({ searchParams }: PageProps) {
             <div className="mt-4 pt-4 border-t border-white/10">
               <Link href={`/jobs/${job.slug}`}>
                 <Button variant="primary" fullWidth>
-                  <Eye className="w-4 h-4 mr-2" />
                   View Your Job Posting
                 </Button>
               </Link>
@@ -180,7 +179,6 @@ export default async function PostJobSuccessPage({ searchParams }: PageProps) {
               <Link href={`/register?email=${encodeURIComponent(email)}&role=EMPLOYER`}>
                 <Button variant="primary" size="lg" fullWidth>
                   Create Free Employer Account
-                  <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               </Link>
 
