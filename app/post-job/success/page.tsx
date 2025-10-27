@@ -92,7 +92,7 @@ export default async function PostJobSuccessPage({ searchParams }: PageProps) {
               <div className="flex justify-between">
                 <span>Job posted on:</span>
                 <span className="text-white font-medium">
-                  {new Date().toLocaleDateString('en-US', {
+                  {new Date(job.createdAt).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: 'long',
                     day: 'numeric'
