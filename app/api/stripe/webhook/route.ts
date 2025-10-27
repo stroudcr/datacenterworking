@@ -47,7 +47,9 @@ export async function POST(request: NextRequest) {
       // TODO: Send management link email for guest users
       // If the job has no userId (guest posting), send an email with the management link
       if (payment.job && !payment.job.userId && payment.job.managementToken) {
-        const managementUrl = `${process.env.NEXT_PUBLIC_APP_URL}/jobs/manage/${payment.job.id}?token=${payment.job.managementToken}`;
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
+                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://datacenterworking.vercel.app');
+        const managementUrl = `${baseUrl}/jobs/manage/${payment.job.id}?token=${payment.job.managementToken}`;
 
         // TODO: Implement email sending service (Resend, SendGrid, etc.)
         // await sendEmail({
