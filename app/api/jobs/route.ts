@@ -37,13 +37,13 @@ export async function POST(request: NextRequest) {
 
         // Optional fields
         companyLogo: validatedData.companyLogo || undefined,
-        shift: validatedData.shift,
-        clearance: validatedData.clearance,
-        certifications: validatedData.certifications,
-        salary: validatedData.salary,
+        shift: validatedData.shift || undefined,
+        clearance: validatedData.clearance || undefined,
+        certifications: validatedData.certifications || undefined,
+        salary: validatedData.salary || undefined,
         salaryMin: validatedData.salaryMin,
         salaryMax: validatedData.salaryMax,
-        hourlyRate: validatedData.hourlyRate,
+        hourlyRate: validatedData.hourlyRate || undefined,
         hourlyRateMin: validatedData.hourlyRateMin,
         hourlyRateMax: validatedData.hourlyRateMax,
         applyUrl: validatedData.applyUrl || undefined,
@@ -100,6 +100,11 @@ export async function POST(request: NextRequest) {
     });
   } catch (error: any) {
     console.error('Job creation error:', error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack,
+    });
 
     if (error.name === 'ZodError') {
       return NextResponse.json(
@@ -109,7 +114,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Failed to create job' },
+      { error: 'Failed to create job', details: error.message },
       { status: 500 }
     );
   }
