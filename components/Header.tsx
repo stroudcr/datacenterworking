@@ -45,6 +45,14 @@ export function Header({ user }: HeaderProps) {
               Browse Jobs
             </Link>
             <Link
+              href="/pricing"
+              className={`text-sm font-medium transition-colors ${
+                pathname === '/pricing' ? 'text-ice-400' : 'text-silver-300 hover:text-white'
+              }`}
+            >
+              Pricing
+            </Link>
+            <Link
               href="/post-job"
               className={`text-sm font-medium transition-colors ${
                 pathname === '/post-job' ? 'text-ice-400' : 'text-silver-300 hover:text-white'
