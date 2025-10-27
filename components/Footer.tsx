@@ -77,7 +77,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/post-job"
+                  href="/pricing"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >
                   Pricing
