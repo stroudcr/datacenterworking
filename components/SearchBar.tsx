@@ -28,15 +28,16 @@ export function SearchBar({ initialSearch = '' }: { initialSearch?: string }) {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search jobs, companies, or keywords..."
+              placeholder="Search"
               className="flex-1 bg-transparent border-none outline-none text-white placeholder:text-silver-500"
             />
           </div>
           <button
             type="submit"
-            className="px-6 py-3 rounded-lg bg-gradient-to-r from-ice-500 to-ice-600 text-white font-medium hover:from-ice-600 hover:to-ice-700 transition-all"
+            className="px-4 sm:px-6 py-3 rounded-lg bg-gradient-to-r from-ice-500 to-ice-600 text-white font-medium hover:from-ice-600 hover:to-ice-700 transition-all flex items-center justify-center gap-2"
           >
-            Search
+            <Search className="w-5 h-5" />
+            <span className="hidden sm:inline">Search</span>
           </button>
         </div>
       </GlassCard>
