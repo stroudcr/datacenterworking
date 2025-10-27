@@ -9,7 +9,6 @@ import {
   Users,
   TrendingUp,
   CheckCircle,
-  Heart,
   Rocket,
   Building2,
   Clock,
@@ -59,22 +58,13 @@ export default function AboutPage() {
     },
   ];
 
-  const stats = [
-    { icon: Target, value: '100%', label: 'Data Center Focused' },
-    { icon: Building2, value: '$249', label: 'Flat Rate Pricing' },
-    { icon: Clock, value: '<5 min', label: 'Job Posting Time' },
-    { icon: Shield, value: '30 Days', label: 'Active Listings' },
-    { icon: Award, value: 'All Levels', label: 'Security Clearances' },
-    { icon: CheckCircle, value: 'Verified', label: 'Quality Employers' },
-  ];
-
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-6xl text-center">
           <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-ice-500 to-ice-600 mb-6">
-            <Heart className="w-8 h-8 text-white" />
+            <Rocket className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-5xl md:text-6xl font-bold text-white mb-6">
             Connecting{' '}
@@ -94,9 +84,6 @@ export default function AboutPage() {
       <section className="py-16 px-4 bg-gradient-to-b from-transparent to-black/20">
         <div className="container mx-auto max-w-4xl">
           <div className="text-center mb-12">
-            <div className="inline-flex p-3 rounded-2xl bg-gradient-to-br from-ice-500 to-ice-600 mb-4">
-              <Rocket className="w-6 h-6 text-white" />
-            </div>
             <h2 className="text-4xl font-bold text-white mb-4">Our Story</h2>
           </div>
 
@@ -217,7 +204,6 @@ export default function AboutPage() {
               <div className="mt-8">
                 <Link href="/">
                   <Button variant="outline" fullWidth>
-                    <Search className="w-4 h-4 mr-2" />
                     Browse Jobs
                   </Button>
                 </Link>
@@ -286,37 +272,11 @@ export default function AboutPage() {
               <div className="mt-8">
                 <Link href="/post-job">
                   <Button variant="primary" fullWidth>
-                    <FileText className="w-4 h-4 mr-2" />
                     Post a Job
                   </Button>
                 </Link>
               </div>
             </GlassCard>
-          </div>
-        </div>
-      </section>
-
-      {/* By The Numbers Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">By The Numbers</h2>
-            <p className="text-lg text-silver-300">
-              The metrics that matter to data center professionals.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {stats.map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <GlassCard key={index} className="text-center p-6">
-                  <Icon className="w-8 h-8 text-ice-400 mx-auto mb-3" />
-                  <div className="text-2xl font-bold text-white mb-1">{stat.value}</div>
-                  <div className="text-xs text-silver-400">{stat.label}</div>
-                </GlassCard>
-              );
-            })}
           </div>
         </div>
       </section>
