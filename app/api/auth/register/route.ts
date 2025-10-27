@@ -36,6 +36,19 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // If EMPLOYER role, claim any guest jobs with matching email
+    if (validatedData.role === 'EMPLOYER') {
+      await db.job.updateMany({
+        where: {
+          email: validatedData.email,
+          userId: null, // Only claim unclaimed jobs
+        },
+        data: {
+          userId: user.id,
+        },
+      });
+    }
+
     // Generate token
     const token = generateToken({
       userId: user.id,

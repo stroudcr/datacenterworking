@@ -35,6 +35,7 @@ export const jobSchema = z.object({
   applyUrl: z.string().url().optional().or(z.literal('')),
   applyEmail: z.string().email().optional().or(z.literal('')),
   tags: z.array(z.string()).min(1, 'At least one tag is required'),
+  email: z.string().email('Valid email address is required'),
 });
 
 export const applicationSchema = z.object({

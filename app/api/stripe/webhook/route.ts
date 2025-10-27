@@ -33,13 +33,34 @@ export async function POST(request: NextRequest) {
       const session = event.data.object as Stripe.Checkout.Session;
 
       // Update payment status
-      await db.payment.update({
+      const payment = await db.payment.update({
         where: { stripeSessionId: session.id },
         data: {
           status: 'completed',
           stripePaymentId: session.payment_intent as string,
         },
+        include: {
+          job: true,
+        },
       });
+
+      // TODO: Send management link email for guest users
+      // If the job has no userId (guest posting), send an email with the management link
+      if (payment.job && !payment.job.userId && payment.job.managementToken) {
+        const managementUrl = `${process.env.NEXT_PUBLIC_APP_URL}/jobs/manage/${payment.job.id}?token=${payment.job.managementToken}`;
+
+        // TODO: Implement email sending service (Resend, SendGrid, etc.)
+        // await sendEmail({
+        //   to: payment.job.email,
+        //   subject: 'Your Job Posting is Live - Management Link',
+        //   html: `
+        //     <h1>Your job posting is now live!</h1>
+        //     <p>Manage your job posting at: ${managementUrl}</p>
+        //   `
+        // });
+
+        console.log('Management link for guest user:', managementUrl);
+      }
 
       // Job is already ACTIVE, no need to update
       console.log('Payment completed:', session.id);

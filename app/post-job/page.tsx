@@ -120,6 +120,18 @@ export default function PostJobPage() {
             </h2>
             <div className="space-y-4">
               <Input
+                label="Your Email *"
+                type="email"
+                placeholder="your@email.com"
+                fullWidth
+                error={errors.email?.message}
+                {...register('email')}
+              />
+              <p className="text-xs text-silver-500 -mt-2">
+                We'll send your payment receipt and a link to manage your job posting
+              </p>
+
+              <Input
                 label="Job Title *"
                 placeholder="e.g., Senior Data Center Technician"
                 fullWidth

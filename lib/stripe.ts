@@ -9,10 +9,12 @@ export async function createCheckoutSession({
   userId,
   jobId,
   isFeatured,
+  email,
 }: {
-  userId: string;
+  userId: string | null;
   jobId: string;
   isFeatured: boolean;
+  email: string;
 }) {
   const amount = isFeatured
     ? PRICING.BASE_LISTING + PRICING.FEATURED_UPGRADE
@@ -20,6 +22,7 @@ export async function createCheckoutSession({
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
+    customer_email: email,
     line_items: [
       {
         price_data: {
@@ -36,10 +39,10 @@ export async function createCheckoutSession({
       },
     ],
     mode: 'payment',
-    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard/employer?payment=success`,
+    success_url: `${process.env.NEXT_PUBLIC_APP_URL}/post-job/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/post-job?payment=cancelled`,
     metadata: {
-      userId,
+      userId: userId || '',
       jobId,
       isFeatured: isFeatured.toString(),
     },

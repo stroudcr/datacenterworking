@@ -312,7 +312,7 @@ export default async function JobPage({ params }: JobPageProps) {
               </h3>
               <div className="space-y-2 text-silver-300">
                 <p className="font-medium text-white">{job.company}</p>
-                {job.user.company && job.user.company !== job.company && (
+                {job.user?.company && job.user.company !== job.company && (
                   <p className="text-sm">Posted by: {job.user.company}</p>
                 )}
               </div>

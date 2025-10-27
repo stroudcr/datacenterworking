@@ -176,8 +176,17 @@ export default async function AdminPanel() {
                         </td>
                         <td className="py-4 px-4">
                           <div className="text-sm">
-                            <div className="text-silver-300">{job.user.name}</div>
-                            <div className="text-silver-500">{job.user.email}</div>
+                            {job.user ? (
+                              <>
+                                <div className="text-silver-300">{job.user.name}</div>
+                                <div className="text-silver-500">{job.user.email}</div>
+                              </>
+                            ) : (
+                              <>
+                                <div className="text-silver-300">Guest User</div>
+                                <div className="text-silver-500">{job.email}</div>
+                              </>
+                            )}
                           </div>
                         </td>
                         <td className="py-4 px-4">

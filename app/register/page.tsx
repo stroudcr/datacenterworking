@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,9 +13,17 @@ import { UserPlus, Briefcase, User } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<'EMPLOYER' | 'JOB_SEEKER'>('JOB_SEEKER');
+
+  // Get email and role from URL params if provided
+  const emailParam = searchParams.get('email');
+  const roleParam = searchParams.get('role') as 'EMPLOYER' | 'JOB_SEEKER' | null;
+
+  const [selectedRole, setSelectedRole] = useState<'EMPLOYER' | 'JOB_SEEKER'>(
+    roleParam || 'JOB_SEEKER'
+  );
 
   const {
     register,
@@ -25,9 +33,17 @@ export default function RegisterPage() {
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      role: 'JOB_SEEKER',
+      role: roleParam || 'JOB_SEEKER',
+      email: emailParam || '',
     },
   });
+
+  // Pre-fill email if provided in URL
+  useEffect(() => {
+    if (emailParam) {
+      setValue('email', emailParam);
+    }
+  }, [emailParam, setValue]);
 
   const onSubmit = async (data: RegisterInput) => {
     try {

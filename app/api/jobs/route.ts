@@ -6,20 +6,21 @@ import { createCheckoutSession } from '@/lib/stripe';
 import { PRICING } from '@/lib/constants';
 import { addDays } from 'date-fns';
 import { generateJobSlug } from '@/lib/slugify';
+import { generateManagementToken } from '@/lib/tokens';
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if user is logged in (optional for guest posting)
     const session = await getSession();
-
-    if (!session || session.role !== 'EMPLOYER') {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const body = await request.json();
     const { isFeatured, ...jobData } = body;
 
     // Validate job data
     const validatedData = jobSchema.parse(jobData);
+
+    // Generate management token for guest users
+    const managementToken = !session ? generateManagementToken() : undefined;
 
     // Create job with temporary slug (will be updated with real ID-based slug)
     const job = await db.job.create({
@@ -48,9 +49,13 @@ export async function POST(request: NextRequest) {
         applyUrl: validatedData.applyUrl || undefined,
         applyEmail: validatedData.applyEmail || undefined,
 
+        // Guest posting fields
+        email: validatedData.email,
+        managementToken,
+
         // System fields
         slug: 'temp', // Temporary, will be updated immediately
-        userId: session.userId,
+        userId: session?.userId || null,
         status: 'ACTIVE',
         isFeatured: isFeatured || false,
         expiresAt: addDays(new Date(), PRICING.LISTING_DURATION),
@@ -69,15 +74,16 @@ export async function POST(request: NextRequest) {
 
     // Create Stripe checkout session
     const checkoutSession = await createCheckoutSession({
-      userId: session.userId,
+      userId: session?.userId || null,
       jobId: job.id,
       isFeatured: isFeatured || false,
+      email: validatedData.email,
     });
 
     // Create payment record
     await db.payment.create({
       data: {
-        userId: session.userId,
+        userId: session?.userId || null,
         jobId: job.id,
         stripeSessionId: checkoutSession.id,
         amount: isFeatured
