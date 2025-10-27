@@ -218,7 +218,6 @@ export default function ContactPage() {
                         'Sending...'
                       ) : (
                         <>
-                          <Send className="w-4 h-4 mr-2" />
                           Send Message
                         </>
                       )}
@@ -244,21 +243,6 @@ export default function ContactPage() {
                     >
                       support@workindatacenter.com
                     </a>
-                  </div>
-                </div>
-              </GlassCard>
-
-              {/* Response Time */}
-              <GlassCard>
-                <div className="flex items-start gap-3">
-                  <div className="p-2 rounded-lg bg-ice-500/20">
-                    <Clock className="w-5 h-5 text-ice-400" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-semibold text-white mb-1">Response Time</h3>
-                    <p className="text-silver-400 text-sm">
-                      We typically respond within 24-48 hours during business days.
-                    </p>
                   </div>
                 </div>
               </GlassCard>
