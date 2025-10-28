@@ -12,8 +12,10 @@ interface JobCardPreviewProps {
   location?: string;
   type?: string;
   category?: string;
-  salary?: string;
-  hourlyRate?: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  hourlyRateMin?: number;
+  hourlyRateMax?: number;
   isFeatured?: boolean;
   tags?: string[];
 }
@@ -25,13 +27,22 @@ export function JobCardPreview({
   location,
   type,
   category,
-  salary,
-  hourlyRate,
+  salaryMin,
+  salaryMax,
+  hourlyRateMin,
+  hourlyRateMax,
   isFeatured,
   tags = [],
 }: JobCardPreviewProps) {
-  // Use salary if available, otherwise use hourlyRate
-  const displaySalary = salary || hourlyRate;
+  // Format salary or hourly rate range
+  const displaySalary = useMemo(() => {
+    if (salaryMin && salaryMax) {
+      return `$${salaryMin.toLocaleString()} - $${salaryMax.toLocaleString()}`;
+    } else if (hourlyRateMin && hourlyRateMax) {
+      return `$${hourlyRateMin.toLocaleString()}/hr - $${hourlyRateMax.toLocaleString()}/hr`;
+    }
+    return null;
+  }, [salaryMin, salaryMax, hourlyRateMin, hourlyRateMax]);
 
   // Create preview date once to avoid hydration mismatch
   const previewDate = useMemo(() => new Date(), []);

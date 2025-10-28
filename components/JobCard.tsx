@@ -16,7 +16,10 @@ interface JobCardProps {
     location: string;
     type: string;
     category: string;
-    salary?: string | null;
+    salaryMin?: number | null;
+    salaryMax?: number | null;
+    hourlyRateMin?: number | null;
+    hourlyRateMax?: number | null;
     isFeatured: boolean;
     createdAt: Date;
     tags: string[];
@@ -26,6 +29,16 @@ interface JobCardProps {
 }
 
 export function JobCard({ job, isSaved = false, showSaveButton = false }: JobCardProps) {
+  // Format salary or hourly rate range
+  const displaySalary = (() => {
+    if (job.salaryMin && job.salaryMax) {
+      return `$${job.salaryMin.toLocaleString()} - $${job.salaryMax.toLocaleString()}`;
+    } else if (job.hourlyRateMin && job.hourlyRateMax) {
+      return `$${job.hourlyRateMin.toLocaleString()}/hr - $${job.hourlyRateMax.toLocaleString()}/hr`;
+    }
+    return null;
+  })();
+
   return (
     <Link href={`/jobs/${job.slug}`}>
       <GlassCard hover className="relative">
@@ -71,10 +84,10 @@ export function JobCard({ job, isSaved = false, showSaveButton = false }: JobCar
               <Clock className="w-4 h-4" />
               {job.type}
             </div>
-            {job.salary && (
+            {displaySalary && (
               <div className="flex items-center gap-1 text-ice-400 font-medium">
                 <DollarSign className="w-4 h-4" />
-                {job.salary}
+                {displaySalary}
               </div>
             )}
           </div>

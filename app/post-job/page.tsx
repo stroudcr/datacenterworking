@@ -40,8 +40,10 @@ export default function PostJobPage() {
   const watchedLocation = useWatch({ control, name: 'location' });
   const watchedType = useWatch({ control, name: 'type' });
   const watchedCategory = useWatch({ control, name: 'category' });
-  const watchedSalary = useWatch({ control, name: 'salary' });
-  const watchedHourlyRate = useWatch({ control, name: 'hourlyRate' });
+  const watchedSalaryMin = useWatch({ control, name: 'salaryMin' });
+  const watchedSalaryMax = useWatch({ control, name: 'salaryMax' });
+  const watchedHourlyRateMin = useWatch({ control, name: 'hourlyRateMin' });
+  const watchedHourlyRateMax = useWatch({ control, name: 'hourlyRateMax' });
   const watchedDescription = useWatch({ control, name: 'description' });
   const watchedRequirements = useWatch({ control, name: 'requirements' });
 
@@ -345,59 +347,41 @@ export default function PostJobPage() {
               </div>
 
               {compensationType === 'salary' ? (
-                <>
+                <div className="grid grid-cols-2 gap-4">
                   <Input
-                    label="Salary Range (optional)"
-                    placeholder="e.g., $80k-$120k"
+                    label="Min Salary ($)"
+                    type="number"
+                    placeholder="80000"
                     fullWidth
-                    {...register('salary')}
+                    {...register('salaryMin', { valueAsNumber: true })}
                   />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="Min Salary ($)"
-                      type="number"
-                      placeholder="80000"
-                      fullWidth
-                      {...register('salaryMin', { valueAsNumber: true })}
-                    />
-                    <Input
-                      label="Max Salary ($)"
-                      type="number"
-                      placeholder="120000"
-                      fullWidth
-                      {...register('salaryMax', { valueAsNumber: true })}
-                    />
-                  </div>
-                </>
+                  <Input
+                    label="Max Salary ($)"
+                    type="number"
+                    placeholder="120000"
+                    fullWidth
+                    {...register('salaryMax', { valueAsNumber: true })}
+                  />
+                </div>
               ) : (
-                <>
+                <div className="grid grid-cols-2 gap-4">
                   <Input
-                    label="Hourly Rate Range (optional)"
-                    placeholder="e.g., $35-$50/hr"
+                    label="Min Hourly Rate ($)"
+                    type="number"
+                    placeholder="35"
+                    step="0.01"
                     fullWidth
-                    {...register('hourlyRate')}
+                    {...register('hourlyRateMin', { valueAsNumber: true })}
                   />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <Input
-                      label="Min Hourly Rate ($)"
-                      type="number"
-                      placeholder="35"
-                      step="0.01"
-                      fullWidth
-                      {...register('hourlyRateMin', { valueAsNumber: true })}
-                    />
-                    <Input
-                      label="Max Hourly Rate ($)"
-                      type="number"
-                      placeholder="50"
-                      step="0.01"
-                      fullWidth
-                      {...register('hourlyRateMax', { valueAsNumber: true })}
-                    />
-                  </div>
-                </>
+                  <Input
+                    label="Max Hourly Rate ($)"
+                    type="number"
+                    placeholder="50"
+                    step="0.01"
+                    fullWidth
+                    {...register('hourlyRateMax', { valueAsNumber: true })}
+                  />
+                </div>
               )}
             </div>
           </GlassCard>
@@ -493,8 +477,10 @@ export default function PostJobPage() {
                   location={watchedLocation}
                   type={watchedType}
                   category={watchedCategory}
-                  salary={compensationType === 'salary' ? watchedSalary : undefined}
-                  hourlyRate={compensationType === 'hourly' ? watchedHourlyRate : undefined}
+                  salaryMin={compensationType === 'salary' ? watchedSalaryMin : undefined}
+                  salaryMax={compensationType === 'salary' ? watchedSalaryMax : undefined}
+                  hourlyRateMin={compensationType === 'hourly' ? watchedHourlyRateMin : undefined}
+                  hourlyRateMax={compensationType === 'hourly' ? watchedHourlyRateMax : undefined}
                   isFeatured={isFeatured}
                   tags={tags}
                 />
