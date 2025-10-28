@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth';
 import { GlassCard } from '@/components/GlassCard';
 import { Button } from '@/components/Button';
 import { SaveJobButton } from '@/components/SaveJobButton';
+import { ViewTracker } from '@/components/ViewTracker';
 import {
   MapPin,
   Clock,
@@ -20,45 +21,59 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { isLegacyId } from '@/lib/slugify';
 import type { Metadata } from 'next';
+import { cache } from 'react';
+
+// Cache this page for 5 minutes to reduce database operations
+export const revalidate = 300;
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
 }
+
+// Cached job fetch function to deduplicate queries between metadata and page render
+// This ensures we only query the database once per request, not twice
+const getJobBySlug = cache(async (slug: string) => {
+  // Check if this is an old-style ID URL
+  if (isLegacyId(slug)) {
+    const legacyJob = await db.job.findUnique({
+      where: { id: slug },
+      select: { slug: true },
+    });
+    return { isLegacy: true, redirectSlug: legacyJob?.slug };
+  }
+
+  // Fetch job by slug with all needed data
+  const job = await db.job.findUnique({
+    where: { slug },
+    include: {
+      user: {
+        select: {
+          name: true,
+          email: true,
+          company: true,
+        },
+      },
+    },
+  });
+
+  return { isLegacy: false, job };
+});
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: JobPageProps): Promise<Metadata> {
   const { slug } = await params;
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
 
-  // Check if this is an old-style ID URL
-  if (isLegacyId(slug)) {
-    const job = await db.job.findUnique({
-      where: { id: slug },
-      select: { slug: true },
-    });
-    if (job) {
-      return {
-        title: 'Redirecting...',
-      };
-    }
+  const result = await getJobBySlug(slug);
+
+  // Handle legacy ID redirects
+  if (result.isLegacy) {
     return {
-      title: 'Job Not Found',
+      title: result.redirectSlug ? 'Redirecting...' : 'Job Not Found',
     };
   }
 
-  // Fetch job by slug
-  const job = await db.job.findUnique({
-    where: { slug },
-    select: {
-      title: true,
-      company: true,
-      description: true,
-      location: true,
-      salary: true,
-      companyLogo: true,
-    },
-  });
-
+  const { job } = result;
   if (!job) {
     return {
       title: 'Job Not Found | Work In Data Center',
@@ -101,69 +116,53 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
 
 export default async function JobPage({ params }: JobPageProps) {
   const { slug } = await params;
-  const session = await getSession();
 
-  // Check if this is an old-style ID URL and redirect if so
-  if (isLegacyId(slug)) {
-    const job = await db.job.findUnique({
-      where: { id: slug },
-      select: { slug: true },
-    });
-    if (job) {
-      redirect(`/jobs/${job.slug}`);
+  // Use cached job fetch (deduplicates with generateMetadata)
+  const result = await getJobBySlug(slug);
+
+  // Handle legacy ID redirects
+  if (result.isLegacy) {
+    if (result.redirectSlug) {
+      redirect(`/jobs/${result.redirectSlug}`);
     }
     notFound();
   }
 
-  // Fetch job by slug
-  const job = await db.job.findUnique({
-    where: { slug },
-    include: {
-      user: {
-        select: {
-          name: true,
-          email: true,
-          company: true,
-        },
-      },
-    },
-  });
-
+  const { job } = result;
   if (!job || job.status !== 'ACTIVE') {
     notFound();
   }
 
-  // Increment view count
-  await db.job.update({
-    where: { id: job.id },
-    data: { viewCount: { increment: 1 } },
-  });
+  const session = await getSession();
 
-  // Check if user has saved this job
+  // Optimized: Fetch savedJob and application status in parallel if user is logged in
   let isSaved = false;
   let hasApplied = false;
   if (session) {
-    const savedJob = await db.savedJob.findUnique({
-      where: {
-        jobId_userId: {
-          jobId: job.id,
-          userId: session.userId,
+    const [savedJob, application] = await Promise.all([
+      db.savedJob.findUnique({
+        where: {
+          jobId_userId: {
+            jobId: job.id,
+            userId: session.userId,
+          },
         },
-      },
-    });
+      }),
+      db.application.findUnique({
+        where: {
+          jobId_userId: {
+            jobId: job.id,
+            userId: session.userId,
+          },
+        },
+      }),
+    ]);
     isSaved = !!savedJob;
-
-    // Check if already applied
-    const application = await db.application.findUnique({
-      where: {
-        jobId_userId: {
-          jobId: job.id,
-          userId: session.userId,
-        },
-      },
-    });
     hasApplied = !!application;
   }
+
+  // Note: View count increment moved to client-side component for non-blocking behavior
+  // This prevents the database write from delaying page render
 
   const isExpired = new Date(job.expiresAt) < new Date();
 
@@ -271,6 +270,9 @@ export default async function JobPage({ params }: JobPageProps) {
 
   return (
     <>
+      {/* Track page view asynchronously */}
+      <ViewTracker jobId={job.id} />
+
       {/* JSON-LD Structured Data for SEO */}
       <script
         type="application/ld+json"

@@ -18,6 +18,9 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 
+// Cache dashboard for 30 seconds to reduce database load during active usage
+export const revalidate = 30;
+
 export default async function EmployerDashboard() {
   const session = await getSession();
 

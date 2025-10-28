@@ -1,6 +1,9 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 
+// Cache sitemap for 1 hour to reduce database operations from frequent crawler requests
+export const revalidate = 3600;
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
 

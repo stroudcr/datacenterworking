@@ -17,6 +17,9 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 
+// Cache dashboard for 30 seconds to reduce database load during active usage
+export const revalidate = 30;
+
 export default async function SeekerDashboard() {
   const session = await getSession();
 
@@ -24,31 +27,31 @@ export default async function SeekerDashboard() {
     redirect('/login');
   }
 
-  // Fetch saved jobs
-  const savedJobs = await db.savedJob.findMany({
-    where: {
-      userId: session.userId,
-    },
-    include: {
-      job: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-
-  // Fetch applications
-  const applications = await db.application.findMany({
-    where: {
-      userId: session.userId,
-    },
-    include: {
-      job: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+  // Optimized: Fetch saved jobs and applications in parallel
+  const [savedJobs, applications] = await Promise.all([
+    db.savedJob.findMany({
+      where: {
+        userId: session.userId,
+      },
+      include: {
+        job: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+    db.application.findMany({
+      where: {
+        userId: session.userId,
+      },
+      include: {
+        job: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    }),
+  ]);
 
   // Calculate stats
   const totalApplications = applications.length;

@@ -9,6 +9,9 @@ import type { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
 
+// Cache this page for 60 seconds to reduce database operations
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: 'Find Data Center Jobs | Work In Data Center',
   description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, security clearance positions, and more. Post jobs for $249.',
@@ -36,23 +39,18 @@ export default async function Home({
   const clearance = params.clearance;
   const certifications = params.certifications;
 
-  // Get total active jobs count (without filters)
-  const totalActiveJobs = await db.job.count({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: {
-        gte: new Date(),
-      },
-    },
-  });
+  const now = new Date();
 
-  // Fetch jobs
+  // Base where clause for active jobs
+  const activeJobsWhere = {
+    status: 'ACTIVE' as const,
+    expiresAt: { gte: now },
+  };
+
+  // Optimized: Fetch jobs (cached for 60 seconds via revalidate)
   const jobs = await db.job.findMany({
     where: {
-      status: 'ACTIVE',
-      expiresAt: {
-        gte: new Date(),
-      },
+      ...activeJobsWhere,
       ...(category && { category }),
       ...(type && { type }),
       ...(shift && { shift }),
@@ -73,20 +71,14 @@ export default async function Home({
     take: 50,
   });
 
-  // Get featured jobs
-  const featuredJobs = await db.job.findMany({
-    where: {
-      status: 'ACTIVE',
-      isFeatured: true,
-      featuredUntil: {
-        gte: new Date(),
-      },
-      expiresAt: {
-        gte: new Date(),
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 3,
+  // Get featured jobs (filter from main query results to avoid separate DB call)
+  const featuredJobs = jobs
+    .filter((job) => job.isFeatured && job.featuredUntil && job.featuredUntil >= now)
+    .slice(0, 3);
+
+  // Get total active jobs count (only needed for display, not for filtering)
+  const totalActiveJobs = await db.job.count({
+    where: activeJobsWhere,
   });
 
   // WebSite schema with SearchAction for sitelinks searchbox

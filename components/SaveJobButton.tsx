@@ -53,12 +53,12 @@ export function SaveJobButton({
       // Update with actual server response
       setIsSaved(data.saved);
 
-      // Refresh the page data to update saved state in server component
-      router.refresh();
+      // Note: Removed router.refresh() to prevent expensive full-page re-queries
+      // The optimistic UI update provides instant feedback without database overhead
     } catch (error) {
       console.error('Error saving job:', error);
       // Revert optimistic update on error
-      setIsSaved(isSaved);
+      setIsSaved(!isSaved);
     } finally {
       setIsLoading(false);
     }
