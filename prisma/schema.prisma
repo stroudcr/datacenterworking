@@ -170,10 +170,16 @@ model Newsletter {
 model NotificationPreferences {
   id                    String   @id @default(cuid())
   userId                String   @unique
+  // Employer preferences
   newApplications       Boolean  @default(true) // Email when new application received
   expirationReminders   Boolean  @default(true) // Email reminders before job expires
   weeklyAnalytics       Boolean  @default(true) // Weekly summary of job performance
   paymentConfirmations  Boolean  @default(true) // Payment receipts
+  // Job Seeker preferences
+  jobAlerts             Boolean  @default(true) // Email alerts for new jobs matching preferences
+  applicationUpdates    Boolean  @default(true) // Email when application status changes
+  savedJobReminders     Boolean  @default(true) // Email when saved jobs are expiring
+  weeklyDigest          Boolean  @default(true) // Weekly email with job recommendations
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 

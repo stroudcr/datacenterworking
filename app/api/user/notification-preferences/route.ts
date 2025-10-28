@@ -4,10 +4,16 @@ import { getSession } from '@/lib/auth';
 import { z } from 'zod';
 
 const notificationPreferencesSchema = z.object({
+  // Employer preferences
   newApplications: z.boolean().optional(),
   expirationReminders: z.boolean().optional(),
   weeklyAnalytics: z.boolean().optional(),
   paymentConfirmations: z.boolean().optional(),
+  // Job Seeker preferences
+  jobAlerts: z.boolean().optional(),
+  applicationUpdates: z.boolean().optional(),
+  savedJobReminders: z.boolean().optional(),
+  weeklyDigest: z.boolean().optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -31,10 +37,15 @@ export async function GET(request: NextRequest) {
       preferences = await db.notificationPreferences.create({
         data: {
           userId: session.userId,
+          // Set all defaults to true
           newApplications: true,
           expirationReminders: true,
           weeklyAnalytics: true,
           paymentConfirmations: true,
+          jobAlerts: true,
+          applicationUpdates: true,
+          savedJobReminders: true,
+          weeklyDigest: true,
         },
       });
     }
