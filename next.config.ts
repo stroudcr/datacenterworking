@@ -1,5 +1,4 @@
 import type { NextConfig } from 'next';
-import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
 
 // Ensure Cloudinary cloud name is set
 if (!process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME) {
@@ -15,14 +14,10 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  serverExternalPackages: ['@prisma/client', 'prisma'],
-  // Silence Turbopack warning and keep webpack config for Vercel deployment
-  turbopack: {},
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.plugins = [...config.plugins, new PrismaPlugin()];
-    }
-    return config;
+  // Explicitly include Prisma engine files in the deployment
+  outputFileTracingIncludes: {
+    '/': ['./node_modules/.prisma/client/**/*', './node_modules/@prisma/client/**/*'],
+    '/api/**/*': ['./node_modules/.prisma/client/**/*', './node_modules/@prisma/client/**/*'],
   },
 };
 
