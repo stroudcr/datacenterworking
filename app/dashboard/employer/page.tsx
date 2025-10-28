@@ -13,7 +13,8 @@ import {
   Plus,
   Trash2,
   Edit,
-  Clock
+  Clock,
+  Settings
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -57,12 +58,20 @@ export default async function EmployerDashboard() {
             <h1 className="text-4xl font-bold text-white mb-2">Employer Dashboard</h1>
             <p className="text-silver-400">Manage your job postings and view analytics</p>
           </div>
-          <Link href="/post-job">
-            <Button variant="primary" size="lg">
-              <Plus className="w-5 h-5 mr-2" />
-              Post New Job
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link href="/dashboard/employer/settings">
+              <Button variant="secondary" size="lg">
+                <Settings className="w-5 h-5 mr-2" />
+                Settings
+              </Button>
+            </Link>
+            <Link href="/post-job">
+              <Button variant="primary" size="lg">
+                <Plus className="w-5 h-5 mr-2" />
+                Post New Job
+              </Button>
+            </Link>
+          </div>
         </div>
 
         {/* Stats Grid */}

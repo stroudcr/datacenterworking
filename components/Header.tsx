@@ -72,6 +72,13 @@ export function Header({ user }: HeaderProps) {
                     {user.name}
                   </Button>
                 </Link>
+                {user.role === 'EMPLOYER' && (
+                  <Link href="/dashboard/employer/settings">
+                    <Button variant="ghost" size="sm">
+                      <Settings className="w-4 h-4" />
+                    </Button>
+                  </Link>
+                )}
                 {user.role === 'ADMIN' && (
                   <Link href="/admin">
                     <Button variant="ghost" size="sm">

@@ -36,6 +36,16 @@ export default async function Home({
   const clearance = params.clearance;
   const certifications = params.certifications;
 
+  // Get total active jobs count (without filters)
+  const totalActiveJobs = await db.job.count({
+    where: {
+      status: 'ACTIVE',
+      expiresAt: {
+        gte: new Date(),
+      },
+    },
+  });
+
   // Fetch jobs
   const jobs = await db.job.findMany({
     where: {
@@ -159,7 +169,7 @@ export default async function Home({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto">
             <GlassCard className="text-center">
               <Briefcase className="w-8 h-8 text-ice-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">{jobs.length}+</div>
+              <div className="text-2xl font-bold text-white">{totalActiveJobs}+</div>
               <div className="text-sm text-silver-400">Active Jobs</div>
             </GlassCard>
             <GlassCard className="text-center">

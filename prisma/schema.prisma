@@ -36,10 +36,11 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  jobs         Job[] // Posted jobs (for employers)
-  applications Application[] // Job applications (for job seekers)
-  savedJobs    SavedJob[] // Saved jobs (for job seekers)
-  payments     Payment[]
+  jobs                     Job[] // Posted jobs (for employers)
+  applications             Application[] // Job applications (for job seekers)
+  savedJobs                SavedJob[] // Saved jobs (for job seekers)
+  payments                 Payment[]
+  notificationPreferences  NotificationPreferences?
 
   @@index([email])
   @@index([role])
@@ -164,4 +165,20 @@ model Newsletter {
 
   @@index([email])
   @@index([isActive])
+}
+
+model NotificationPreferences {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  newApplications       Boolean  @default(true) // Email when new application received
+  expirationReminders   Boolean  @default(true) // Email reminders before job expires
+  weeklyAnalytics       Boolean  @default(true) // Weekly summary of job performance
+  paymentConfirmations  Boolean  @default(true) // Payment receipts
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
