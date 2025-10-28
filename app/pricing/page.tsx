@@ -76,8 +76,8 @@ export default function PricingPage() {
             </GlassCard>
             <GlassCard className="text-center">
               <Shield className="w-8 h-8 text-ice-400 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-white">Verified</div>
-              <div className="text-sm text-silver-400">Quality Candidates</div>
+              <div className="text-3xl font-bold text-white">Active</div>
+              <div className="text-sm text-silver-400">Professional Community</div>
             </GlassCard>
           </div>
 
