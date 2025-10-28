@@ -192,10 +192,12 @@ export default async function EmployerDashboard() {
                             <Eye className="w-4 h-4" />
                             {job.viewCount} views
                           </div>
-                          <div className="flex items-center gap-2 text-silver-300">
-                            <Users className="w-4 h-4" />
-                            {job.applicationCount} applications
-                          </div>
+                          <Link href={`/dashboard/employer/jobs/${job.id}/applicants`}>
+                            <div className="flex items-center gap-2 text-ice-400 hover:text-ice-300 transition-colors cursor-pointer">
+                              <Users className="w-4 h-4" />
+                              {job.applicationCount} applications
+                            </div>
+                          </Link>
                           <div className="flex items-center gap-2 text-silver-300">
                             <Clock className="w-4 h-4" />
                             Posted {format(new Date(job.createdAt), 'MMM d, yyyy')}
@@ -209,8 +211,14 @@ export default async function EmployerDashboard() {
                       </div>
 
                       <div className="flex gap-2">
-                        <Link href={`/jobs/${job.slug}`}>
+                        <Link href={`/dashboard/employer/jobs/${job.id}/applicants`}>
                           <Button variant="secondary" size="sm">
+                            <Users className="w-4 h-4 mr-1" />
+                            View Applicants
+                          </Button>
+                        </Link>
+                        <Link href={`/jobs/${job.slug}`}>
+                          <Button variant="ghost" size="sm">
                             <Eye className="w-4 h-4" />
                           </Button>
                         </Link>

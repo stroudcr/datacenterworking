@@ -109,7 +109,7 @@ model Application {
   userId      String
   coverLetter String?  @db.Text
   resume      String? // URL or file path
-  status      String   @default("pending") // pending, reviewed, accepted, rejected
+  status      String   @default("pending") // pending, reviewed, closed
   createdAt   DateTime @default(now())
 
   // Relations

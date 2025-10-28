@@ -12,7 +12,8 @@ import {
   Clock,
   XCircle,
   Search,
-  Settings
+  Settings,
+  Eye
 } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -60,11 +61,9 @@ export default async function SeekerDashboard() {
       case 'pending':
         return <Clock className="w-4 h-4 text-amber-400" />;
       case 'reviewed':
-        return <CheckCircle className="w-4 h-4 text-blue-400" />;
-      case 'accepted':
-        return <CheckCircle className="w-4 h-4 text-green-400" />;
-      case 'rejected':
-        return <XCircle className="w-4 h-4 text-red-400" />;
+        return <Eye className="w-4 h-4 text-blue-400" />;
+      case 'closed':
+        return <XCircle className="w-4 h-4 text-silver-400" />;
       default:
         return <Clock className="w-4 h-4 text-silver-400" />;
     }
@@ -76,12 +75,23 @@ export default async function SeekerDashboard() {
         return 'text-amber-400 bg-amber-500/10 border-amber-500/30';
       case 'reviewed':
         return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
-      case 'accepted':
-        return 'text-green-400 bg-green-500/10 border-green-500/30';
-      case 'rejected':
-        return 'text-red-400 bg-red-500/10 border-red-500/30';
+      case 'closed':
+        return 'text-silver-400 bg-white/5 border-white/10';
       default:
         return 'text-silver-400 bg-white/5 border-white/10';
+    }
+  };
+
+  const getStatusLabel = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return 'Application Submitted';
+      case 'reviewed':
+        return 'Application Viewed';
+      case 'closed':
+        return 'Position Closed';
+      default:
+        return status.charAt(0).toUpperCase() + status.slice(1);
     }
   };
 
@@ -185,7 +195,7 @@ export default async function SeekerDashboard() {
                         </Link>
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold border flex items-center gap-1 ${getStatusColor(application.status)}`}>
                           {getStatusIcon(application.status)}
-                          {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                          {getStatusLabel(application.status)}
                         </span>
                       </div>
 
