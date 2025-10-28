@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { MapPin, Clock, DollarSign, Bookmark, Star } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { format } from 'date-fns';
@@ -31,6 +32,9 @@ export function JobCardPreview({
 }: JobCardPreviewProps) {
   // Use salary if available, otherwise use hourlyRate
   const displaySalary = salary || hourlyRate;
+
+  // Create preview date once to avoid hydration mismatch
+  const previewDate = useMemo(() => new Date(), []);
 
   return (
     <div>
@@ -91,7 +95,7 @@ export function JobCardPreview({
               {category || 'Category'}
             </span>
             <span className="text-xs text-silver-500">
-              {format(new Date(), 'MMM d, yyyy')}
+              {format(previewDate, 'MMM d, yyyy')}
             </span>
           </div>
 
