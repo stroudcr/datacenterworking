@@ -154,7 +154,6 @@ export default async function SeekerDashboard() {
               <p className="text-silver-400 mb-4">You haven't applied to any jobs yet</p>
               <Link href="/">
                 <Button variant="primary">
-                  <Search className="w-4 h-4 mr-2" />
                   Browse Jobs
                 </Button>
               </Link>
@@ -229,7 +228,6 @@ export default async function SeekerDashboard() {
                 </p>
                 <Link href="/">
                   <Button variant="primary">
-                    <Search className="w-4 h-4 mr-2" />
                     Browse Jobs
                   </Button>
                 </Link>

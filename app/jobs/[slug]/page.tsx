@@ -3,11 +3,11 @@ import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { GlassCard } from '@/components/GlassCard';
 import { Button } from '@/components/Button';
+import { SaveJobButton } from '@/components/SaveJobButton';
 import {
   MapPin,
   Clock,
   DollarSign,
-  Bookmark,
   Star,
   Building2,
   Calendar,
@@ -136,16 +136,10 @@ export default async function JobPage({ params }: JobPageProps) {
                 {/* Actions */}
                 {session && session.role === 'JOB_SEEKER' && (
                   <div className="flex gap-2">
-                    <form action="/api/jobs/save" method="POST">
-                      <input type="hidden" name="jobId" value={job.id} />
-                      <Button
-                        type="submit"
-                        variant={isSaved ? 'primary' : 'secondary'}
-                        size="sm"
-                      >
-                        <Bookmark className={`w-4 h-4 ${isSaved ? 'fill-current' : ''}`} />
-                      </Button>
-                    </form>
+                    <SaveJobButton
+                      jobId={job.id}
+                      initialSaved={isSaved}
+                    />
                   </div>
                 )}
               </div>

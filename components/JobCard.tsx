@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { MapPin, Clock, DollarSign, Bookmark, Star } from 'lucide-react';
+import { MapPin, Clock, DollarSign, Star } from 'lucide-react';
 import { GlassCard } from './GlassCard';
+import { SaveJobButton } from './SaveJobButton';
 import { format } from 'date-fns';
 
 interface JobCardProps {
@@ -20,9 +21,11 @@ interface JobCardProps {
     createdAt: Date;
     tags: string[];
   };
+  isSaved?: boolean;
+  showSaveButton?: boolean;
 }
 
-export function JobCard({ job }: JobCardProps) {
+export function JobCard({ job, isSaved = false, showSaveButton = false }: JobCardProps) {
   return (
     <Link href={`/jobs/${job.slug}`}>
       <GlassCard hover className="relative">
@@ -107,17 +110,15 @@ export function JobCard({ job }: JobCardProps) {
         </div>
 
         {/* Bookmark Button - Bottom Right */}
-        <div className="absolute bottom-6 right-6">
-          <button
-            className="p-2 rounded-lg glass-hover"
-            onClick={(e) => {
-              e.preventDefault();
-              // TODO: Add save job functionality
-            }}
-          >
-            <Bookmark className="w-5 h-5 text-silver-400" />
-          </button>
-        </div>
+        {showSaveButton && (
+          <div className="absolute bottom-6 right-6">
+            <SaveJobButton
+              jobId={job.id}
+              initialSaved={isSaved}
+              className="p-2 rounded-lg glass-hover"
+            />
+          </div>
+        )}
       </GlassCard>
     </Link>
   );
