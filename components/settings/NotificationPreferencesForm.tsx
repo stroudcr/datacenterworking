@@ -95,7 +95,7 @@ export function NotificationPreferencesForm() {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-4">
         {/* New Applications */}
-        <div className="flex items-start space-x-3 p-4 bg-dark-300 border border-dark-400 rounded-lg">
+        <div className="flex items-start space-x-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors">
           <Bell className="w-5 h-5 text-ice-400 mt-0.5 flex-shrink-0" />
           <div className="flex-grow">
             <label
@@ -113,7 +113,7 @@ export function NotificationPreferencesForm() {
             id="newApplications"
             onClick={() => togglePreference('newApplications')}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              preferences.newApplications ? 'bg-ice-500' : 'bg-dark-500'
+              preferences.newApplications ? 'bg-ice-500' : 'bg-silver-700'
             }`}
           >
             <span
@@ -125,7 +125,7 @@ export function NotificationPreferencesForm() {
         </div>
 
         {/* Expiration Reminders */}
-        <div className="flex items-start space-x-3 p-4 bg-dark-300 border border-dark-400 rounded-lg">
+        <div className="flex items-start space-x-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors">
           <Mail className="w-5 h-5 text-ice-400 mt-0.5 flex-shrink-0" />
           <div className="flex-grow">
             <label
@@ -143,7 +143,7 @@ export function NotificationPreferencesForm() {
             id="expirationReminders"
             onClick={() => togglePreference('expirationReminders')}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              preferences.expirationReminders ? 'bg-ice-500' : 'bg-dark-500'
+              preferences.expirationReminders ? 'bg-ice-500' : 'bg-silver-700'
             }`}
           >
             <span
@@ -155,7 +155,7 @@ export function NotificationPreferencesForm() {
         </div>
 
         {/* Weekly Analytics */}
-        <div className="flex items-start space-x-3 p-4 bg-dark-300 border border-dark-400 rounded-lg">
+        <div className="flex items-start space-x-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors">
           <TrendingUp className="w-5 h-5 text-ice-400 mt-0.5 flex-shrink-0" />
           <div className="flex-grow">
             <label
@@ -173,7 +173,7 @@ export function NotificationPreferencesForm() {
             id="weeklyAnalytics"
             onClick={() => togglePreference('weeklyAnalytics')}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              preferences.weeklyAnalytics ? 'bg-ice-500' : 'bg-dark-500'
+              preferences.weeklyAnalytics ? 'bg-ice-500' : 'bg-silver-700'
             }`}
           >
             <span
@@ -185,7 +185,7 @@ export function NotificationPreferencesForm() {
         </div>
 
         {/* Payment Confirmations */}
-        <div className="flex items-start space-x-3 p-4 bg-dark-300 border border-dark-400 rounded-lg">
+        <div className="flex items-start space-x-3 p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-colors">
           <CreditCard className="w-5 h-5 text-ice-400 mt-0.5 flex-shrink-0" />
           <div className="flex-grow">
             <label
@@ -203,7 +203,7 @@ export function NotificationPreferencesForm() {
             id="paymentConfirmations"
             onClick={() => togglePreference('paymentConfirmations')}
             className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-              preferences.paymentConfirmations ? 'bg-ice-500' : 'bg-dark-500'
+              preferences.paymentConfirmations ? 'bg-ice-500' : 'bg-silver-700'
             }`}
           >
             <span

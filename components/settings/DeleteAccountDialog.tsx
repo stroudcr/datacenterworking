@@ -69,7 +69,7 @@ export function DeleteAccountDialog() {
       {/* Dialog Overlay */}
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
-          <div className="relative w-full max-w-md bg-dark-200 border border-dark-400 rounded-xl shadow-2xl">
+          <div className="relative w-full max-w-md bg-silver-900 border border-white/20 rounded-xl shadow-2xl">
             {/* Close Button */}
             <button
               onClick={closeDialog}
@@ -116,7 +116,7 @@ export function DeleteAccountDialog() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
-                    className="w-full px-4 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-silver-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-silver-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Enter your password"
                   />
                 </div>
@@ -134,7 +134,7 @@ export function DeleteAccountDialog() {
                     value={confirmation}
                     onChange={(e) => setConfirmation(e.target.value)}
                     required
-                    className="w-full px-4 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-silver-500 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-silver-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Type DELETE"
                   />
                 </div>

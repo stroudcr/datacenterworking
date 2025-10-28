@@ -110,7 +110,7 @@ export function UpdateProfileForm() {
             }
             required
             minLength={2}
-            className="w-full pl-10 pr-4 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-silver-500 focus:outline-none focus:ring-2 focus:ring-ice-500"
+            className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-silver-400 focus:outline-none focus:ring-2 focus:ring-ice-500 focus:border-ice-500"
             placeholder="Your full name"
           />
         </div>
@@ -133,7 +133,7 @@ export function UpdateProfileForm() {
               setProfileData({ ...profileData, email: e.target.value })
             }
             required
-            className="w-full pl-10 pr-4 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-silver-500 focus:outline-none focus:ring-2 focus:ring-ice-500"
+            className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-silver-400 focus:outline-none focus:ring-2 focus:ring-ice-500 focus:border-ice-500"
             placeholder="your@email.com"
           />
         </div>
@@ -155,7 +155,7 @@ export function UpdateProfileForm() {
             onChange={(e) =>
               setProfileData({ ...profileData, company: e.target.value })
             }
-            className="w-full pl-10 pr-4 py-2 bg-dark-300 border border-dark-400 rounded-lg text-white placeholder-silver-500 focus:outline-none focus:ring-2 focus:ring-ice-500"
+            className="w-full pl-10 pr-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-silver-400 focus:outline-none focus:ring-2 focus:ring-ice-500 focus:border-ice-500"
             placeholder="Your company name (optional)"
           />
         </div>
