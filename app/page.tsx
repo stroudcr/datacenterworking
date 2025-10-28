@@ -5,6 +5,22 @@ import { SearchBar } from '@/components/SearchBar';
 import { Newsletter } from '@/components/Newsletter';
 import { JobListingsClient } from '@/components/JobListingsClient';
 import { Briefcase, TrendingUp, Shield } from 'lucide-react';
+import type { Metadata } from 'next';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+
+export const metadata: Metadata = {
+  title: 'Find Data Center Jobs | Work In Data Center',
+  description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, security clearance positions, and more. Post jobs for $249.',
+  openGraph: {
+    title: 'Find Data Center Jobs | Work In Data Center',
+    description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, and more.',
+    url: siteUrl,
+  },
+  alternates: {
+    canonical: siteUrl,
+  },
+};
 
 export default async function Home({
   searchParams,
@@ -63,8 +79,63 @@ export default async function Home({
     take: 3,
   });
 
+  // WebSite schema with SearchAction for sitelinks searchbox
+  const websiteSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: 'Work In Data Center',
+    url: siteUrl,
+    description: 'Premium data center job board connecting professionals with top employers',
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: {
+        '@type': 'EntryPoint',
+        urlTemplate: `${siteUrl}/?search={search_term_string}`,
+      },
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  // ItemList schema for job listings
+  const itemListSchema = jobs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: jobs.slice(0, 10).map((job, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'JobPosting',
+        title: job.title,
+        description: job.description.slice(0, 200),
+        datePosted: job.createdAt.toISOString(),
+        hiringOrganization: {
+          '@type': 'Organization',
+          name: job.company,
+        },
+        jobLocation: {
+          '@type': 'Place',
+          address: job.location,
+        },
+        url: `${siteUrl}/jobs/${job.slug}`,
+      },
+    })),
+  } : null;
+
   return (
-    <main className="min-h-screen">
+    <>
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      {itemListSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
+        />
+      )}
+
+      <main className="min-h-screen">
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-6xl text-center">
@@ -142,5 +213,6 @@ export default async function Home({
         </div>
       </section>
     </main>
+    </>
   );
 }

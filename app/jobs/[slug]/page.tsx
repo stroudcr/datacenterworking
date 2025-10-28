@@ -19,9 +19,84 @@ import {
 import { format } from 'date-fns';
 import Link from 'next/link';
 import { isLegacyId } from '@/lib/slugify';
+import type { Metadata } from 'next';
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Generate metadata for SEO
+export async function generateMetadata({ params }: JobPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+
+  // Check if this is an old-style ID URL
+  if (isLegacyId(slug)) {
+    const job = await db.job.findUnique({
+      where: { id: slug },
+      select: { slug: true },
+    });
+    if (job) {
+      return {
+        title: 'Redirecting...',
+      };
+    }
+    return {
+      title: 'Job Not Found',
+    };
+  }
+
+  // Fetch job by slug
+  const job = await db.job.findUnique({
+    where: { slug },
+    select: {
+      title: true,
+      company: true,
+      description: true,
+      location: true,
+      salary: true,
+      companyLogo: true,
+    },
+  });
+
+  if (!job) {
+    return {
+      title: 'Job Not Found | Work In Data Center',
+    };
+  }
+
+  const title = `${job.title} at ${job.company} | Work In Data Center`;
+  const description = job.description.slice(0, 160) + (job.description.length > 160 ? '...' : '');
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: `${siteUrl}/jobs/${slug}`,
+      siteName: 'Work In Data Center',
+      images: job.companyLogo ? [
+        {
+          url: job.companyLogo,
+          width: 1200,
+          height: 630,
+          alt: `${job.company} logo`,
+        }
+      ] : [],
+      locale: 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: job.companyLogo ? [job.companyLogo] : [],
+    },
+    alternates: {
+      canonical: `${siteUrl}/jobs/${slug}`,
+    },
+  };
 }
 
 export default async function JobPage({ params }: JobPageProps) {
@@ -92,8 +167,121 @@ export default async function JobPage({ params }: JobPageProps) {
 
   const isExpired = new Date(job.expiresAt) < new Date();
 
+  // Generate JSON-LD structured data for SEO (Schema.org JobPosting)
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const jobPostingSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'JobPosting',
+    title: job.title,
+    description: job.description,
+    datePosted: job.createdAt.toISOString(),
+    validThrough: job.expiresAt.toISOString(),
+    employmentType: job.type.toUpperCase().replace('-', '_'), // FULL_TIME, PART_TIME, CONTRACT
+    hiringOrganization: {
+      '@type': 'Organization',
+      name: job.company,
+      ...(job.companyLogo && { logo: job.companyLogo }),
+    },
+    jobLocation: {
+      '@type': 'Place',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: job.location.split(',')[0]?.trim() || job.location,
+        addressRegion: job.location.split(',')[1]?.trim() || '',
+        addressCountry: 'US',
+      },
+    },
+    ...(job.salaryMin && job.salaryMax && {
+      baseSalary: {
+        '@type': 'MonetaryAmount',
+        currency: 'USD',
+        value: {
+          '@type': 'QuantitativeValue',
+          minValue: job.salaryMin,
+          maxValue: job.salaryMax,
+          unitText: 'YEAR',
+        },
+      },
+    }),
+    ...(job.hourlyRateMin && job.hourlyRateMax && {
+      baseSalary: {
+        '@type': 'MonetaryAmount',
+        currency: 'USD',
+        value: {
+          '@type': 'QuantitativeValue',
+          minValue: job.hourlyRateMin,
+          maxValue: job.hourlyRateMax,
+          unitText: 'HOUR',
+        },
+      },
+    }),
+    ...(job.applyUrl && {
+      directApply: true,
+      applicationContact: {
+        '@type': 'ContactPoint',
+        url: job.applyUrl,
+      },
+    }),
+    identifier: {
+      '@type': 'PropertyValue',
+      name: 'Work In Data Center',
+      value: job.id,
+    },
+    industry: 'Data Centers',
+    occupationalCategory: job.category,
+    ...(job.requirements && {
+      qualifications: job.requirements,
+    }),
+    ...(job.tags.length > 0 && {
+      skills: job.tags.join(', '),
+    }),
+  };
+
+  // Breadcrumb structured data
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Jobs',
+        item: `${siteUrl}/#jobs`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: job.category,
+        item: `${siteUrl}/?category=${encodeURIComponent(job.category)}`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 4,
+        name: job.title,
+        item: `${siteUrl}/jobs/${job.slug}`,
+      },
+    ],
+  };
+
   return (
-    <main className="min-h-screen py-12 px-4">
+    <>
+      {/* JSON-LD Structured Data for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jobPostingSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+
+      <main className="min-h-screen py-12 px-4">
       <div className="container mx-auto max-w-5xl">
         {/* Back Button */}
         <Link href="/" className="inline-flex items-center gap-2 text-silver-400 hover:text-white mb-6 transition-colors">
@@ -352,5 +540,6 @@ export default async function JobPage({ params }: JobPageProps) {
         </div>
       </div>
     </main>
+    </>
   );
 }

@@ -20,12 +20,12 @@ export async function createCheckoutSession({
     ? PRICING.BASE_LISTING + PRICING.FEATURED_UPGRADE
     : PRICING.BASE_LISTING;
 
-  // Get the base URL - use NEXT_PUBLIC_APP_URL or fallback to VERCEL_URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL ||
+  // Get the base URL - use NEXT_PUBLIC_SITE_URL or fallback to VERCEL_URL
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
                   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
 
   if (!baseUrl) {
-    throw new Error('NEXT_PUBLIC_APP_URL or VERCEL_URL must be set for Stripe checkout');
+    throw new Error('NEXT_PUBLIC_SITE_URL or VERCEL_URL must be set for Stripe checkout');
   }
 
   const session = await stripe.checkout.sessions.create({
