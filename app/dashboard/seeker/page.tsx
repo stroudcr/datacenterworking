@@ -278,17 +278,20 @@ export default async function SeekerDashboard() {
             <div className="space-y-2 text-sm">
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-amber-400" />
-                <span className="text-silver-300"><strong className="text-white">Pending:</strong> Application submitted</span>
+                <span className="text-silver-300"><strong className="text-white">Application Submitted:</strong> Your application has been received</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-blue-400" />
-                <span className="text-silver-300"><strong className="text-white">Reviewed:</strong> Employer viewed your application</span>
+                <Eye className="w-4 h-4 text-blue-400" />
+                <span className="text-silver-300"><strong className="text-white">Application Viewed:</strong> Employer has reviewed your application</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
-                <span className="text-silver-300"><strong className="text-white">Accepted:</strong> You're moving forward!</span>
+                <XCircle className="w-4 h-4 text-silver-400" />
+                <span className="text-silver-300"><strong className="text-white">Position Closed:</strong> This position is no longer available</span>
               </div>
             </div>
+            <p className="text-xs text-silver-500 mt-4">
+              If an employer is interested, they will contact you directly via email.
+            </p>
           </GlassCard>
         </div>
       </div>
