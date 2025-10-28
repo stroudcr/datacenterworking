@@ -21,6 +21,7 @@ export function Button({
     <button
       className={clsx(
         'rounded-lg font-medium transition-all duration-200',
+        'flex items-center justify-center',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         {
           // Variants
