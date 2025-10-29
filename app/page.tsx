@@ -150,7 +150,8 @@ export default async function Home({
           <div className="max-w-2xl mx-auto">
             <SearchBar initialSearch={search} />
           </div>
-
+        </div>
+      </section>
 
       {/* Featured Jobs */}
       {featuredJobs.length > 0 && (
