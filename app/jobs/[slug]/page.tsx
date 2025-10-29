@@ -483,6 +483,7 @@ export default async function JobPage({ params }: JobPageProps) {
                       jobId={job.id}
                       jobTitle={job.title}
                       companyName={job.company}
+                      jobSlug={job.slug}
                     />
                   )}
                 </div>
