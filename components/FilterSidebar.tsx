@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter, useSearchParams } from 'next/navigation';
 import { JOB_CATEGORIES, JOB_TYPES, SHIFT_REQUIREMENTS, SECURITY_CLEARANCE, CERTIFICATIONS } from '@/lib/constants';
 import { X } from 'lucide-react';
 
@@ -22,15 +23,25 @@ export function FilterSidebar({
   isOpen = true,
   onClose,
 }: FilterSidebarProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const activeFilterCount = [category, type, shift, clearance, certifications].filter(Boolean).length;
 
-  const buildUrl = (filters: Record<string, string | undefined>) => {
-    const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.set(key, value);
-    });
+  // Handle filter change - updates URL without page reload
+  const handleFilterChange = (filterKey: string, filterValue: string | null) => {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (filterValue) {
+      params.set(filterKey, filterValue);
+    } else {
+      params.delete(filterKey);
+    }
+
     const queryString = params.toString();
-    return queryString ? `/?${queryString}` : '/';
+    const newUrl = queryString ? `/?${queryString}` : '/';
+
+    // Use router.replace to update URL without reload or scroll jump
+    router.replace(newUrl, { scroll: false });
   };
 
   return (
@@ -72,40 +83,40 @@ export function FilterSidebar({
 
           {/* Clear All Button */}
           {activeFilterCount > 0 && (
-            <a
-              href="/"
+            <button
+              onClick={() => router.replace('/', { scroll: false })}
               className="block w-full px-4 py-2 text-center text-sm font-medium text-ice-400 glass rounded-lg hover:bg-white/10 transition-colors"
             >
               Clear All Filters
-            </a>
+            </button>
           )}
 
           {/* Categories */}
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Category</h3>
             <div className="space-y-2">
-              <a
-                href={buildUrl({ type, shift, clearance, certifications })}
-                className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+              <button
+                onClick={() => handleFilterChange('category', null)}
+                className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                   !category
                     ? 'bg-ice-500 text-white'
                     : 'glass text-silver-300 hover:bg-white/10'
                 }`}
               >
                 All Categories
-              </a>
+              </button>
               {JOB_CATEGORIES.map((cat) => (
-                <a
+                <button
                   key={cat}
-                  href={buildUrl({ type, shift, clearance, certifications, category: cat })}
-                  className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+                  onClick={() => handleFilterChange('category', cat)}
+                  className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                     category === cat
                       ? 'bg-ice-500 text-white'
                       : 'glass text-silver-300 hover:bg-white/10'
                   }`}
                 >
                   {cat}
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -114,28 +125,28 @@ export function FilterSidebar({
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Employment Type</h3>
             <div className="space-y-2">
-              <a
-                href={buildUrl({ category, shift, clearance, certifications })}
-                className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+              <button
+                onClick={() => handleFilterChange('type', null)}
+                className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                   !type
                     ? 'bg-ice-500 text-white'
                     : 'glass text-silver-300 hover:bg-white/10'
                 }`}
               >
                 All Types
-              </a>
+              </button>
               {JOB_TYPES.map((jobType) => (
-                <a
+                <button
                   key={jobType}
-                  href={buildUrl({ category, shift, clearance, certifications, type: jobType })}
-                  className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+                  onClick={() => handleFilterChange('type', jobType)}
+                  className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                     type === jobType
                       ? 'bg-ice-500 text-white'
                       : 'glass text-silver-300 hover:bg-white/10'
                   }`}
                 >
                   {jobType}
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -144,28 +155,28 @@ export function FilterSidebar({
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Shift Requirements</h3>
             <div className="space-y-2">
-              <a
-                href={buildUrl({ category, type, clearance, certifications })}
-                className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+              <button
+                onClick={() => handleFilterChange('shift', null)}
+                className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                   !shift
                     ? 'bg-ice-500 text-white'
                     : 'glass text-silver-300 hover:bg-white/10'
                 }`}
               >
                 All Shifts
-              </a>
+              </button>
               {SHIFT_REQUIREMENTS.map((shiftReq) => (
-                <a
+                <button
                   key={shiftReq}
-                  href={buildUrl({ category, type, clearance, certifications, shift: shiftReq })}
-                  className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+                  onClick={() => handleFilterChange('shift', shiftReq)}
+                  className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                     shift === shiftReq
                       ? 'bg-ice-500 text-white'
                       : 'glass text-silver-300 hover:bg-white/10'
                   }`}
                 >
                   {shiftReq}
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -174,28 +185,28 @@ export function FilterSidebar({
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Security Clearance</h3>
             <div className="space-y-2">
-              <a
-                href={buildUrl({ category, type, shift, certifications })}
-                className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+              <button
+                onClick={() => handleFilterChange('clearance', null)}
+                className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                   !clearance
                     ? 'bg-ice-500 text-white'
                     : 'glass text-silver-300 hover:bg-white/10'
                 }`}
               >
                 All Clearances
-              </a>
+              </button>
               {SECURITY_CLEARANCE.map((clearanceLevel) => (
-                <a
+                <button
                   key={clearanceLevel}
-                  href={buildUrl({ category, type, shift, certifications, clearance: clearanceLevel })}
-                  className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+                  onClick={() => handleFilterChange('clearance', clearanceLevel)}
+                  className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                     clearance === clearanceLevel
                       ? 'bg-ice-500 text-white'
                       : 'glass text-silver-300 hover:bg-white/10'
                   }`}
                 >
                   {clearanceLevel}
-                </a>
+                </button>
               ))}
             </div>
           </div>
@@ -204,28 +215,28 @@ export function FilterSidebar({
           <div>
             <h3 className="text-sm font-semibold text-white mb-3">Certifications</h3>
             <div className="space-y-2">
-              <a
-                href={buildUrl({ category, type, shift, clearance })}
-                className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+              <button
+                onClick={() => handleFilterChange('certifications', null)}
+                className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                   !certifications
                     ? 'bg-ice-500 text-white'
                     : 'glass text-silver-300 hover:bg-white/10'
                 }`}
               >
                 All Certifications
-              </a>
+              </button>
               {CERTIFICATIONS.map((cert) => (
-                <a
+                <button
                   key={cert}
-                  href={buildUrl({ category, type, shift, clearance, certifications: cert })}
-                  className={`block px-3 py-1.5 text-xs rounded-lg transition-all ${
+                  onClick={() => handleFilterChange('certifications', cert)}
+                  className={`block w-full text-left px-3 py-1.5 text-xs rounded-lg transition-all ${
                     certifications === cert
                       ? 'bg-ice-500 text-white'
                       : 'glass text-silver-300 hover:bg-white/10'
                   }`}
                 >
                   {cert}
-                </a>
+                </button>
               ))}
             </div>
           </div>

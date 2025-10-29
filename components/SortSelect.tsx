@@ -10,7 +10,7 @@ export function SortSelect() {
   const handleChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', value);
-    router.push(`/?${params.toString()}`);
+    router.replace(`/?${params.toString()}`, { scroll: false });
   };
 
   return (

@@ -15,7 +15,7 @@ export function SearchBar({ initialSearch = '' }: { initialSearch?: string }) {
     if (search) {
       params.set('search', search);
     }
-    router.push(`/?${params.toString()}`);
+    router.replace(`/?${params.toString()}`, { scroll: false });
   };
 
   return (

@@ -47,15 +47,12 @@ export default async function Home({
     expiresAt: { gte: now },
   };
 
-  // Optimized: Fetch jobs (cached for 60 seconds via revalidate)
+  // Fetch ALL active jobs for client-side filtering (cached for 60 seconds)
+  // Note: Removed server-side filters (category, type, shift, etc.) for instant filtering
   const jobs = await db.job.findMany({
     where: {
       ...activeJobsWhere,
-      ...(category && { category }),
-      ...(type && { type }),
-      ...(shift && { shift }),
-      ...(clearance && { clearance }),
-      ...(certifications && { certifications }),
+      // Keep search filter on server-side (more complex, involves text search)
       ...(search && {
         OR: [
           { title: { contains: search, mode: 'insensitive' } },
@@ -64,11 +61,8 @@ export default async function Home({
         ],
       }),
     },
-    orderBy:
-      sort === 'applications'
-        ? { applicationCount: 'desc' }
-        : { createdAt: 'desc' },
-    take: 50,
+    orderBy: { createdAt: 'desc' }, // Default sort, client will handle sorting
+    take: 150, // Increased limit for client-side filtering
   });
 
   // Get featured jobs (filter from main query results to avoid separate DB call)
@@ -199,11 +193,12 @@ export default async function Home({
         <div className="container mx-auto max-w-7xl">
           <JobListingsClient
             jobs={jobs}
-            category={category}
-            type={type}
-            shift={shift}
-            clearance={clearance}
-            certifications={certifications}
+            initialCategory={category}
+            initialType={type}
+            initialShift={shift}
+            initialClearance={clearance}
+            initialCertifications={certifications}
+            initialSort={sort}
           />
         </div>
       </section>
