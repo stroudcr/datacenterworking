@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { GlassCard } from '@/components/GlassCard';
-import { Mail, Clock, Eye, ChevronDown, ChevronUp, Users } from 'lucide-react';
+import { Mail, Clock, Eye, ChevronDown, ChevronUp, Users, FileText, Download } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface Application {
   id: string;
   coverLetter: string | null;
+  resume: string | null;
   status: string;
   createdAt: Date;
   user: {
@@ -163,6 +164,23 @@ export function ApplicantsList({ jobId, applications }: ApplicantsListProps) {
                   {getStatusBadge(application.status)}
                 </div>
               </div>
+
+              {/* Resume Download */}
+              {application.resume && (
+                <div className="flex items-center gap-2 p-3 rounded-lg glass border border-ice-500/20">
+                  <FileText className="w-5 h-5 text-ice-400" />
+                  <span className="text-sm text-white font-medium flex-1">Resume attached</span>
+                  <a
+                    href={application.resume}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-ice-500 text-white text-sm font-medium hover:bg-ice-600 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download
+                  </a>
+                </div>
+              )}
 
               {/* Cover Letter */}
               {application.coverLetter && (

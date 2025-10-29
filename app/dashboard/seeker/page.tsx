@@ -212,16 +212,26 @@ export default async function SeekerDashboard() {
                         <span>Applied {format(new Date(application.createdAt), 'MMM d, yyyy')}</span>
                       </div>
 
-                      {application.coverLetter && (
-                        <details className="mt-3">
-                          <summary className="text-sm text-ice-400 cursor-pointer hover:text-ice-300">
-                            View cover letter
-                          </summary>
-                          <p className="mt-2 text-sm text-silver-300 whitespace-pre-wrap p-3 glass rounded">
-                            {application.coverLetter}
-                          </p>
-                        </details>
-                      )}
+                      {/* Submission Info */}
+                      <div className="flex flex-wrap gap-4 mt-3 text-sm">
+                        {application.coverLetter && (
+                          <details className="w-full">
+                            <summary className="text-ice-400 cursor-pointer hover:text-ice-300 flex items-center gap-1">
+                              <FileText className="w-4 h-4" />
+                              View cover letter
+                            </summary>
+                            <p className="mt-2 text-sm text-silver-300 whitespace-pre-wrap p-3 glass rounded">
+                              {application.coverLetter}
+                            </p>
+                          </details>
+                        )}
+                        {application.resume && (
+                          <div className="flex items-center gap-2 text-green-400">
+                            <CheckCircle className="w-4 h-4" />
+                            <span>Resume submitted</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <Link href={`/jobs/${application.job.slug}`}>

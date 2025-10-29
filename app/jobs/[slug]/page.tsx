@@ -5,6 +5,7 @@ import { GlassCard } from '@/components/GlassCard';
 import { Button } from '@/components/Button';
 import { SaveJobButton } from '@/components/SaveJobButton';
 import { ViewTracker } from '@/components/ViewTracker';
+import { ApplyButton } from '@/components/ApplyButton';
 import {
   MapPin,
   Clock,
@@ -478,12 +479,11 @@ export default async function JobPage({ params }: JobPageProps) {
                     </a>
                   )}
                   {!job.applyUrl && !job.applyEmail && (
-                    <form action="/api/applications" method="POST">
-                      <input type="hidden" name="jobId" value={job.id} />
-                      <Button type="submit" variant="primary" fullWidth>
-                        Apply Now
-                      </Button>
-                    </form>
+                    <ApplyButton
+                      jobId={job.id}
+                      jobTitle={job.title}
+                      companyName={job.company}
+                    />
                   )}
                 </div>
               )}

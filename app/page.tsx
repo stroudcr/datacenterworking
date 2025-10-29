@@ -188,6 +188,13 @@ export default async function Home({
         </section>
       )}
 
+      {/* Newsletter Section */}
+      <section className="py-12 px-4">
+        <div className="container mx-auto max-w-2xl">
+          <Newsletter />
+        </div>
+      </section>
+
       {/* Main Content with Sidebar */}
       <section className="py-12 px-4">
         <div className="container mx-auto max-w-7xl">
@@ -200,13 +207,6 @@ export default async function Home({
             initialCertifications={certifications}
             initialSort={sort}
           />
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="py-12 px-4 bg-gradient-to-b from-transparent to-black/20">
-        <div className="container mx-auto max-w-2xl">
-          <Newsletter />
         </div>
       </section>
     </main>

@@ -10,12 +10,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const formData = await request.formData();
-    const jobId = formData.get('jobId') as string;
-    const coverLetter = formData.get('coverLetter') as string;
+    const body = await request.json();
+    const { jobId, coverLetter, resume } = body;
 
     if (!jobId) {
       return NextResponse.json({ error: 'Job ID required' }, { status: 400 });
+    }
+
+    // Validate at least one field is provided
+    if (!coverLetter && !resume) {
+      return NextResponse.json(
+        { error: 'Please provide either a cover letter or resume' },
+        { status: 400 }
+      );
     }
 
     // Check if job exists and is active
@@ -44,12 +51,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create application
+    // Create application with cover letter and/or resume
     await db.application.create({
       data: {
         jobId,
         userId: session.userId,
-        coverLetter,
+        coverLetter: coverLetter || null,
+        resume: resume || null,
         status: 'pending',
       },
     });
