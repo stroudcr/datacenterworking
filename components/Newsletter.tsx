@@ -23,6 +23,7 @@ export function Newsletter() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
+          categories: ['All'], // Default to all job categories
         }),
       });
 
