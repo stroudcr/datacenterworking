@@ -1,10 +1,7 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
-  engineType    = "library"
   binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  engineType    = "library"
 }
 
 datasource db {
@@ -12,54 +9,39 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  EMPLOYER
-  JOB_SEEKER
-  ADMIN
-}
-
-enum JobStatus {
-  PENDING
-  ACTIVE
-  EXPIRED
-  DELETED
-}
-
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      UserRole
-  company   String? // For employers
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  jobs                     Job[] // Posted jobs (for employers)
-  applications             Application[] // Job applications (for job seekers)
-  savedJobs                SavedJob[] // Saved jobs (for job seekers)
-  payments                 Payment[]
-  notificationPreferences  NotificationPreferences?
+  id                      String                   @id @default(cuid())
+  email                   String                   @unique
+  password                String
+  name                    String
+  role                    UserRole
+  company                 String?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  applications            Application[]
+  jobs                    Job[]
+  notificationPreferences NotificationPreferences?
+  payments                Payment[]
+  savedJobs               SavedJob[]
 
   @@index([email])
   @@index([role])
 }
 
 model Job {
-  id               String    @id @default(cuid())
-  slug             String    @unique
+  id               String        @id @default(cuid())
+  slug             String        @unique
   title            String
   company          String
   companyLogo      String?
   location         String
-  type             String // Full-time, Part-time, Contract
-  category         String // One of the 10 categories
-  shift            String? // Shift requirements
-  clearance        String? // Security clearance required
-  certifications   String? // Required certifications
-  description      String    @db.Text
-  requirements     String    @db.Text
+  type             String
+  category         String
+  shift            String?
+  clearance        String?
+  certifications   String?
+  description      String
+  requirements     String
   salary           String?
   salaryMin        Int?
   salaryMax        Int?
@@ -68,26 +50,22 @@ model Job {
   hourlyRateMax    Float?
   applyUrl         String?
   applyEmail       String?
-  tags             String[] // Skills/technologies
-  status           JobStatus @default(ACTIVE)
-  isFeatured       Boolean   @default(false)
+  tags             String[]
+  status           JobStatus     @default(ACTIVE)
+  isFeatured       Boolean       @default(false)
   featuredUntil    DateTime?
   expiresAt        DateTime
-  viewCount        Int       @default(0)
-  applicationCount Int       @default(0)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
-
-  // Guest posting fields
-  email            String? // Email for guest job posters
-  managementToken  String?   @unique // Secure token for guest job management
-
-  // Relations
-  userId       String?
-  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  applications Application[]
-  savedBy      SavedJob[]
-  payment      Payment?
+  viewCount        Int           @default(0)
+  applicationCount Int           @default(0)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  email            String?
+  managementToken  String?       @unique
+  userId           String?
+  applications     Application[]
+  user             User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment          Payment?
+  savedBy          SavedJob[]
 
   @@index([slug])
   @@index([status])
@@ -107,14 +85,12 @@ model Application {
   id          String   @id @default(cuid())
   jobId       String
   userId      String
-  coverLetter String?  @db.Text
-  resume      String? // URL or file path
-  status      String   @default("pending") // pending, reviewed, closed
+  coverLetter String?
+  resume      String?
+  status      String   @default("pending")
   createdAt   DateTime @default(now())
-
-  // Relations
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job         Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([jobId, userId])
   @@index([userId])
@@ -126,10 +102,8 @@ model SavedJob {
   jobId     String
   userId    String
   createdAt DateTime @default(now())
-
-  // Relations
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  job       Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([jobId, userId])
   @@index([userId])
@@ -141,15 +115,13 @@ model Payment {
   jobId           String   @unique
   stripeSessionId String   @unique
   stripePaymentId String?  @unique
-  amount          Int // Amount in cents
+  amount          Int
   isFeatured      Boolean  @default(false)
-  status          String // pending, completed, failed
+  status          String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-
-  // Relations
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-  job  Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([stripeSessionId])
@@ -158,7 +130,7 @@ model Payment {
 model Newsletter {
   id         String   @id @default(cuid())
   email      String   @unique
-  categories String[] // Selected categories for alerts
+  categories String[]
   isActive   Boolean  @default(true)
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -168,23 +140,32 @@ model Newsletter {
 }
 
 model NotificationPreferences {
-  id                    String   @id @default(cuid())
-  userId                String   @unique
-  // Employer preferences
-  newApplications       Boolean  @default(true) // Email when new application received
-  expirationReminders   Boolean  @default(true) // Email reminders before job expires
-  weeklyAnalytics       Boolean  @default(true) // Weekly summary of job performance
-  paymentConfirmations  Boolean  @default(true) // Payment receipts
-  // Job Seeker preferences
-  jobAlerts             Boolean  @default(true) // Email alerts for new jobs matching preferences
-  applicationUpdates    Boolean  @default(true) // Email when application status changes
-  savedJobReminders     Boolean  @default(true) // Email when saved jobs are expiring
-  weeklyDigest          Boolean  @default(true) // Weekly email with job recommendations
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  newApplications      Boolean  @default(true)
+  expirationReminders  Boolean  @default(true)
+  weeklyAnalytics      Boolean  @default(true)
+  paymentConfirmations Boolean  @default(true)
+  jobAlerts            Boolean  @default(true)
+  applicationUpdates   Boolean  @default(true)
+  savedJobReminders    Boolean  @default(true)
+  weeklyDigest         Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+enum UserRole {
+  EMPLOYER
+  JOB_SEEKER
+  ADMIN
+}
+
+enum JobStatus {
+  PENDING
+  ACTIVE
+  EXPIRED
+  DELETED
 }
