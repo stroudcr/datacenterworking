@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, JobStatus } from '@prisma/client';
 import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -53,7 +53,7 @@ This is an excellent opportunity to work with cutting-edge technology in a fast-
 • Excellent problem-solving skills
 • Strong communication skills`,
       tags: ['Data Center', 'Server Maintenance', 'Networking', 'Hardware', 'Operations'],
-      status: 'ACTIVE',
+      status: JobStatus.ACTIVE,
       isFeatured: true,
       featuredUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
@@ -89,7 +89,7 @@ This role requires strong leadership skills and a deep understanding of data cen
 • Excellent leadership and communication skills
 • PMP certification preferred`,
       tags: ['Management', 'Leadership', 'Facility Operations', 'Clearance', 'CDCP'],
-      status: 'ACTIVE',
+      status: JobStatus.ACTIVE,
       isFeatured: false,
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
@@ -121,7 +121,7 @@ What you'll do:
 • Python or Ansible scripting experience
 • Bachelor's degree in Computer Science or equivalent`,
       tags: ['Networking', 'CCNP', 'BGP', 'Automation', 'Python', 'Cisco'],
-      status: 'ACTIVE',
+      status: JobStatus.ACTIVE,
       isFeatured: true,
       featuredUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
@@ -154,7 +154,7 @@ Responsibilities include:
 • Ability to read electrical schematics
 • Available for occasional weekend work`,
       tags: ['Electrical', 'Contract', '480V', 'UPS', 'Master Electrician', 'NFPA'],
-      status: 'ACTIVE',
+      status: JobStatus.ACTIVE,
       isFeatured: false,
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     },
@@ -187,7 +187,7 @@ Key responsibilities:
 • Python or Go programming skills
 • Azure certification (bonus)`,
       tags: ['Cloud', 'AWS', 'Kubernetes', 'Terraform', 'Clearance', 'FedRAMP', 'Top Secret'],
-      status: 'ACTIVE',
+      status: JobStatus.ACTIVE,
       isFeatured: true,
       featuredUntil: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
