@@ -151,26 +151,6 @@ export default async function Home({
             <SearchBar initialSearch={search} />
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto">
-            <GlassCard className="text-center">
-              <Briefcase className="w-8 h-8 text-ice-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">{totalActiveJobs}+</div>
-              <div className="text-sm text-silver-400">Active Jobs</div>
-            </GlassCard>
-            <GlassCard className="text-center">
-              <TrendingUp className="w-8 h-8 text-ice-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">$249</div>
-              <div className="text-sm text-silver-400">30-Day Listing</div>
-            </GlassCard>
-            <GlassCard className="text-center">
-              <Shield className="w-8 h-8 text-ice-400 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-white">Active</div>
-              <div className="text-sm text-silver-400">Professional Community</div>
-            </GlassCard>
-          </div>
-        </div>
-      </section>
 
       {/* Featured Jobs */}
       {featuredJobs.length > 0 && (
