@@ -14,7 +14,7 @@ export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: 'Find Data Center Jobs | Work In Data Center',
-  description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, security clearance positions, and more. Post jobs for $249.',
+  description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, security clearance positions, and more.',
   openGraph: {
     title: 'Find Data Center Jobs | Work In Data Center',
     description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, and more.',
@@ -152,7 +152,7 @@ export default async function Home({
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto">
+          <div className="grid grid-cols-3 gap-4 mt-12 max-w-3xl mx-auto">
             <GlassCard className="text-center">
               <Briefcase className="w-8 h-8 text-ice-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">{totalActiveJobs}+</div>
