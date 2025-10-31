@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { contactSchema } from '@/lib/validations';
+import { sendContactFormEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -8,29 +9,29 @@ export async function POST(request: NextRequest) {
     // Validate input
     const validatedData = contactSchema.parse(body);
 
-    // Here you can:
-    // 1. Store the contact message in the database (if you have a Contact model)
-    // 2. Send an email notification to your support team
-    // 3. Integrate with a CRM or ticketing system
-
-    // For now, we'll just log it and return success
+    // Log the submission
     console.log('Contact form submission:', {
       name: validatedData.name,
       email: validatedData.email,
       inquiryType: validatedData.inquiryType,
       subject: validatedData.subject,
-      message: validatedData.message,
       timestamp: new Date().toISOString(),
     });
 
-    // In a production environment, you would send an email here
-    // Example with nodemailer or similar:
-    // await sendEmail({
-    //   to: 'support@workindatacenter.com',
-    //   from: validatedData.email,
-    //   subject: `[Contact Form] ${validatedData.inquiryType} - ${validatedData.subject}`,
-    //   text: `From: ${validatedData.name} (${validatedData.email})\n\nInquiry Type: ${validatedData.inquiryType}\n\nMessage:\n${validatedData.message}`,
-    // });
+    // Send email to admin team
+    const emailResult = await sendContactFormEmail({
+      name: validatedData.name,
+      email: validatedData.email,
+      inquiryType: validatedData.inquiryType,
+      subject: validatedData.subject,
+      message: validatedData.message,
+    });
+
+    if (!emailResult.success) {
+      console.error('Failed to send contact form email, but continuing...');
+      // We still return success to the user even if email fails
+      // since we logged the submission
+    }
 
     return NextResponse.json({
       success: true,

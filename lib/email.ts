@@ -1,6 +1,10 @@
 import { Resend } from 'resend';
 import { EmployerWelcome } from '@/emails/EmployerWelcome';
 import { JobSeekerWelcome } from '@/emails/JobSeekerWelcome';
+import { ManagementLink } from '@/emails/ManagementLink';
+import { PaymentConfirmation } from '@/emails/PaymentConfirmation';
+import { NewApplication } from '@/emails/NewApplication';
+import { ContactForm } from '@/emails/ContactForm';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -62,8 +66,223 @@ export async function sendWelcomeEmail({
   }
 }
 
+// Management Link Email for Guest Job Posters
+interface SendManagementLinkEmailParams {
+  to: string;
+  jobTitle: string;
+  company: string;
+  managementUrl: string;
+}
+
+export async function sendManagementLinkEmail({
+  to,
+  jobTitle,
+  company,
+  managementUrl,
+}: SendManagementLinkEmailParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not configured. Skipping management link email.');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const from = process.env.EMAIL_FROM || 'noreply@workindatacenter.com';
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject: `Your Job Posting is Live - ${jobTitle}`,
+      react: ManagementLink({ jobTitle, company, managementUrl }),
+    });
+
+    if (error) {
+      console.error('Failed to send management link email:', error);
+      return { success: false, error };
+    }
+
+    console.log('Management link email sent successfully:', data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error sending management link email:', error);
+    return { success: false, error };
+  }
+}
+
+// Payment Confirmation Email
+interface SendPaymentConfirmationParams {
+  to: string;
+  jobTitle: string;
+  company: string;
+  amount: number;
+  paymentId: string;
+  isFeatured: boolean;
+  jobUrl: string;
+  managementUrl?: string;
+}
+
+export async function sendPaymentConfirmation({
+  to,
+  jobTitle,
+  company,
+  amount,
+  paymentId,
+  isFeatured,
+  jobUrl,
+  managementUrl,
+}: SendPaymentConfirmationParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not configured. Skipping payment confirmation email.');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const from = process.env.EMAIL_FROM || 'noreply@workindatacenter.com';
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject: `Payment Confirmed - ${jobTitle} is Now Live`,
+      react: PaymentConfirmation({
+        jobTitle,
+        company,
+        amount,
+        paymentId,
+        isFeatured,
+        jobUrl,
+        managementUrl,
+      }),
+    });
+
+    if (error) {
+      console.error('Failed to send payment confirmation email:', error);
+      return { success: false, error };
+    }
+
+    console.log('Payment confirmation email sent successfully:', data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error sending payment confirmation email:', error);
+    return { success: false, error };
+  }
+}
+
+// Application Notification Email to Employers
+interface SendApplicationNotificationParams {
+  to: string;
+  jobTitle: string;
+  company: string;
+  applicantName: string;
+  applicantEmail: string;
+  coverLetter?: string;
+  resumeUrl?: string;
+  applicantsPageUrl: string;
+}
+
+export async function sendApplicationNotification({
+  to,
+  jobTitle,
+  company,
+  applicantName,
+  applicantEmail,
+  coverLetter,
+  resumeUrl,
+  applicantsPageUrl,
+}: SendApplicationNotificationParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not configured. Skipping application notification email.');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const from = process.env.EMAIL_FROM || 'noreply@workindatacenter.com';
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject: `New Application: ${jobTitle} - ${applicantName}`,
+      react: NewApplication({
+        jobTitle,
+        company,
+        applicantName,
+        applicantEmail,
+        coverLetter,
+        resumeUrl,
+        applicantsPageUrl,
+      }),
+    });
+
+    if (error) {
+      console.error('Failed to send application notification email:', error);
+      return { success: false, error };
+    }
+
+    console.log('Application notification email sent successfully:', data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error sending application notification email:', error);
+    return { success: false, error };
+  }
+}
+
+// Contact Form Email to Admin
+interface SendContactFormEmailParams {
+  name: string;
+  email: string;
+  inquiryType: string;
+  subject: string;
+  message: string;
+}
+
+export async function sendContactFormEmail({
+  name,
+  email,
+  inquiryType,
+  subject,
+  message,
+}: SendContactFormEmailParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not configured. Skipping contact form email.');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const from = process.env.EMAIL_FROM || 'noreply@workindatacenter.com';
+  const adminEmail = process.env.ADMIN_EMAIL;
+
+  if (!adminEmail) {
+    console.error('ADMIN_EMAIL not configured. Cannot send contact form email.');
+    return { success: false, error: 'Admin email not configured' };
+  }
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to: adminEmail,
+      replyTo: email, // Allow admin to reply directly to the sender
+      subject: `Contact Form: ${subject}`,
+      react: ContactForm({
+        name,
+        email,
+        inquiryType,
+        subject,
+        message,
+      }),
+    });
+
+    if (error) {
+      console.error('Failed to send contact form email:', error);
+      return { success: false, error };
+    }
+
+    console.log('Contact form email sent successfully:', data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error sending contact form email:', error);
+    return { success: false, error };
+  }
+}
+
 // Additional email functions can be added here:
 // - sendJobExpirationReminder()
-// - sendApplicationNotification()
-// - sendPaymentConfirmation()
+// - sendWeeklyAnalytics()
+// - sendJobAlerts()
 // etc.

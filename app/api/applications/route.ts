@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { sendApplicationNotification } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,13 +26,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if job exists and is active
+    // Check if job exists and is active, and fetch user info for applicant and employer
     const job = await db.job.findUnique({
       where: { id: jobId },
+      include: {
+        user: {
+          select: {
+            email: true,
+            notificationPreferences: true,
+          },
+        },
+      },
     });
 
     if (!job || job.status !== 'ACTIVE') {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    // Get applicant info
+    const applicant = await db.user.findUnique({
+      where: { id: session.userId },
+      select: { name: true, email: true },
+    });
+
+    if (!applicant) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     // Check if already applied
@@ -71,6 +90,35 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Send email notification to employer (non-blocking)
+    const employerEmail = job.user?.email || job.email; // Use registered user email or guest email
+
+    // Check notification preferences for registered employers
+    const shouldSendEmail = job.userId
+      ? job.user?.notificationPreferences?.newApplications !== false // Default to true if not set
+      : true; // Always send for guest posters
+
+    if (employerEmail && shouldSendEmail) {
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+      const applicantsPageUrl = job.userId
+        ? `${baseUrl}/dashboard/employer/jobs/${job.id}/applicants`
+        : `${baseUrl}/jobs/manage/${job.id}?token=${job.managementToken}`;
+
+      sendApplicationNotification({
+        to: employerEmail,
+        jobTitle: job.title,
+        company: job.company,
+        applicantName: applicant.name || 'Anonymous',
+        applicantEmail: applicant.email,
+        coverLetter: coverLetter || undefined,
+        resumeUrl: resume || undefined,
+        applicantsPageUrl,
+      }).catch(error => {
+        console.error('Failed to send application notification email:', error);
+        // Don't fail the application submission if email fails
+      });
+    }
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

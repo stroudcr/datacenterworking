@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
+import { sendManagementLinkEmail, sendPaymentConfirmation } from '@/lib/email';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -52,27 +53,49 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      // TODO: Send management link email for guest users
-      // If the job has no userId (guest posting), send an email with the management link
-      if (payment.job && !payment.job.userId && payment.job.managementToken) {
-        const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-                        (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://workindatacenter.com');
-        const managementUrl = `${baseUrl}/jobs/manage/${payment.job.id}?token=${payment.job.managementToken}`;
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
+                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://workindatacenter.com');
 
-        // TODO: Implement email sending service (Resend, SendGrid, etc.)
-        // await sendEmail({
-        //   to: payment.job.email,
-        //   subject: 'Your Job Posting is Live - Management Link',
-        //   html: `
-        //     <h1>Your job posting is now live!</h1>
-        //     <p>Manage your job posting at: ${managementUrl}</p>
-        //   `
-        // });
+      // Send emails (non-blocking - failures won't affect webhook processing)
+      if (payment.job) {
+        const job = payment.job;
+        const jobUrl = `${baseUrl}/jobs/${job.slug}`;
+        const managementUrl = job.managementToken
+          ? `${baseUrl}/jobs/manage/${job.id}?token=${job.managementToken}`
+          : undefined;
 
-        console.log('Management link for guest user:', managementUrl);
+        // Determine recipient email (guest job email or user email)
+        const recipientEmail = job.email;
+
+        // Send management link email for guest users (no userId)
+        if (!job.userId && job.managementToken && recipientEmail) {
+          sendManagementLinkEmail({
+            to: recipientEmail,
+            jobTitle: job.title,
+            company: job.company,
+            managementUrl: managementUrl!,
+          }).catch(error => {
+            console.error('Failed to send management link email:', error);
+          });
+        }
+
+        // Send payment confirmation email to all users
+        if (recipientEmail) {
+          sendPaymentConfirmation({
+            to: recipientEmail,
+            jobTitle: job.title,
+            company: job.company,
+            amount: payment.amount,
+            paymentId: payment.stripePaymentId || session.payment_intent as string || session.id,
+            isFeatured: job.isFeatured,
+            jobUrl,
+            managementUrl: !job.userId ? managementUrl : undefined, // Only include for guests
+          }).catch(error => {
+            console.error('Failed to send payment confirmation email:', error);
+          });
+        }
       }
 
-      // Job is already ACTIVE, no need to update
       console.log('Payment completed:', session.id);
       break;
     }
