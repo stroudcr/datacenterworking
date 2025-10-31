@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, generateToken, setAuthCookie } from '@/lib/auth';
 import { registerSchema } from '@/lib/validations';
+import { sendWelcomeEmail } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
@@ -58,6 +59,16 @@ export async function POST(request: NextRequest) {
 
     // Set cookie
     await setAuthCookie(token);
+
+    // Send welcome email (non-blocking, failures won't prevent registration)
+    sendWelcomeEmail({
+      to: user.email,
+      name: user.name,
+      role: user.role as 'EMPLOYER' | 'JOB_SEEKER',
+      company: user.company || undefined,
+    }).catch((err) => {
+      console.error('Failed to send welcome email (non-blocking):', err);
+    });
 
     return NextResponse.json({
       user: {

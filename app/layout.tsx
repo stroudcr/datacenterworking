@@ -81,7 +81,7 @@ export default async function RootLayout({
     url: siteUrl,
     logo: `${siteUrl}/images/NavLogo.png`,
     description: 'Premium job board connecting data center professionals with top employers across operations, engineering, IT infrastructure, and more.',
-    email: 'contact@workindatacenter.com',
+    email: 'info@workindatacenter.com',
     foundingDate: '2024',
     slogan: 'Find Your Next Data Center Job',
     knowsAbout: [
