@@ -5,6 +5,7 @@ import { ManagementLink } from '@/emails/ManagementLink';
 import { PaymentConfirmation } from '@/emails/PaymentConfirmation';
 import { NewApplication } from '@/emails/NewApplication';
 import { ContactForm } from '@/emails/ContactForm';
+import { JobExpirationReminder } from '@/emails/JobExpirationReminder';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -281,8 +282,62 @@ export async function sendContactFormEmail({
   }
 }
 
+// Job Expiration Reminder Email
+interface SendJobExpirationReminderParams {
+  to: string;
+  jobTitle: string;
+  company: string;
+  viewCount: number;
+  applicationCount: number;
+  jobUrl: string;
+  managementUrl?: string;
+}
+
+export async function sendJobExpirationReminder({
+  to,
+  jobTitle,
+  company,
+  viewCount,
+  applicationCount,
+  jobUrl,
+  managementUrl,
+}: SendJobExpirationReminderParams) {
+  if (!process.env.RESEND_API_KEY) {
+    console.warn('RESEND_API_KEY not configured. Skipping expiration reminder email.');
+    return { success: false, error: 'Email service not configured' };
+  }
+
+  const from = process.env.EMAIL_FROM || 'noreply@workindatacenter.com';
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from,
+      to,
+      subject: `Your Job Expires Tomorrow - ${jobTitle}`,
+      react: JobExpirationReminder({
+        jobTitle,
+        company,
+        viewCount,
+        applicationCount,
+        jobUrl,
+        managementUrl,
+      }),
+    });
+
+    if (error) {
+      console.error('Failed to send expiration reminder email:', error);
+      return { success: false, error };
+    }
+
+    console.log('Expiration reminder email sent successfully:', data?.id);
+    return { success: true, data };
+  } catch (error) {
+    console.error('Error sending expiration reminder email:', error);
+    return { success: false, error };
+  }
+}
+
 // Additional email functions can be added here:
-// - sendJobExpirationReminder()
 // - sendWeeklyAnalytics()
 // - sendJobAlerts()
 // etc.
