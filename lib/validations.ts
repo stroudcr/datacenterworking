@@ -32,6 +32,7 @@ export const jobSchema = z.object({
   hourlyRateMax: z.number().min(0).nullish().transform(val => (val == null || Number.isNaN(val)) ? undefined : val),
   applyUrl: z.string().url().optional().or(z.literal('')),
   applyEmail: z.string().email().optional().or(z.literal('')),
+  enableInternalApplications: z.boolean().optional(),
   tags: z.array(z.string()).min(1, 'At least one tag is required'),
   email: z.string().email('Valid email address is required'),
 });

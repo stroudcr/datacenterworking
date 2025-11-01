@@ -478,7 +478,7 @@ export default async function JobPage({ params }: JobPageProps) {
                       </Button>
                     </a>
                   )}
-                  {!job.applyUrl && !job.applyEmail && (
+                  {(job.enableInternalApplications || (!job.applyUrl && !job.applyEmail)) && (
                     <ApplyButton
                       jobId={job.id}
                       jobTitle={job.title}

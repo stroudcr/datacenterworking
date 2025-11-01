@@ -50,6 +50,7 @@ model Job {
   hourlyRateMax    Float?
   applyUrl         String?
   applyEmail       String?
+  enableInternalApplications Boolean @default(false)
   tags             String[]
   status           JobStatus     @default(ACTIVE)
   isFeatured       Boolean       @default(false)

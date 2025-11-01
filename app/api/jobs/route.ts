@@ -46,6 +46,7 @@ export async function POST(request: NextRequest) {
         hourlyRateMax: validatedData.hourlyRateMax,
         applyUrl: validatedData.applyUrl || undefined,
         applyEmail: validatedData.applyEmail || undefined,
+        enableInternalApplications: validatedData.enableInternalApplications || false,
 
         // Guest posting fields
         email: validatedData.email,

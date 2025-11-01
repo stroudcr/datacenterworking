@@ -22,6 +22,7 @@ export default function PostJobPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [compensationType, setCompensationType] = useState<'salary' | 'hourly'>('salary');
+  const [applicationMethod, setApplicationMethod] = useState<'internal' | 'external' | 'email'>('internal');
 
   const {
     register,
@@ -81,7 +82,14 @@ export default function PostJobPage() {
       const response = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...data, isFeatured, tags }),
+        body: JSON.stringify({
+          ...data,
+          isFeatured,
+          tags,
+          enableInternalApplications: applicationMethod === 'internal',
+          applyUrl: applicationMethod === 'external' ? data.applyUrl : undefined,
+          applyEmail: applicationMethod === 'email' ? data.applyEmail : undefined,
+        }),
       });
 
       const result = await response.json();
@@ -404,25 +412,99 @@ export default function PostJobPage() {
           {/* Application */}
           <GlassCard>
             <h2 className="text-xl font-semibold text-white mb-4">
-              How to Apply
+              How to Accept Applications
             </h2>
             <div className="space-y-4">
-              <Input
-                label="Application URL"
-                placeholder="https://yourcompany.com/careers/apply"
-                fullWidth
-                {...register('applyUrl')}
-              />
+              {/* Radio button options */}
+              <div className="space-y-3">
+                <label className={`flex items-start gap-3 p-4 rounded-lg cursor-pointer transition-all ${
+                  applicationMethod === 'internal'
+                    ? 'bg-ice-500/20 border-2 border-ice-500'
+                    : 'glass hover:bg-white/10'
+                }`}>
+                  <input
+                    type="radio"
+                    name="applicationMethod"
+                    value="internal"
+                    checked={applicationMethod === 'internal'}
+                    onChange={() => setApplicationMethod('internal')}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-white font-medium">Accept Applications on This Site</span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-ice-500 text-white">Recommended</span>
+                    </div>
+                    <p className="text-sm text-silver-400">
+                      Job seekers submit their resume and cover letter directly through our platform. Track and manage all applications in your employer dashboard.
+                    </p>
+                  </div>
+                </label>
 
-              <div className="text-center text-sm text-silver-400">OR</div>
+                <label className={`flex items-start gap-3 p-4 rounded-lg cursor-pointer transition-all ${
+                  applicationMethod === 'external'
+                    ? 'bg-ice-500/20 border-2 border-ice-500'
+                    : 'glass hover:bg-white/10'
+                }`}>
+                  <input
+                    type="radio"
+                    name="applicationMethod"
+                    value="external"
+                    checked={applicationMethod === 'external'}
+                    onChange={() => setApplicationMethod('external')}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <span className="text-white font-medium block mb-1">Redirect to External Application Page</span>
+                    <p className="text-sm text-silver-400">
+                      Send applicants to your company's careers page or ATS system
+                    </p>
+                  </div>
+                </label>
 
-              <Input
-                label="Application Email"
-                type="email"
-                placeholder="careers@yourcompany.com"
-                fullWidth
-                {...register('applyEmail')}
-              />
+                <label className={`flex items-start gap-3 p-4 rounded-lg cursor-pointer transition-all ${
+                  applicationMethod === 'email'
+                    ? 'bg-ice-500/20 border-2 border-ice-500'
+                    : 'glass hover:bg-white/10'
+                }`}>
+                  <input
+                    type="radio"
+                    name="applicationMethod"
+                    value="email"
+                    checked={applicationMethod === 'email'}
+                    onChange={() => setApplicationMethod('email')}
+                    className="mt-1"
+                  />
+                  <div className="flex-1">
+                    <span className="text-white font-medium block mb-1">Receive Applications via Email</span>
+                    <p className="text-sm text-silver-400">
+                      Applicants will email their application materials directly to you
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              {/* Conditional input fields */}
+              {applicationMethod === 'external' && (
+                <Input
+                  label="Application URL *"
+                  placeholder="https://yourcompany.com/careers/apply"
+                  fullWidth
+                  error={errors.applyUrl?.message}
+                  {...register('applyUrl')}
+                />
+              )}
+
+              {applicationMethod === 'email' && (
+                <Input
+                  label="Application Email *"
+                  type="email"
+                  placeholder="careers@yourcompany.com"
+                  fullWidth
+                  error={errors.applyEmail?.message}
+                  {...register('applyEmail')}
+                />
+              )}
             </div>
           </GlassCard>
 
