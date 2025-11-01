@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -46,6 +46,17 @@ export default function PostJobPage() {
   const watchedHourlyRateMax = useWatch({ control, name: 'hourlyRateMax' });
   const watchedDescription = useWatch({ control, name: 'description' });
   const watchedRequirements = useWatch({ control, name: 'requirements' });
+
+  // Clear unused compensation fields when toggling between salary and hourly
+  useEffect(() => {
+    if (compensationType === 'salary') {
+      setValue('hourlyRateMin', undefined);
+      setValue('hourlyRateMax', undefined);
+    } else {
+      setValue('salaryMin', undefined);
+      setValue('salaryMax', undefined);
+    }
+  }, [compensationType, setValue]);
 
   const addTag = () => {
     if (tagInput.trim() && !tags.includes(tagInput.trim())) {
@@ -353,6 +364,7 @@ export default function PostJobPage() {
                     type="number"
                     placeholder="80000"
                     fullWidth
+                    error={errors.salaryMin?.message}
                     {...register('salaryMin', { valueAsNumber: true })}
                   />
                   <Input
@@ -360,6 +372,7 @@ export default function PostJobPage() {
                     type="number"
                     placeholder="120000"
                     fullWidth
+                    error={errors.salaryMax?.message}
                     {...register('salaryMax', { valueAsNumber: true })}
                   />
                 </div>
@@ -371,6 +384,7 @@ export default function PostJobPage() {
                     placeholder="35"
                     step="0.01"
                     fullWidth
+                    error={errors.hourlyRateMin?.message}
                     {...register('hourlyRateMin', { valueAsNumber: true })}
                   />
                   <Input
@@ -379,6 +393,7 @@ export default function PostJobPage() {
                     placeholder="50"
                     step="0.01"
                     fullWidth
+                    error={errors.hourlyRateMax?.message}
                     {...register('hourlyRateMax', { valueAsNumber: true })}
                   />
                 </div>
