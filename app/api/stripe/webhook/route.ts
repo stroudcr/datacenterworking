@@ -74,9 +74,13 @@ export async function POST(request: NextRequest) {
             jobTitle: job.title,
             company: job.company,
             managementUrl: managementUrl!,
-          }).catch(error => {
-            console.error('Failed to send management link email:', error);
-          });
+          })
+            .then(result => {
+              console.log('Management link email sent successfully to:', recipientEmail, result);
+            })
+            .catch(error => {
+              console.error('Failed to send management link email to:', recipientEmail, error);
+            });
         }
 
         // Send payment confirmation email to all users
@@ -90,9 +94,15 @@ export async function POST(request: NextRequest) {
             isFeatured: job.isFeatured,
             jobUrl,
             managementUrl: !job.userId ? managementUrl : undefined, // Only include for guests
-          }).catch(error => {
-            console.error('Failed to send payment confirmation email:', error);
-          });
+          })
+            .then(result => {
+              console.log('Payment confirmation email sent successfully to:', recipientEmail, result);
+            })
+            .catch(error => {
+              console.error('Failed to send payment confirmation email to:', recipientEmail, error);
+            });
+        } else {
+          console.warn('No recipient email available for payment confirmation. Job ID:', job.id);
         }
       }
 

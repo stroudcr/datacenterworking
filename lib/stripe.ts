@@ -54,6 +54,15 @@ export async function createCheckoutSession({
       jobId,
       isFeatured: isFeatured.toString(),
     },
+    invoice_creation: {
+      enabled: true,
+      invoice_data: {
+        description: `30-Day Job Listing - ${isFeatured ? 'Featured' : 'Standard'}`,
+        metadata: {
+          jobId,
+        },
+      },
+    },
   });
 
   return session;
