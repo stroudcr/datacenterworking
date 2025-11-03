@@ -43,7 +43,7 @@ export function JobCard({ job, isSaved = false, showSaveButton = false }: JobCar
     <Link href={`/jobs/${job.slug}`}>
       <GlassCard hover className="relative">
         {job.isFeatured && (
-          <div className="absolute top-3 right-3">
+          <div className="absolute bottom-3 right-3">
             <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold">
               <Star className="w-3 h-3 fill-current" />
               Featured
