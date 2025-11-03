@@ -33,25 +33,30 @@ export async function POST(request: NextRequest) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
 
-      // Update payment status
-      const payment = await db.payment.update({
-        where: { stripeSessionId: session.id },
-        data: {
-          status: 'completed',
-          stripePaymentId: session.payment_intent as string,
-        },
-        include: {
-          job: true,
-        },
-      });
-
-      // Activate the job now that payment is confirmed
-      if (payment.jobId) {
-        await db.job.update({
-          where: { id: payment.jobId },
-          data: { status: 'ACTIVE' },
+      // Update payment status and activate job in a transaction
+      // This ensures atomicity - both operations succeed or both fail
+      const payment = await db.$transaction(async (tx) => {
+        const updatedPayment = await tx.payment.update({
+          where: { stripeSessionId: session.id },
+          data: {
+            status: 'completed',
+            stripePaymentId: session.payment_intent as string,
+          },
+          include: {
+            job: true,
+          },
         });
-      }
+
+        // Activate the job now that payment is confirmed
+        if (updatedPayment.jobId) {
+          await tx.job.update({
+            where: { id: updatedPayment.jobId },
+            data: { status: 'ACTIVE' },
+          });
+        }
+
+        return updatedPayment;
+      });
 
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://workindatacenter.com');
@@ -113,23 +118,22 @@ export async function POST(request: NextRequest) {
     case 'checkout.session.expired': {
       const session = event.data.object as Stripe.Checkout.Session;
 
-      // Mark payment as failed
-      await db.payment.update({
-        where: { stripeSessionId: session.id },
-        data: { status: 'failed' },
-      });
-
-      // Optionally delete the job or mark it as expired
-      const payment = await db.payment.findUnique({
-        where: { stripeSessionId: session.id },
-      });
-
-      if (payment) {
-        await db.job.update({
-          where: { id: payment.jobId },
-          data: { status: 'DELETED' },
+      // Mark payment as failed and delete job in a transaction
+      // This ensures atomicity - both operations succeed or both fail
+      await db.$transaction(async (tx) => {
+        const payment = await tx.payment.update({
+          where: { stripeSessionId: session.id },
+          data: { status: 'failed' },
         });
-      }
+
+        // Delete the job since payment failed
+        if (payment.jobId) {
+          await tx.job.update({
+            where: { id: payment.jobId },
+            data: { status: 'DELETED' },
+          });
+        }
+      });
 
       console.log('Payment expired:', session.id);
       break;

@@ -22,53 +22,58 @@ export async function POST(request: NextRequest) {
     // Generate management token for guest users
     const managementToken = !session ? generateManagementToken() : undefined;
 
-    // Create job with temporary slug (will be updated with real ID-based slug)
-    const job = await db.job.create({
-      data: {
-        // Required fields
-        title: validatedData.title,
-        company: validatedData.company,
-        location: validatedData.location,
-        type: validatedData.type,
-        category: validatedData.category,
-        description: validatedData.description,
-        requirements: validatedData.requirements,
-        tags: validatedData.tags,
+    // Create job and update slug in a transaction to ensure atomicity
+    const job = await db.$transaction(async (tx) => {
+      // Create job with temporary slug (will be updated with real ID-based slug)
+      const createdJob = await tx.job.create({
+        data: {
+          // Required fields
+          title: validatedData.title,
+          company: validatedData.company,
+          location: validatedData.location,
+          type: validatedData.type,
+          category: validatedData.category,
+          description: validatedData.description,
+          requirements: validatedData.requirements,
+          tags: validatedData.tags,
 
-        // Optional fields
-        companyLogo: validatedData.companyLogo || undefined,
-        shift: validatedData.shift || undefined,
-        clearance: validatedData.clearance || undefined,
-        certifications: validatedData.certifications || undefined,
-        salaryMin: validatedData.salaryMin,
-        salaryMax: validatedData.salaryMax,
-        hourlyRateMin: validatedData.hourlyRateMin,
-        hourlyRateMax: validatedData.hourlyRateMax,
-        applyUrl: validatedData.applyUrl || undefined,
-        applyEmail: validatedData.applyEmail || undefined,
-        enableInternalApplications: validatedData.enableInternalApplications || false,
+          // Optional fields
+          companyLogo: validatedData.companyLogo || undefined,
+          shift: validatedData.shift || undefined,
+          clearance: validatedData.clearance || undefined,
+          certifications: validatedData.certifications || undefined,
+          salaryMin: validatedData.salaryMin,
+          salaryMax: validatedData.salaryMax,
+          hourlyRateMin: validatedData.hourlyRateMin,
+          hourlyRateMax: validatedData.hourlyRateMax,
+          applyUrl: validatedData.applyUrl || undefined,
+          applyEmail: validatedData.applyEmail || undefined,
+          enableInternalApplications: validatedData.enableInternalApplications || false,
 
-        // Guest posting fields
-        email: validatedData.email,
-        managementToken,
+          // Guest posting fields
+          email: validatedData.email,
+          managementToken,
 
-        // System fields
-        slug: 'temp', // Temporary, will be updated immediately
-        userId: session?.userId || null,
-        status: 'PENDING', // Will be set to ACTIVE after payment confirmation
-        isFeatured: isFeatured || false,
-        expiresAt: addDays(new Date(), PRICING.LISTING_DURATION),
-        featuredUntil: isFeatured
-          ? addDays(new Date(), PRICING.FEATURED_DURATION)
-          : undefined,
-      },
-    });
+          // System fields
+          slug: 'temp', // Temporary, will be updated immediately
+          userId: session?.userId || null,
+          status: 'PENDING', // Will be set to ACTIVE after payment confirmation
+          isFeatured: isFeatured || false,
+          expiresAt: addDays(new Date(), PRICING.LISTING_DURATION),
+          featuredUntil: isFeatured
+            ? addDays(new Date(), PRICING.FEATURED_DURATION)
+            : undefined,
+        },
+      });
 
-    // Generate and update slug with the real ID
-    const slug = generateJobSlug(validatedData.title, validatedData.location, job.id);
-    await db.job.update({
-      where: { id: job.id },
-      data: { slug },
+      // Generate and update slug with the real ID
+      const slug = generateJobSlug(validatedData.title, validatedData.location, createdJob.id);
+      const updatedJob = await tx.job.update({
+        where: { id: createdJob.id },
+        data: { slug },
+      });
+
+      return updatedJob;
     });
 
     // Create Stripe checkout session

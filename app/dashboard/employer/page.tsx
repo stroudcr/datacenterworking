@@ -11,12 +11,12 @@ import {
   DollarSign,
   Star,
   Plus,
-  Trash2,
   Edit,
   Clock,
   Settings
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { DeleteJobButton } from './DeleteJobButton';
 
 // Cache dashboard for 30 seconds to reduce database load during active usage
 export const revalidate = 30;
@@ -225,11 +225,7 @@ export default async function EmployerDashboard() {
                             <Eye className="w-4 h-4" />
                           </Button>
                         </Link>
-                        <form action={`/api/jobs/${job.id}/delete`} method="POST">
-                          <Button variant="ghost" size="sm" type="submit">
-                            <Trash2 className="w-4 h-4 text-red-400" />
-                          </Button>
-                        </form>
+                        <DeleteJobButton jobId={job.id} jobTitle={job.title} />
                       </div>
                     </div>
                   </div>

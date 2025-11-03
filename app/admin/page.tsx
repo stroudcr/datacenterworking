@@ -10,11 +10,11 @@ import {
   Users,
   DollarSign,
   Eye,
-  Trash2,
   ExternalLink,
   AlertTriangle
 } from 'lucide-react';
 import { format } from 'date-fns';
+import { DeleteJobButton } from './DeleteJobButton';
 
 export default async function AdminPanel() {
   const session = await getSession();
@@ -225,11 +225,7 @@ export default async function AdminPanel() {
                                 <ExternalLink className="w-4 h-4" />
                               </Button>
                             </Link>
-                            <form action={`/api/admin/jobs/${job.id}/delete`} method="POST">
-                              <Button variant="ghost" size="sm" type="submit">
-                                <Trash2 className="w-4 h-4 text-red-400" />
-                              </Button>
-                            </form>
+                            <DeleteJobButton jobId={job.id} jobTitle={job.title} />
                           </div>
                         </td>
                       </tr>
