@@ -105,7 +105,7 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 rounded-lg bg-navy-800/95 border border-ice-blue/20 shadow-xl backdrop-blur-md overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-screen max-w-[calc(100vw-2rem)] sm:w-64 rounded-lg bg-[#0f172a] border border-ice-blue/30 shadow-2xl backdrop-blur-lg overflow-hidden z-[100]">
           {/* User Info Section */}
           <div className="p-4 border-b border-ice-blue/20">
             <div className="flex items-center gap-3 mb-2">
