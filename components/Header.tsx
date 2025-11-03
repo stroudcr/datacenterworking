@@ -3,13 +3,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LogOut, User, Settings } from 'lucide-react';
 import { Button } from './Button';
+import { UserMenu } from './UserMenu';
 
 interface HeaderProps {
   user?: {
     name: string;
-    role: string;
+    email: string;
+    role: 'EMPLOYER' | 'JOB_SEEKER' | 'ADMIN';
   } | null;
 }
 
@@ -65,41 +66,7 @@ export function Header({ user }: HeaderProps) {
           {/* Auth Section */}
           <div className="flex items-center gap-3">
             {user ? (
-              <>
-                <Link href={user.role === 'EMPLOYER' ? '/dashboard/employer' : '/dashboard/seeker'}>
-                  <Button variant="ghost" size="sm">
-                    <User className="w-4 h-4 mr-2" />
-                    {user.name}
-                  </Button>
-                </Link>
-                {user.role === 'EMPLOYER' && (
-                  <Link href="/dashboard/employer/settings">
-                    <Button variant="ghost" size="sm">
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                )}
-                {user.role === 'JOB_SEEKER' && (
-                  <Link href="/dashboard/seeker/settings">
-                    <Button variant="ghost" size="sm">
-                      <Settings className="w-4 h-4" />
-                    </Button>
-                  </Link>
-                )}
-                {user.role === 'ADMIN' && (
-                  <Link href="/admin">
-                    <Button variant="ghost" size="sm">
-                      <Settings className="w-4 h-4 mr-2" />
-                      Admin
-                    </Button>
-                  </Link>
-                )}
-                <form action="/api/auth/logout" method="POST">
-                  <Button variant="outline" size="sm" type="submit">
-                    <LogOut className="w-4 h-4" />
-                  </Button>
-                </form>
-              </>
+              <UserMenu name={user.name} email={user.email} role={user.role} />
             ) : (
               <>
                 <Link href="/login">

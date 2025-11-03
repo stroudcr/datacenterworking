@@ -120,7 +120,8 @@ export default async function RootLayout({
           user={
             session
               ? {
-                  name: session.email.split('@')[0],
+                  name: session.name,
+                  email: session.email,
                   role: session.role,
                 }
               : null
