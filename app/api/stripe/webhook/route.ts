@@ -9,8 +9,19 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
 
   if (!signature) {
+    console.error('Webhook error: No stripe-signature header present');
     return NextResponse.json({ error: 'No signature' }, { status: 400 });
   }
+
+  // Validate webhook secret is configured
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    console.error('Webhook error: STRIPE_WEBHOOK_SECRET is not configured in environment variables');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
+  }
+
+  // Log webhook secret prefix for debugging (first 10 chars only)
+  console.log('Webhook verification attempt with secret prefix:', webhookSecret.substring(0, 10));
 
   let event: Stripe.Event;
 
@@ -18,15 +29,22 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(
       body,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET || ''
+      webhookSecret
     );
   } catch (error: any) {
     console.error('Webhook signature verification failed:', error.message);
+    console.error('This usually means:');
+    console.error('1. The STRIPE_WEBHOOK_SECRET does not match the endpoint configured in Stripe Dashboard');
+    console.error('2. You are using a local CLI secret (from "stripe listen") for a production URL');
+    console.error('3. The webhook endpoint URL in Stripe Dashboard does not match your actual URL');
+    console.error('Current site URL:', process.env.NEXT_PUBLIC_SITE_URL);
     return NextResponse.json(
       { error: 'Invalid signature' },
       { status: 400 }
     );
   }
+
+  console.log('Webhook signature verified successfully for event:', event.type);
 
   // Handle the event
   switch (event.type) {
