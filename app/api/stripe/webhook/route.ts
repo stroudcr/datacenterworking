@@ -4,6 +4,24 @@ import { db } from '@/lib/db';
 import { sendManagementLinkEmail, sendPaymentConfirmation } from '@/lib/email';
 import Stripe from 'stripe';
 
+// GET endpoint for debugging webhook configuration
+export async function GET() {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+  return NextResponse.json({
+    status: 'webhook_endpoint_active',
+    configured: !!webhookSecret,
+    webhookSecretPrefix: webhookSecret ? webhookSecret.substring(0, 10) : 'NOT_SET',
+    siteUrl: siteUrl || 'NOT_SET',
+    expectedUrl: `${siteUrl}/api/stripe/webhook`,
+    timestamp: new Date().toISOString(),
+    message: webhookSecret
+      ? 'Webhook endpoint is configured. Verify this secret matches your Stripe Dashboard endpoint.'
+      : 'ERROR: STRIPE_WEBHOOK_SECRET is not set in environment variables.'
+  });
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
