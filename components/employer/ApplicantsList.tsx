@@ -102,12 +102,12 @@ export function ApplicantsList({ jobId, applications }: ApplicantsListProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Filters */}
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setFilter('all')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
             filter === 'all'
               ? 'bg-ice-500 text-white'
               : 'glass text-silver-300 hover:bg-white/10'
@@ -117,7 +117,7 @@ export function ApplicantsList({ jobId, applications }: ApplicantsListProps) {
         </button>
         <button
           onClick={() => setFilter('pending')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
             filter === 'pending'
               ? 'bg-amber-500 text-white'
               : 'glass text-silver-300 hover:bg-white/10'
@@ -127,7 +127,7 @@ export function ApplicantsList({ jobId, applications }: ApplicantsListProps) {
         </button>
         <button
           onClick={() => setFilter('reviewed')}
-          className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors ${
             filter === 'reviewed'
               ? 'bg-blue-500 text-white'
               : 'glass text-silver-300 hover:bg-white/10'
@@ -141,26 +141,34 @@ export function ApplicantsList({ jobId, applications }: ApplicantsListProps) {
       <div className="space-y-4">
         {filteredApplications.map((application) => (
           <GlassCard key={application.id} className="hover:bg-white/10 transition-all">
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               {/* Header */}
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white mb-1">
-                    {application.user.name}
-                  </h3>
-                  <div className="flex flex-wrap items-center gap-3 text-sm text-silver-400">
+                  <div className="flex items-start justify-between sm:block mb-1">
+                    <h3 className="text-base sm:text-lg font-semibold text-white">
+                      {application.user.name}
+                    </h3>
+                    <div className="sm:hidden">
+                      {getStatusBadge(application.status)}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-silver-400">
                     <a
                       href={`mailto:${application.user.email}`}
                       className="inline-flex items-center gap-1 text-ice-400 hover:text-ice-300 transition-colors"
                     >
-                      <Mail className="w-4 h-4" />
-                      {application.user.email}
+                      <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span className="truncate max-w-[200px] sm:max-w-none">{application.user.email}</span>
                     </a>
-                    <span>•</span>
-                    <span>Applied {format(new Date(application.createdAt), 'MMM d, yyyy')}</span>
+                    <span className="hidden sm:inline">•</span>
+                    <span className="text-xs sm:text-sm">
+                      <span className="hidden sm:inline">Applied </span>
+                      {format(new Date(application.createdAt), 'MMM d, yyyy')}
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-3">
                   {getStatusBadge(application.status)}
                 </div>
               </div>

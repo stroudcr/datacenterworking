@@ -53,32 +53,32 @@ export default async function EmployerDashboard() {
   const featuredJobs = jobs.filter((j) => j.isFeatured && j.featuredUntil && new Date(j.featuredUntil) > new Date()).length;
 
   return (
-    <main className="min-h-screen py-12 px-4">
+    <main className="min-h-screen py-6 sm:py-8 md:py-12 px-4">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Employer Dashboard</h1>
-            <p className="text-silver-400">Manage your job postings and view analytics</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Employer Dashboard</h1>
+            <p className="text-sm sm:text-base text-silver-400">Manage your job postings and view analytics</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <Link href="/dashboard/employer/settings">
-              <Button variant="secondary" size="lg">
-                <Settings className="w-5 h-5 mr-2" />
-                Settings
+              <Button variant="secondary" size="md" className="w-full sm:w-auto">
+                <Settings className="w-5 h-5 sm:mr-2" />
+                <span className="hidden sm:inline">Settings</span>
               </Button>
             </Link>
             <Link href="/post-job">
-              <Button variant="primary" size="lg">
-                <Plus className="w-5 h-5 mr-2" />
-                Post New Job
+              <Button variant="primary" size="md" className="w-full sm:w-auto">
+                <Plus className="w-5 h-5 sm:mr-2" />
+                <span className="sm:inline">Post New Job</span>
               </Button>
             </Link>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <GlassCard>
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg bg-ice-500/20">
@@ -130,10 +130,10 @@ export default async function EmployerDashboard() {
 
         {/* Jobs List */}
         <GlassCard>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-white">Your Job Postings</h2>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <h2 className="text-xl sm:text-2xl font-semibold text-white">Your Job Postings</h2>
             <div className="flex gap-2">
-              <select className="glass rounded-lg px-4 py-2 text-white text-sm">
+              <select className="glass rounded-lg px-3 sm:px-4 py-2 text-white text-sm w-full sm:w-auto">
                 <option value="all">All Jobs</option>
                 <option value="active">Active</option>
                 <option value="expired">Expired</option>
@@ -158,14 +158,14 @@ export default async function EmployerDashboard() {
                 return (
                   <div
                     key={job.id}
-                    className="glass rounded-lg p-6 hover:bg-white/10 transition-all"
+                    className="glass rounded-lg p-4 sm:p-6 hover:bg-white/10 transition-all"
                   >
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-4">
                       <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
                           <Link
                             href={`/jobs/${job.slug}`}
-                            className="text-xl font-semibold text-white hover:text-ice-400 transition-colors"
+                            className="text-lg sm:text-xl font-semibold text-white hover:text-ice-400 transition-colors"
                           >
                             {job.title}
                           </Link>
@@ -182,42 +182,45 @@ export default async function EmployerDashboard() {
                           )}
                         </div>
 
-                        <div className="flex flex-wrap gap-4 text-sm text-silver-400 mb-3">
+                        <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-silver-400 mb-3">
                           <span>{job.location}</span>
-                          <span>•</span>
+                          <span className="hidden sm:inline">•</span>
                           <span>{job.type}</span>
-                          <span>•</span>
-                          <span>{job.category}</span>
+                          <span className="hidden sm:inline">•</span>
+                          <span className="hidden sm:inline">{job.category}</span>
                         </div>
 
-                        <div className="flex flex-wrap gap-6 text-sm">
-                          <div className="flex items-center gap-2 text-silver-300">
-                            <Eye className="w-4 h-4" />
-                            {job.viewCount} views
+                        <div className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-silver-300">
+                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span>{job.viewCount} views</span>
                           </div>
                           <Link href={`/dashboard/employer/jobs/${job.id}/applicants`}>
-                            <div className="flex items-center gap-2 text-ice-400 hover:text-ice-300 transition-colors cursor-pointer">
-                              <Users className="w-4 h-4" />
-                              {job.applicationCount} applications
+                            <div className="flex items-center gap-1.5 sm:gap-2 text-ice-400 hover:text-ice-300 transition-colors cursor-pointer">
+                              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                              <span>{job.applicationCount} apps</span>
                             </div>
                           </Link>
-                          <div className="flex items-center gap-2 text-silver-300">
-                            <Clock className="w-4 h-4" />
-                            Posted {format(new Date(job.createdAt), 'MMM d, yyyy')}
+                          <div className="flex items-center gap-1.5 sm:gap-2 text-silver-300">
+                            <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Posted {format(new Date(job.createdAt), 'MMM d, yyyy')}</span>
+                            <span className="sm:hidden">{format(new Date(job.createdAt), 'MMM d')}</span>
                           </div>
                           {!isExpired && (
-                            <div className="flex items-center gap-2 text-silver-300">
-                              Expires {format(new Date(job.expiresAt), 'MMM d, yyyy')}
+                            <div className="flex items-center gap-1.5 sm:gap-2 text-silver-300">
+                              <span className="hidden sm:inline">Expires {format(new Date(job.expiresAt), 'MMM d, yyyy')}</span>
+                              <span className="sm:hidden">Exp {format(new Date(job.expiresAt), 'MMM d')}</span>
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <div className="flex gap-2">
-                        <Link href={`/dashboard/employer/jobs/${job.id}/applicants`}>
-                          <Button variant="secondary" size="sm">
-                            <Users className="w-4 h-4 mr-1" />
-                            View Applicants
+                      <div className="flex flex-wrap gap-2 pt-3 border-t border-white/10">
+                        <Link href={`/dashboard/employer/jobs/${job.id}/applicants`} className="flex-1 sm:flex-none">
+                          <Button variant="secondary" size="sm" className="w-full sm:w-auto">
+                            <Users className="w-4 h-4 sm:mr-1" />
+                            <span className="hidden sm:inline">View Applicants</span>
+                            <span className="sm:hidden ml-1">Applicants</span>
                           </Button>
                         </Link>
                         <Link href={`/jobs/${job.slug}`}>
@@ -236,7 +239,7 @@ export default async function EmployerDashboard() {
         </GlassCard>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-6 sm:mt-8">
           <GlassCard>
             <h3 className="text-lg font-semibold text-white mb-3">Need More Visibility?</h3>
             <p className="text-silver-400 text-sm mb-4">

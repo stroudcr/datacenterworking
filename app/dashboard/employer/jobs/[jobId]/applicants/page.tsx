@@ -54,32 +54,33 @@ export default async function ApplicantsPage({
   const reviewedApplications = job.applications.filter((a) => a.status === 'reviewed').length;
 
   return (
-    <main className="min-h-screen py-12 px-4">
+    <main className="min-h-screen py-6 sm:py-8 md:py-12 px-4">
       <div className="container mx-auto max-w-7xl">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link
             href="/dashboard/employer"
-            className="inline-flex items-center text-ice-400 hover:text-ice-300 mb-4 transition-colors"
+            className="inline-flex items-center text-sm sm:text-base text-ice-400 hover:text-ice-300 mb-4 transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
-          <div className="flex items-start gap-4 mb-4">
-            <div className="p-3 rounded-lg bg-ice-500/20">
-              <Briefcase className="w-8 h-8 text-ice-400" />
+          <div className="flex flex-col sm:flex-row sm:items-start gap-3 sm:gap-4 mb-4">
+            <div className="p-2.5 sm:p-3 rounded-lg bg-ice-500/20 w-fit">
+              <Briefcase className="w-6 h-6 sm:w-8 sm:h-8 text-ice-400" />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold text-white mb-2">{job.title}</h1>
-              <p className="text-silver-400">
-                {job.location} • {job.type} • {job.category}
+            <div className="flex-1">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">{job.title}</h1>
+              <p className="text-sm sm:text-base text-silver-400">
+                {job.location} • {job.type}
+                <span className="hidden sm:inline"> • {job.category}</span>
               </p>
             </div>
           </div>
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <GlassCard>
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg bg-ice-500/20">

@@ -128,53 +128,95 @@ export default async function EmployerSettings() {
                   <p className="text-silver-400 text-sm">No payment history yet</p>
                 </div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-dark-400">
-                        <th className="text-left py-3 px-4 text-sm font-medium text-silver-300">Date</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-silver-300">Job Title</th>
-                        <th className="text-left py-3 px-4 text-sm font-medium text-silver-300">Type</th>
-                        <th className="text-right py-3 px-4 text-sm font-medium text-silver-300">Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {payments.map((payment) => (
-                        <tr key={payment.id} className="border-b border-dark-400/50 hover:bg-white/5">
-                          <td className="py-3 px-4 text-sm text-silver-300">
-                            {format(new Date(payment.createdAt), 'MMM d, yyyy')}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-white">
+                <>
+                  {/* Mobile Card Layout */}
+                  <div className="md:hidden space-y-3">
+                    {payments.map((payment) => (
+                      <div key={payment.id} className="glass rounded-lg p-4">
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="flex-1">
                             {payment.job ? (
                               <Link
                                 href={`/jobs/${payment.job.slug}`}
-                                className="hover:text-ice-400 transition-colors"
+                                className="text-white hover:text-ice-400 transition-colors font-medium text-sm"
                               >
                                 {payment.job.title}
                               </Link>
                             ) : (
-                              <span className="text-silver-500">Deleted job</span>
+                              <span className="text-silver-500 text-sm">Deleted job</span>
                             )}
-                          </td>
-                          <td className="py-3 px-4 text-sm">
-                            {payment.isFeatured ? (
-                              <span className="px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium">
-                                Featured
-                              </span>
-                            ) : (
-                              <span className="px-2 py-1 rounded-full bg-ice-500/20 text-ice-400 text-xs font-medium">
-                                Standard
-                              </span>
-                            )}
-                          </td>
-                          <td className="py-3 px-4 text-sm text-white text-right font-medium">
+                          </div>
+                          <span className="text-white font-semibold text-sm ml-2">
                             ${(payment.amount / 100).toFixed(2)}
-                          </td>
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-3 text-xs">
+                          <span className="text-silver-400">
+                            {format(new Date(payment.createdAt), 'MMM d, yyyy')}
+                          </span>
+                          {payment.isFeatured ? (
+                            <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 font-medium">
+                              Featured
+                            </span>
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-full bg-ice-500/20 text-ice-400 font-medium">
+                              Standard
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Desktop Table Layout */}
+                  <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-dark-400">
+                          <th className="text-left py-3 px-4 text-sm font-medium text-silver-300">Date</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-silver-300">Job Title</th>
+                          <th className="text-left py-3 px-4 text-sm font-medium text-silver-300">Type</th>
+                          <th className="text-right py-3 px-4 text-sm font-medium text-silver-300">Amount</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {payments.map((payment) => (
+                          <tr key={payment.id} className="border-b border-dark-400/50 hover:bg-white/5">
+                            <td className="py-3 px-4 text-sm text-silver-300">
+                              {format(new Date(payment.createdAt), 'MMM d, yyyy')}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-white">
+                              {payment.job ? (
+                                <Link
+                                  href={`/jobs/${payment.job.slug}`}
+                                  className="hover:text-ice-400 transition-colors"
+                                >
+                                  {payment.job.title}
+                                </Link>
+                              ) : (
+                                <span className="text-silver-500">Deleted job</span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-sm">
+                              {payment.isFeatured ? (
+                                <span className="px-2 py-1 rounded-full bg-amber-500/20 text-amber-400 text-xs font-medium">
+                                  Featured
+                                </span>
+                              ) : (
+                                <span className="px-2 py-1 rounded-full bg-ice-500/20 text-ice-400 text-xs font-medium">
+                                  Standard
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-3 px-4 text-sm text-white text-right font-medium">
+                              ${(payment.amount / 100).toFixed(2)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
               )}
             </GlassCard>
           </section>
