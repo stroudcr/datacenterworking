@@ -1,23 +1,30 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useTransition } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { LogOut, User as UserIcon, LayoutDashboard } from 'lucide-react';
+import { LogOut, LayoutDashboard } from 'lucide-react';
+import { logout } from '@/app/actions/auth';
 
 interface UserMenuProps {
-  name: string;
+  name?: string;
   email: string;
   role: 'EMPLOYER' | 'JOB_SEEKER' | 'ADMIN';
 }
 
 export function UserMenu({ name, email, role }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const menuRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+
+  // Use name if available, otherwise fall back to email prefix
+  const displayName = name || email.split('@')[0];
 
   // Generate initials from name
   const getInitials = (name: string): string => {
+    if (!name || !name.trim()) {
+      // Fallback to email if name is empty
+      return email.substring(0, 2).toUpperCase();
+    }
     const parts = name.trim().split(' ');
     if (parts.length >= 2) {
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
@@ -49,14 +56,10 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
     };
   }, [isOpen]);
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST' });
-      router.push('/');
-      router.refresh();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
+  const handleLogout = () => {
+    startTransition(async () => {
+      await logout();
+    });
   };
 
   const dashboardLink = role === 'ADMIN'
@@ -74,12 +77,12 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
       >
         {/* Initials Circle */}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ice-blue to-silver-400 flex items-center justify-center text-navy-900 font-semibold text-sm">
-          {getInitials(name)}
+          {getInitials(displayName)}
         </div>
 
         {/* Name (hidden on mobile) */}
         <span className="hidden sm:block text-white font-medium text-sm">
-          {name}
+          {displayName}
         </span>
 
         {/* Dropdown Arrow */}
@@ -107,10 +110,10 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
           <div className="p-4 border-b border-ice-blue/20">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ice-blue to-silver-400 flex items-center justify-center text-navy-900 font-semibold">
-                {getInitials(name)}
+                {getInitials(displayName)}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-white font-medium text-sm truncate">{name}</p>
+                <p className="text-white font-medium text-sm truncate">{displayName}</p>
                 <p className="text-silver-400 text-xs truncate">{email}</p>
               </div>
             </div>
@@ -132,10 +135,13 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-2.5 text-silver-300 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              disabled={isPending}
+              className="w-full flex items-center gap-3 px-4 py-2.5 text-silver-300 hover:bg-red-500/10 hover:text-red-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <LogOut className="w-4 h-4" />
-              <span className="text-sm font-medium">Logout</span>
+              <span className="text-sm font-medium">
+                {isPending ? 'Logging out...' : 'Logout'}
+              </span>
             </button>
           </div>
         </div>

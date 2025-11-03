@@ -1,8 +1,9 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import './globals.css';
-import { Header } from '@/components/Header';
+import { HeaderServer } from '@/components/HeaderServer';
+import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import { Footer } from '@/components/Footer';
-import { getSession } from '@/lib/auth';
 import { Analytics } from '@vercel/analytics/next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
@@ -65,13 +66,11 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
-
   // Organization schema for the entire site
   const organizationSchema = {
     '@context': 'https://schema.org',
@@ -116,17 +115,9 @@ export default async function RootLayout({
         />
       </head>
       <body>
-        <Header
-          user={
-            session
-              ? {
-                  name: session.name,
-                  email: session.email,
-                  role: session.role,
-                }
-              : null
-          }
-        />
+        <Suspense fallback={<HeaderSkeleton />}>
+          <HeaderServer />
+        </Suspense>
         {children}
         <Footer />
         <Analytics />
