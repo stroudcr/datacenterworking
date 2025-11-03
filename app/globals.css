@@ -27,10 +27,24 @@ body {
 /* Glassmorphism base styles */
 .glass {
   background: rgba(255, 255, 255, 0.05);
+  /* Cross-browser backdrop blur support */
   backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Safari & older Chrome */
+  -moz-backdrop-filter: blur(10px);    /* Firefox */
+  -o-backdrop-filter: blur(10px);      /* Opera */
+  -ms-backdrop-filter: blur(10px);     /* IE/Edge legacy */
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  /* Force hardware acceleration for better performance */
+  transform: translateZ(0);
+  will-change: backdrop-filter;
+}
+
+/* Fallback for browsers that don't support backdrop-filter */
+@supports not (backdrop-filter: blur(10px)) {
+  .glass {
+    background: rgba(255, 255, 255, 0.15); /* More opaque fallback */
+  }
 }
 
 .glass-hover {
