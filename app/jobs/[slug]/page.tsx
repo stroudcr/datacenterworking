@@ -397,11 +397,10 @@ export default async function JobPage({ params }: JobPageProps) {
               <h2 className="text-xl font-semibold text-white mb-4">
                 Job Description
               </h2>
-              <div className="prose prose-invert prose-ice max-w-none">
-                <p className="text-silver-300 whitespace-pre-wrap leading-relaxed">
-                  {job.description}
-                </p>
-              </div>
+              <div
+                className="prose prose-invert prose-ice max-w-none text-silver-300 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: job.description }}
+              />
             </GlassCard>
 
             {/* Requirements */}
@@ -409,11 +408,10 @@ export default async function JobPage({ params }: JobPageProps) {
               <h2 className="text-xl font-semibold text-white mb-4">
                 Requirements
               </h2>
-              <div className="prose prose-invert prose-ice max-w-none">
-                <p className="text-silver-300 whitespace-pre-wrap leading-relaxed">
-                  {job.requirements}
-                </p>
-              </div>
+              <div
+                className="prose prose-invert prose-ice max-w-none text-silver-300 leading-relaxed"
+                dangerouslySetInnerHTML={{ __html: job.requirements }}
+              />
             </GlassCard>
           </div>
 
