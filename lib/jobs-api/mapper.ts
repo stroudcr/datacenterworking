@@ -1,6 +1,5 @@
 import { ScoredJob } from './types';
 import { JOB_CATEGORIES, JOB_TYPES } from '../constants';
-import { generateSlug } from '../slugify';
 
 export interface MappedJob {
   title: string;
@@ -294,6 +293,25 @@ function buildRequirements(job: ScoredJob): string {
 }
 
 /**
+ * Generate a slug from title and external ID
+ */
+function generateSlugFromExternal(title: string, externalId: string): string {
+  // Create slug from title
+  const slug = title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+    .replace(/\s+/g, '-')          // Replace spaces with hyphens
+    .replace(/-+/g, '-')           // Replace multiple hyphens with single
+    .replace(/^-|-$/g, '')         // Remove leading/trailing hyphens
+    .substring(0, 80);             // Limit length
+
+  // Use first 12 chars of external ID for uniqueness
+  const shortId = externalId.substring(0, 12).replace(/[^a-z0-9]/gi, '').toLowerCase();
+
+  return `${slug}-${shortId}`;
+}
+
+/**
  * Map JSearch job to our database schema
  */
 export function mapJSearchJobToSchema(job: ScoredJob): MappedJob {
@@ -302,8 +320,8 @@ export function mapJSearchJobToSchema(job: ScoredJob): MappedJob {
     ? `${job.job_city}, ${job.job_state}`
     : job.job_city || job.job_state || job.job_country;
 
-  // Generate slug from title
-  const slug = generateSlug(job.job_title);
+  // Generate slug from title and external ID
+  const slug = generateSlugFromExternal(job.job_title, job.job_id);
 
   // Map salary (convert to annual if needed)
   let salaryMin: number | undefined;
