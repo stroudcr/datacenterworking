@@ -99,24 +99,42 @@ export async function POST(request: NextRequest) {
       ? job.user?.notificationPreferences?.newApplications !== false // Default to true if not set
       : true; // Always send for guest posters
 
+    console.log('[APPLICATION] Email notification check:', {
+      hasEmployerEmail: !!employerEmail,
+      employerEmail: employerEmail || 'NOT SET',
+      shouldSendEmail,
+      jobId: job.id,
+      jobTitle: job.title,
+    });
+
     if (employerEmail && shouldSendEmail) {
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
       const applicantsPageUrl = job.userId
         ? `${baseUrl}/dashboard/employer/jobs/${job.id}/applicants`
         : `${baseUrl}/jobs/manage/${job.id}?token=${job.managementToken}`;
 
-      sendApplicationNotification({
-        to: employerEmail,
-        jobTitle: job.title,
-        company: job.company,
-        applicantName: applicant.name || 'Anonymous',
-        applicantEmail: applicant.email,
-        coverLetter: coverLetter || undefined,
-        resumeUrl: resume || undefined,
-        applicantsPageUrl,
-      }).catch(error => {
-        console.error('Failed to send application notification email:', error);
+      console.log('[APPLICATION] Sending notification email to:', employerEmail);
+
+      try {
+        const result = await sendApplicationNotification({
+          to: employerEmail,
+          jobTitle: job.title,
+          company: job.company,
+          applicantName: applicant.name || 'Anonymous',
+          applicantEmail: applicant.email,
+          coverLetter: coverLetter || undefined,
+          resumeUrl: resume || undefined,
+          applicantsPageUrl,
+        });
+        console.log('[APPLICATION] Email notification result:', result);
+      } catch (error) {
+        console.error('[APPLICATION] Failed to send application notification email:', error);
         // Don't fail the application submission if email fails
+      }
+    } else {
+      console.log('[APPLICATION] Skipping email notification. Reasons:', {
+        hasEmployerEmail: !!employerEmail,
+        shouldSendEmail,
       });
     }
 
