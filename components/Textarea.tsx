@@ -22,7 +22,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             'glass rounded-lg px-4 py-2.5 text-white',
             'placeholder:text-silver-500',
             'focus:outline-none focus:ring-2 focus:ring-ice-500',
-            'transition-all duration-200',
+            'transition-[border-color,box-shadow,background-color] duration-200',
             'min-h-[120px] resize-y',
             error && 'ring-2 ring-red-500',
             fullWidth && 'w-full',

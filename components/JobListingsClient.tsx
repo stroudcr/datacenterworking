@@ -79,12 +79,12 @@ export function JobListingsClient({
       {/* Mobile Filter Toggle Button */}
       <button
         onClick={() => setIsFilterOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-30 px-4 py-3 glass rounded-full shadow-lg hover:bg-white/20 transition-all flex items-center gap-2"
+        className="lg:hidden fixed bottom-6 right-6 z-30 px-4 py-3 bg-ice-500 rounded-full shadow-lg hover:bg-ice-600 transition-[background-color,transform] hover:scale-105 flex items-center gap-2"
       >
         <SlidersHorizontal className="w-5 h-5 text-white" />
         <span className="text-sm font-medium text-white">Filters</span>
         {activeFilterCount > 0 && (
-          <span className="bg-ice-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="bg-white/20 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
             {activeFilterCount}
           </span>
         )}

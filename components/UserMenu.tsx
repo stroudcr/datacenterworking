@@ -73,7 +73,7 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
       {/* Avatar Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-ice-blue/10 border border-ice-blue/20 hover:bg-ice-blue/20 transition-all duration-200 backdrop-blur-sm"
+        className="flex items-center gap-2 px-3 py-2 rounded-lg bg-ice-blue/10 border border-ice-blue/20 hover:bg-ice-blue/20 transition-[background-color,border-color] duration-200"
       >
         {/* Initials Circle */}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-ice-blue to-silver-400 flex items-center justify-center text-navy-900 font-semibold text-sm">
@@ -105,7 +105,7 @@ export function UserMenu({ name, email, role }: UserMenuProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-screen max-w-[calc(100vw-2rem)] sm:w-64 rounded-lg bg-[#0f172a] border border-ice-blue/30 shadow-2xl backdrop-blur-lg overflow-hidden z-[100]">
+        <div className="absolute right-0 mt-2 w-screen max-w-[calc(100vw-2rem)] sm:w-64 rounded-lg bg-[#0f172a]/95 border border-ice-blue/30 shadow-2xl overflow-hidden z-[100]">
           {/* User Info Section */}
           <div className="p-4 border-b border-ice-blue/20">
             <div className="flex items-center gap-3 mb-2">

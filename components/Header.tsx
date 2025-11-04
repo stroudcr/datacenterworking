@@ -18,12 +18,12 @@ export function Header({ user }: HeaderProps) {
   const pathname = usePathname();
 
   return (
-    <header className="sticky top-0 z-50 glass border-b border-white/10">
+    <header className="sticky top-0 z-50 bg-[#0f172a]/95 border-b border-white/10 shadow-lg">
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="px-4 py-2 rounded-lg bg-white/95 backdrop-blur-sm transition-all group-hover:bg-white">
+            <div className="px-4 py-2 rounded-lg bg-white transition-[background-color,box-shadow] duration-200 group-hover:shadow-lg">
               <Image
                 src="/images/NavLogo.png"
                 alt="Work In Data Center"
