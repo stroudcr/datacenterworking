@@ -42,7 +42,7 @@ export const JobSeekerWelcome = ({ name }: JobSeekerWelcomeProps) => {
             <Heading style={h2}>What You Can Do:</Heading>
 
             <Text style={bulletPoint}>
-              <strong>Browse Hundreds of Jobs</strong> - Explore opportunities across 10 specialized data center categories from operations to cloud infrastructure.
+              <strong>Browse Hundreds of Jobs</strong> - Explore opportunities across specialized data center categories from operations to cloud infrastructure.
             </Text>
 
             <Text style={bulletPoint}>
