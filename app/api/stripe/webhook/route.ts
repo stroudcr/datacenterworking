@@ -122,18 +122,17 @@ export async function POST(request: NextRequest) {
         // Send management link email for guest users (no userId)
         if (!job.userId && job.managementToken && recipientEmail) {
           console.log('[WEBHOOK] Sending management link email to:', recipientEmail);
-          sendManagementLinkEmail({
-            to: recipientEmail,
-            jobTitle: job.title,
-            company: job.company,
-            managementUrl: managementUrl!,
-          })
-            .then(result => {
-              console.log('[WEBHOOK] Management link email result:', result);
-            })
-            .catch(error => {
-              console.error('[WEBHOOK] Management link email error:', error);
+          try {
+            const result = await sendManagementLinkEmail({
+              to: recipientEmail,
+              jobTitle: job.title,
+              company: job.company,
+              managementUrl: managementUrl!,
             });
+            console.log('[WEBHOOK] Management link email result:', result);
+          } catch (error) {
+            console.error('[WEBHOOK] Management link email error:', error);
+          }
         } else {
           console.log('[WEBHOOK] Skipping management link email. Reasons:', {
             hasUserId: !!job.userId,
@@ -145,22 +144,21 @@ export async function POST(request: NextRequest) {
         // Send payment confirmation email to all users
         if (recipientEmail) {
           console.log('[WEBHOOK] Sending payment confirmation email to:', recipientEmail);
-          sendPaymentConfirmation({
-            to: recipientEmail,
-            jobTitle: job.title,
-            company: job.company,
-            amount: payment.amount,
-            paymentId: payment.stripePaymentId || session.payment_intent as string || session.id,
-            isFeatured: job.isFeatured,
-            jobUrl,
-            managementUrl: !job.userId ? managementUrl : undefined, // Only include for guests
-          })
-            .then(result => {
-              console.log('[WEBHOOK] Payment confirmation email result:', result);
-            })
-            .catch(error => {
-              console.error('[WEBHOOK] Payment confirmation email error:', error);
+          try {
+            const result = await sendPaymentConfirmation({
+              to: recipientEmail,
+              jobTitle: job.title,
+              company: job.company,
+              amount: payment.amount,
+              paymentId: payment.stripePaymentId || session.payment_intent as string || session.id,
+              isFeatured: job.isFeatured,
+              jobUrl,
+              managementUrl: !job.userId ? managementUrl : undefined, // Only include for guests
             });
+            console.log('[WEBHOOK] Payment confirmation email result:', result);
+          } catch (error) {
+            console.error('[WEBHOOK] Payment confirmation email error:', error);
+          }
         } else {
           console.error('[WEBHOOK] ❌ No recipient email available for payment confirmation. Job ID:', job.id);
         }
