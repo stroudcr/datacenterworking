@@ -63,6 +63,11 @@ model Job {
   email            String?
   managementToken  String?       @unique
   userId           String?
+  // External job tracking
+  source           JobSource     @default(INTERNAL)
+  externalId       String?       @unique
+  sourceUrl        String?
+  lastSynced       DateTime?
   applications     Application[]
   user             User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
   payment          Payment?
@@ -80,6 +85,8 @@ model Job {
   @@index([userId])
   @@index([email])
   @@index([managementToken])
+  @@index([source])
+  @@index([externalId])
 }
 
 model Application {
@@ -169,4 +176,9 @@ enum JobStatus {
   ACTIVE
   EXPIRED
   DELETED
+}
+
+enum JobSource {
+  INTERNAL
+  EXTERNAL_JSEARCH
 }

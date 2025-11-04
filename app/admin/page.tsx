@@ -11,10 +11,13 @@ import {
   DollarSign,
   Eye,
   ExternalLink,
-  AlertTriangle
+  AlertTriangle,
+  Download,
+  Cloud
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { DeleteJobButton } from './DeleteJobButton';
+import { ImportJobsButton } from './ImportJobsButton';
 
 export default async function AdminPanel() {
   const session = await getSession();
@@ -52,6 +55,28 @@ export default async function AdminPanel() {
   });
 
   const revenue = (totalRevenue._sum.amount || 0) / 100;
+
+  // External jobs stats
+  const externalJobsCount = await db.job.count({
+    where: {
+      source: 'EXTERNAL_JSEARCH',
+      status: 'ACTIVE',
+    },
+  });
+
+  const internalJobsCount = totalJobs - externalJobsCount;
+
+  const latestExternalJob = await db.job.findFirst({
+    where: {
+      source: 'EXTERNAL_JSEARCH',
+    },
+    orderBy: {
+      lastSynced: 'desc',
+    },
+    select: {
+      lastSynced: true,
+    },
+  });
 
   return (
     <main className="min-h-screen py-12 px-4">
@@ -115,6 +140,54 @@ export default async function AdminPanel() {
             </div>
           </GlassCard>
         </div>
+
+        {/* Import External Jobs Section */}
+        <GlassCard className="mb-8">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <Cloud className="w-6 h-6 text-ice-400" />
+                <h2 className="text-xl font-semibold text-white">Import Jobs from JSearch API</h2>
+              </div>
+              <p className="text-silver-400 text-sm mb-4">
+                Import real data center jobs from Google for Jobs via JSearch API (RapidAPI).
+                Free tier: 100 API calls per month = up to 1,000 jobs fetched, top 100 imported.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div className="glass rounded-lg p-3">
+                  <p className="text-xs text-silver-500 mb-1">Internal Jobs</p>
+                  <p className="text-xl font-bold text-white">{internalJobsCount}</p>
+                </div>
+                <div className="glass rounded-lg p-3">
+                  <p className="text-xs text-silver-500 mb-1">External Jobs</p>
+                  <p className="text-xl font-bold text-ice-400">{externalJobsCount}</p>
+                </div>
+                <div className="glass rounded-lg p-3">
+                  <p className="text-xs text-silver-500 mb-1">Last Synced</p>
+                  <p className="text-sm font-medium text-white">
+                    {latestExternalJob?.lastSynced
+                      ? format(new Date(latestExternalJob.lastSynced), 'MMM d, yyyy')
+                      : 'Never'}
+                  </p>
+                </div>
+              </div>
+              {!process.env.RAPIDAPI_KEY && (
+                <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 mb-4">
+                  <AlertTriangle className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="text-sm">
+                    <p className="text-amber-400 font-medium">RAPIDAPI_KEY not configured</p>
+                    <p className="text-silver-400 mt-1">
+                      Add RAPIDAPI_KEY to your environment variables to enable job imports.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+            <div className="ml-6">
+              <ImportJobsButton disabled={!process.env.RAPIDAPI_KEY} />
+            </div>
+          </div>
+        </GlassCard>
 
         {/* Jobs Management */}
         <GlassCard>
@@ -202,6 +275,11 @@ export default async function AdminPanel() {
                         </td>
                         <td className="py-4 px-4">
                           <div className="flex flex-col gap-1">
+                            {job.source === 'EXTERNAL_JSEARCH' && (
+                              <span className="px-2 py-1 rounded text-xs bg-ice-500/20 text-ice-400 border border-ice-500/30 w-fit">
+                                External
+                              </span>
+                            )}
                             {job.isFeatured && (
                               <span className="px-2 py-1 rounded text-xs bg-amber-500/20 text-amber-400 border border-amber-500/30 w-fit">
                                 Featured

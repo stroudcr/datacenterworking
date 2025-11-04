@@ -23,6 +23,7 @@ interface JobCardProps {
     isFeatured: boolean;
     createdAt: Date;
     tags: string[];
+    source?: string;
   };
   isSaved?: boolean;
   showSaveButton?: boolean;
@@ -93,10 +94,15 @@ export function JobCard({ job, isSaved = false, showSaveButton = false }: JobCar
           </div>
 
           {/* Category Badge */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="px-3 py-1 rounded-full glass text-xs text-ice-400 border border-ice-500/30">
               {job.category}
             </span>
+            {job.source === 'EXTERNAL_JSEARCH' && (
+              <span className="px-2 py-1 rounded text-xs text-silver-400 bg-ice-500/10 border border-ice-500/20">
+                via Google for Jobs
+              </span>
+            )}
             <span className="text-xs text-silver-500">
               {format(new Date(job.createdAt), 'MMM d, yyyy')}
             </span>
