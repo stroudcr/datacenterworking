@@ -13,15 +13,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.co
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: 'Find Data Center Jobs | Work In Data Center',
+  title: '"Find Data Center Jobs | WorkInDataCenter.com',
   description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, security clearance positions, and more.',
   openGraph: {
-    title: 'Find Data Center Jobs | Work In Data Center',
+    title: '"Find Data Center Jobs | WorkInDataCenter.com',
     description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, and more.',
     url: siteUrl,
-  },
-  alternates: {
-    canonical: siteUrl,
   },
 };
 
