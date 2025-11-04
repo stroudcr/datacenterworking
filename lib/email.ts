@@ -9,6 +9,23 @@ import { JobExpirationReminder } from '@/emails/JobExpirationReminder';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+// Enhanced logging helper
+function logEmailError(emailType: string, error: any, recipient: string) {
+  console.error(`[EMAIL ERROR] ${new Date().toISOString()}`);
+  console.error(`Type: ${emailType}`);
+  console.error(`Recipient: ${recipient}`);
+  console.error(`Error:`, JSON.stringify(error, null, 2));
+  console.error(`API Key configured: ${!!process.env.RESEND_API_KEY}`);
+  console.error(`Email From: ${process.env.EMAIL_FROM || 'noreply@workindatacenter.com'}`);
+}
+
+function logEmailSuccess(emailType: string, emailId: string | undefined, recipient: string) {
+  console.log(`[EMAIL SUCCESS] ${new Date().toISOString()}`);
+  console.log(`Type: ${emailType}`);
+  console.log(`Recipient: ${recipient}`);
+  console.log(`Email ID: ${emailId || 'N/A'}`);
+}
+
 interface SendWelcomeEmailParams {
   to: string;
   name: string;
@@ -39,11 +56,11 @@ export async function sendWelcomeEmail({
       });
 
       if (error) {
-        console.error('Failed to send employer welcome email:', error);
+        logEmailError('Employer Welcome', error, to);
         return { success: false, error };
       }
 
-      console.log('Employer welcome email sent successfully:', data?.id);
+      logEmailSuccess('Employer Welcome', data?.id, to);
       return { success: true, data };
     } else {
       const { data, error } = await resend.emails.send({
@@ -54,15 +71,15 @@ export async function sendWelcomeEmail({
       });
 
       if (error) {
-        console.error('Failed to send job seeker welcome email:', error);
+        logEmailError('Job Seeker Welcome', error, to);
         return { success: false, error };
       }
 
-      console.log('Job seeker welcome email sent successfully:', data?.id);
+      logEmailSuccess('Job Seeker Welcome', data?.id, to);
       return { success: true, data };
     }
   } catch (error) {
-    console.error('Error sending welcome email:', error);
+    logEmailError('Welcome Email (Catch)', error, to);
     return { success: false, error };
   }
 }
@@ -97,14 +114,14 @@ export async function sendManagementLinkEmail({
     });
 
     if (error) {
-      console.error('Failed to send management link email:', error);
+      logEmailError('Management Link', error, to);
       return { success: false, error };
     }
 
-    console.log('Management link email sent successfully:', data?.id);
+    logEmailSuccess('Management Link', data?.id, to);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending management link email:', error);
+    logEmailError('Management Link (Catch)', error, to);
     return { success: false, error };
   }
 }
@@ -155,14 +172,14 @@ export async function sendPaymentConfirmation({
     });
 
     if (error) {
-      console.error('Failed to send payment confirmation email:', error);
+      logEmailError('Payment Confirmation', error, to);
       return { success: false, error };
     }
 
-    console.log('Payment confirmation email sent successfully:', data?.id);
+    logEmailSuccess('Payment Confirmation', data?.id, to);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending payment confirmation email:', error);
+    logEmailError('Payment Confirmation (Catch)', error, to);
     return { success: false, error };
   }
 }
@@ -213,14 +230,14 @@ export async function sendApplicationNotification({
     });
 
     if (error) {
-      console.error('Failed to send application notification email:', error);
+      logEmailError('Application Notification', error, to);
       return { success: false, error };
     }
 
-    console.log('Application notification email sent successfully:', data?.id);
+    logEmailSuccess('Application Notification', data?.id, to);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending application notification email:', error);
+    logEmailError('Application Notification (Catch)', error, to);
     return { success: false, error };
   }
 }
@@ -270,14 +287,14 @@ export async function sendContactFormEmail({
     });
 
     if (error) {
-      console.error('Failed to send contact form email:', error);
+      logEmailError('Contact Form', error, adminEmail);
       return { success: false, error };
     }
 
-    console.log('Contact form email sent successfully:', data?.id);
+    logEmailSuccess('Contact Form', data?.id, adminEmail);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending contact form email:', error);
+    logEmailError('Contact Form (Catch)', error, adminEmail);
     return { success: false, error };
   }
 }
@@ -325,14 +342,14 @@ export async function sendJobExpirationReminder({
     });
 
     if (error) {
-      console.error('Failed to send expiration reminder email:', error);
+      logEmailError('Job Expiration Reminder', error, to);
       return { success: false, error };
     }
 
-    console.log('Expiration reminder email sent successfully:', data?.id);
+    logEmailSuccess('Job Expiration Reminder', data?.id, to);
     return { success: true, data };
   } catch (error) {
-    console.error('Error sending expiration reminder email:', error);
+    logEmailError('Job Expiration Reminder (Catch)', error, to);
     return { success: false, error };
   }
 }

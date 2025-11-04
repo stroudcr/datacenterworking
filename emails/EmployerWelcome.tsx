@@ -109,7 +109,6 @@ export const EmployerWelcome = ({ name, company }: EmployerWelcomeProps) => {
             <Link href={`${baseUrl}/contact`} style={link}>
               contact page
             </Link>{' '}
-            or reply to this email with any questions.
           </Text>
 
           <Text style={text}>
