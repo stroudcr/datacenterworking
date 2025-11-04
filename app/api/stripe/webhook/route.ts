@@ -98,6 +98,9 @@ export async function POST(request: NextRequest) {
                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://workindatacenter.com');
 
       // Send emails (non-blocking - failures won't affect webhook processing)
+      console.log('[WEBHOOK] Payment completed, checking for job and email...');
+      console.log('[WEBHOOK] Payment has job:', !!payment.job);
+
       if (payment.job) {
         const job = payment.job;
         const jobUrl = `${baseUrl}/jobs/${job.slug}`;
@@ -108,8 +111,17 @@ export async function POST(request: NextRequest) {
         // Determine recipient email (guest job email or user email)
         const recipientEmail = job.email;
 
+        console.log('[WEBHOOK] Job details:', {
+          jobId: job.id,
+          jobTitle: job.title,
+          recipientEmail: recipientEmail || 'NULL/UNDEFINED',
+          hasManagementToken: !!job.managementToken,
+          hasUserId: !!job.userId,
+        });
+
         // Send management link email for guest users (no userId)
         if (!job.userId && job.managementToken && recipientEmail) {
+          console.log('[WEBHOOK] Sending management link email to:', recipientEmail);
           sendManagementLinkEmail({
             to: recipientEmail,
             jobTitle: job.title,
@@ -117,15 +129,22 @@ export async function POST(request: NextRequest) {
             managementUrl: managementUrl!,
           })
             .then(result => {
-              console.log('Management link email sent successfully to:', recipientEmail, result);
+              console.log('[WEBHOOK] Management link email result:', result);
             })
             .catch(error => {
-              console.error('Failed to send management link email to:', recipientEmail, error);
+              console.error('[WEBHOOK] Management link email error:', error);
             });
+        } else {
+          console.log('[WEBHOOK] Skipping management link email. Reasons:', {
+            hasUserId: !!job.userId,
+            hasManagementToken: !!job.managementToken,
+            hasRecipientEmail: !!recipientEmail,
+          });
         }
 
         // Send payment confirmation email to all users
         if (recipientEmail) {
+          console.log('[WEBHOOK] Sending payment confirmation email to:', recipientEmail);
           sendPaymentConfirmation({
             to: recipientEmail,
             jobTitle: job.title,
@@ -137,14 +156,16 @@ export async function POST(request: NextRequest) {
             managementUrl: !job.userId ? managementUrl : undefined, // Only include for guests
           })
             .then(result => {
-              console.log('Payment confirmation email sent successfully to:', recipientEmail, result);
+              console.log('[WEBHOOK] Payment confirmation email result:', result);
             })
             .catch(error => {
-              console.error('Failed to send payment confirmation email to:', recipientEmail, error);
+              console.error('[WEBHOOK] Payment confirmation email error:', error);
             });
         } else {
-          console.warn('No recipient email available for payment confirmation. Job ID:', job.id);
+          console.error('[WEBHOOK] ❌ No recipient email available for payment confirmation. Job ID:', job.id);
         }
+      } else {
+        console.error('[WEBHOOK] ❌ Payment has no associated job! Payment ID:', payment.id);
       }
 
       console.log('Payment completed:', session.id);
