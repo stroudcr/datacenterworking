@@ -92,6 +92,14 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
+                  href="/resources"
+                  className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
+                >
+                  Career Resources
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/about"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >

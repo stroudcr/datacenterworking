@@ -1,5 +1,6 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
+import { resources } from '@/lib/resources-data';
 
 // Cache sitemap for 1 hour to reduce database operations from frequent crawler requests
 export const revalidate = 3600;
@@ -54,6 +55,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     {
+      url: `${siteUrl}/resources`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly',
+      priority: 0.7,
+    },
+    {
       url: `${siteUrl}/privacy`,
       lastModified: new Date(),
       changeFrequency: 'yearly',
@@ -75,5 +82,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...jobPages];
+  // Resource pages
+  const resourcePages: MetadataRoute.Sitemap = resources.map((resource) => ({
+    url: `${siteUrl}/resources/${resource.slug}`,
+    lastModified: new Date(resource.date),
+    changeFrequency: 'monthly' as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...jobPages, ...resourcePages];
 }
