@@ -19,7 +19,9 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   const [activeId, setActiveId] = useState<string>('');
 
   useEffect(() => {
-    // Extract H2 headings from content
+    // Extract H2 headings from content (browser only)
+    if (typeof window === 'undefined') return;
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(content, 'text/html');
     const headings = doc.querySelectorAll('h2');
