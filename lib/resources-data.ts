@@ -39,7 +39,7 @@ export const resources: Resource[] = [
     description: 'Comprehensive salary insights for data center technicians across experience levels, locations, and specializations.',
     category: 'Industry Reports',
     tags: ['Salary', 'Career Path', 'Industry Trends'],
-    date: '2025-11-4',
+    date: '2025-11-04',
     readTime: '25 min read',
     author: 'Work In Data Center Team',
     featured: true,
