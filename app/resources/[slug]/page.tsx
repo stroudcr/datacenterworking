@@ -3,13 +3,13 @@ import { GlassCard } from '@/components/GlassCard';
 import { Button } from '@/components/Button';
 import { ShareButton } from '@/components/ShareButton';
 import { TableOfContents } from '@/components/TableOfContents';
+import { Newsletter } from '@/components/Newsletter';
 import {
   Calendar,
   Clock,
   Tag,
   ArrowLeft,
   BookOpen,
-  Briefcase,
 } from 'lucide-react';
 import { format } from 'date-fns';
 import Link from 'next/link';
@@ -283,23 +283,18 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
         </div>
       </section>
 
-      {/* Call to Action */}
+      {/* Newsletter CTA */}
       <section className="py-12 px-4 bg-gradient-to-b from-black/10 to-transparent">
         <div className="container mx-auto max-w-4xl">
-          <GlassCard className="text-center p-8">
-            <Briefcase className="w-12 h-12 text-ice-400 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-white mb-4">
-              Ready to Apply Your Knowledge?
+          <div className="text-center mb-8">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-3">
+              Unlock More Insider Data Center Insights
             </h2>
-            <p className="text-lg text-silver-300 mb-6">
-              Browse thousands of data center jobs and take the next step in your career.
+            <p className="text-lg text-silver-300">
+              Subscribe Now and Stay Ahead of the Curve!
             </p>
-            <Link href="/">
-              <Button variant="primary" size="lg">
-                Browse Jobs
-              </Button>
-            </Link>
-          </GlassCard>
+          </div>
+          <Newsletter />
         </div>
       </section>
 
