@@ -13,8 +13,6 @@ import {
   Star,
   Building2,
   Calendar,
-  Eye,
-  Users,
   ExternalLink,
   Mail
 } from 'lucide-react';
@@ -354,18 +352,6 @@ export default async function JobPage({ params }: JobPageProps) {
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4" />
                   Posted {format(new Date(job.createdAt), 'MMM d, yyyy')}
-                </div>
-              </div>
-
-              {/* Stats */}
-              <div className="flex gap-4 mt-4 text-sm text-silver-400">
-                <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  {job.viewCount} views
-                </div>
-                <div className="flex items-center gap-1">
-                  <Users className="w-4 h-4" />
-                  {job.applicationCount} applicants
                 </div>
               </div>
             </div>
