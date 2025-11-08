@@ -261,12 +261,12 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
         <div className="container mx-auto max-w-7xl">
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
             {/* Table of Contents - Sidebar */}
-            <aside className="lg:col-span-1 order-2 lg:order-1">
+            <aside className="lg:col-span-1 order-1 lg:order-1">
               <TableOfContents content={resource.content} />
             </aside>
 
             {/* Main Article Content */}
-            <main className="lg:col-span-3 order-1 lg:order-2">
+            <main className="lg:col-span-3 order-2 lg:order-2">
               <GlassCard>
                 <div
                   className="prose prose-invert max-w-none
@@ -294,7 +294,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
               Subscribe Now and Stay Ahead of the Curve!
             </p>
           </div>
-          <Newsletter />
+          <Newsletter showHeader={false} buttonText="Subscribe for More Guides" />
         </div>
       </section>
 

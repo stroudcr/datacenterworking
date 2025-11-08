@@ -6,7 +6,15 @@ import { Button } from './Button';
 import { Input } from './Input';
 import { Mail, Check } from 'lucide-react';
 
-export function Newsletter() {
+interface NewsletterProps {
+  showHeader?: boolean;
+  buttonText?: string;
+}
+
+export function Newsletter({
+  showHeader = true,
+  buttonText = 'Subscribe to Alerts'
+}: NewsletterProps = {}) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -62,19 +70,21 @@ export function Newsletter() {
 
   return (
     <GlassCard>
-      <div className="flex items-start gap-4 mb-6">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-ice-500 to-ice-600">
-          <Mail className="w-6 h-6 text-white" />
+      {showHeader && (
+        <div className="flex items-start gap-4 mb-6">
+          <div className="p-3 rounded-xl bg-gradient-to-br from-ice-500 to-ice-600">
+            <Mail className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-semibold text-white mb-2">
+              Get Job Alerts
+            </h3>
+            <p className="text-silver-400">
+              Subscribe to receive new job postings in your inbox
+            </p>
+          </div>
         </div>
-        <div>
-          <h3 className="text-2xl font-semibold text-white mb-2">
-            Get Job Alerts
-          </h3>
-          <p className="text-silver-400">
-            Subscribe to receive new job postings in your inbox
-          </p>
-        </div>
-      </div>
+      )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
@@ -93,7 +103,7 @@ export function Newsletter() {
         />
 
         <Button type="submit" variant="primary" fullWidth disabled={loading}>
-          {loading ? 'Subscribing...' : 'Subscribe to Alerts'}
+          {loading ? 'Subscribing...' : buttonText}
         </Button>
 
         <p className="text-xs text-silver-500 text-center">
