@@ -490,6 +490,7 @@ export default function PrivacyPage() {
                   <div className="pt-4 border-t border-white/10">
                     <p className="text-white font-semibold">Work In Data Center</p>
                     <p className="text-silver-400 text-sm mt-1">Premium Data Center Careers Platform</p>
+                    <p className="text-silver-400 text-sm mt-2">Owned and operated by WellDiem Company</p>
                   </div>
                 </div>
               </GlassCard>

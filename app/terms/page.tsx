@@ -420,6 +420,7 @@ export default function TermsPage() {
               </p>
               <div className="glass rounded-lg p-6 mt-4">
                 <p className="text-white font-semibold mb-2">Work In Data Center</p>
+                <p className="text-silver-400 text-sm mb-3">Owned and operated by WellDiem Company</p>
                 <p>Email: <a href="mailto:support@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">support@workindatacenter.com</a></p>
                 <p className="mt-3">
                   Or visit our <Link href="/contact" className="text-ice-400 hover:text-ice-300 underline">Contact Page</Link>
