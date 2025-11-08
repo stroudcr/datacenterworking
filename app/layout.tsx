@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     description: 'Find top data center jobs in operations, engineering, IT, security, and more. Post jobs and connect with qualified professionals.',
     images: [
       {
-        url: `${siteUrl}/images/og-image.png`,
+        url: `${siteUrl}/images/og-image.jpg`,
         width: 1200,
         height: 630,
         alt: 'Work In Data Center - Find Your Next Data Center Job',
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Work In Data Center - Premium Data Center Career Opportunities',
     description: 'Find top data center jobs in operations, engineering, IT, security, and more.',
-    images: [`${siteUrl}/images/og-image.png`],
+    images: [`${siteUrl}/images/og-image.jpg`],
   },
   robots: {
     index: true,
