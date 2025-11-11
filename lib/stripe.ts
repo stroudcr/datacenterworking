@@ -47,6 +47,7 @@ export async function createCheckoutSession({
       },
     ],
     mode: 'payment',
+    allow_promotion_codes: true,
     success_url: `${baseUrl}/post-job/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl}/post-job?payment=cancelled`,
     metadata: {
