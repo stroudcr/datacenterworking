@@ -35,6 +35,9 @@ model Job {
   company          String
   companyLogo      String?
   location         String
+  city             String?
+  state            String?
+  country          String        @default("US")
   type             String
   category         String
   shift            String?
@@ -87,6 +90,9 @@ model Job {
   @@index([managementToken])
   @@index([source])
   @@index([externalId])
+  @@index([country, state])
+  @@index([country])
+  @@index([state])
 }
 
 model Application {

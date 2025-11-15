@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 import { resources } from '@/lib/resources-data';
+import { getAllStates } from '@/lib/locations';
 
 // Cache sitemap for 1 hour to reduce database operations from frequent crawler requests
 export const revalidate = 3600;
@@ -90,5 +91,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
-  return [...staticPages, ...jobPages, ...resourcePages];
+  // State pages
+  const allStates = getAllStates();
+  const statePages: MetadataRoute.Sitemap = [
+    // States index page
+    {
+      url: `${siteUrl}/states`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    // Remote jobs page
+    {
+      url: `${siteUrl}/states/remote`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    // Individual state pages
+    ...allStates.map((state) => ({
+      url: `${siteUrl}/states/${state.slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    })),
+  ];
+
+  return [...staticPages, ...jobPages, ...resourcePages, ...statePages];
 }

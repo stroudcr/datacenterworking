@@ -7,6 +7,7 @@ import { PRICING } from '@/lib/constants';
 import { addDays } from 'date-fns';
 import { generateJobSlug } from '@/lib/slugify';
 import { generateManagementToken } from '@/lib/tokens';
+import { parseLocation } from '@/lib/locations';
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,6 +19,9 @@ export async function POST(request: NextRequest) {
 
     // Validate job data
     const validatedData = jobSchema.parse(jobData);
+
+    // Parse location to extract city, state, and country
+    const parsedLocation = parseLocation(validatedData.location);
 
     // Generate management token for guest users
     const managementToken = !session ? generateManagementToken() : undefined;
@@ -31,6 +35,9 @@ export async function POST(request: NextRequest) {
           title: validatedData.title,
           company: validatedData.company,
           location: validatedData.location,
+          city: parsedLocation.city,
+          state: parsedLocation.state,
+          country: parsedLocation.country,
           type: validatedData.type,
           category: validatedData.category,
           description: validatedData.description,
