@@ -1,0 +1,32 @@
+import { Metadata } from 'next';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+
+export const metadata: Metadata = {
+  title: 'Resources & Insights | Work In Data Center',
+  description: 'In-depth guides, industry reports, salary data, and career resources to help you succeed in the data center industry. Expert insights on certifications, skills, and career advancement.',
+  keywords: ['data center resources', 'career guides', 'salary guide', 'certifications', 'industry reports', 'data center careers', 'technician training'],
+  openGraph: {
+    type: 'website',
+    title: 'Resources & Insights | Work In Data Center',
+    description: 'In-depth guides, industry reports, salary data, and career resources to help you succeed in the data center industry.',
+    url: `${siteUrl}/resources`,
+    siteName: 'Work In Data Center',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Resources & Insights | Work In Data Center',
+    description: 'In-depth guides, industry reports, salary data, and career resources to help you succeed in the data center industry.',
+  },
+  alternates: {
+    canonical: `${siteUrl}/resources`,
+  },
+};
+
+export default function ResourcesLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return children;
+}
