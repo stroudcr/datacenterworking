@@ -80,6 +80,53 @@ export async function searchJobs(options: SearchOptions = {}): Promise<JSearchJo
   }
 }
 
+export interface FetchJobsOptions {
+  pages?: number;
+  datePosted?: 'all' | 'today' | '3days' | 'week' | 'month';
+  delay?: number;
+}
+
+/**
+ * Fetch jobs with configurable options (paid tier)
+ * @param options.pages - Number of pages to fetch (default: 5)
+ * @param options.datePosted - Filter by posting date (default: 'week')
+ * @param options.delay - Delay between requests in ms (default: 150)
+ */
+export async function fetchJobs(options: FetchJobsOptions = {}): Promise<JSearchJob[]> {
+  const {
+    pages = 5,
+    datePosted = 'week',
+    delay = 150,
+  } = options;
+
+  const allJobs: JSearchJob[] = [];
+
+  console.log(`Fetching ${pages} pages from JSearch API (datePosted: ${datePosted})...`);
+
+  for (let page = 1; page <= pages; page++) {
+    try {
+      console.log(`Fetching page ${page}/${pages}...`);
+      const jobs = await searchJobs({
+        query: DATA_CENTER_QUERY,
+        location: 'United States',
+        page,
+        numPages: 1,
+        datePosted,
+      });
+      allJobs.push(...jobs);
+
+      if (page < pages) {
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    } catch (error) {
+      console.error(`Error fetching page ${page}:`, error);
+    }
+  }
+
+  console.log(`Successfully fetched ${allJobs.length} jobs from ${pages} pages`);
+  return allJobs;
+}
+
 /**
  * Fetch multiple pages of jobs efficiently
  * For free tier: Use all 100 requests to get 100 pages (up to ~1000 jobs)
@@ -116,10 +163,12 @@ export async function fetchMultiplePages(
 }
 
 /**
- * Fetch jobs using the free tier strategy (100 pages = 100 API calls)
+ * Fetch jobs using the free tier strategy
+ * Default: 5 pages (~50 jobs) - enough for quality filtering
+ * Use endPage parameter for larger imports
  */
-export async function fetchJobsFreeTier(): Promise<JSearchJob[]> {
-  return fetchMultiplePages(1, 100, {
+export async function fetchJobsFreeTier(endPage: number = 5): Promise<JSearchJob[]> {
+  return fetchMultiplePages(1, endPage, {
     query: DATA_CENTER_QUERY,
     location: 'United States',
   });

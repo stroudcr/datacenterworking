@@ -3,13 +3,15 @@
  * Import real data center jobs from JSearch API (via RapidAPI)
  *
  * Usage:
- *   npx tsx scripts/import-jobs-jsearch.ts              # Import top 100 jobs
- *   npx tsx scripts/import-jobs-jsearch.ts --dry-run    # Preview without importing
- *   npx tsx scripts/import-jobs-jsearch.ts --limit=50   # Import top 50 jobs
+ *   npx tsx scripts/import-jobs-jsearch.ts                        # Import with defaults (5 pages, recent jobs)
+ *   npx tsx scripts/import-jobs-jsearch.ts --dry-run              # Preview without importing
+ *   npx tsx scripts/import-jobs-jsearch.ts --pages=50             # Fetch 50 pages (~500 jobs)
+ *   npx tsx scripts/import-jobs-jsearch.ts --date-filter=month    # Jobs from last month
+ *   npx tsx scripts/import-jobs-jsearch.ts --limit=50             # Import top 50 jobs
  */
 
 import { db } from '../lib/db';
-import { fetchJobsFreeTier } from '../lib/jobs-api/jsearch';
+import { fetchJobs } from '../lib/jobs-api/jsearch';
 import { getTopJobs, deduplicateJobs } from '../lib/jobs-api/filter';
 import { mapJSearchJobs } from '../lib/jobs-api/mapper';
 import { ImportStats } from '../lib/jobs-api/types';
@@ -19,10 +21,16 @@ const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
 const limitArg = args.find(arg => arg.startsWith('--limit='));
 const limit = limitArg ? parseInt(limitArg.split('=')[1]) : 100;
+const pagesArg = args.find(arg => arg.startsWith('--pages='));
+const pages = pagesArg ? parseInt(pagesArg.split('=')[1]) : 5;
+const dateFilterArg = args.find(arg => arg.startsWith('--date-filter='));
+const dateFilter = (dateFilterArg ? dateFilterArg.split('=')[1] : 'week') as 'all' | 'today' | '3days' | 'week' | 'month';
 
 console.log('🚀 JSearch Job Import Script');
 console.log('=' .repeat(50));
 console.log(`Mode: ${isDryRun ? 'DRY RUN (preview only)' : 'LIVE IMPORT'}`);
+console.log(`Pages: ${pages} (~${pages * 10} raw jobs)`);
+console.log(`Date Filter: ${dateFilter}`);
 console.log(`Target: Top ${limit} data center jobs`);
 console.log('=' .repeat(50));
 console.log('');
@@ -39,14 +47,14 @@ async function main() {
   };
 
   try {
-    // Step 1: Fetch jobs from JSearch API (100 pages = 100 API calls)
+    // Step 1: Fetch jobs from JSearch API
     console.log('📡 Step 1: Fetching jobs from JSearch API...');
-    console.log('This will use 100 API calls (100 pages)...');
+    console.log(`This will use ${pages} API calls (${pages} pages)...`);
     console.log('');
 
-    const rawJobs = await fetchJobsFreeTier();
+    const rawJobs = await fetchJobs({ pages, datePosted: dateFilter });
     stats.totalFetched = rawJobs.length;
-    stats.apiCallsUsed = 100; // Free tier strategy uses 100 pages
+    stats.apiCallsUsed = pages;
 
     console.log(`✅ Fetched ${stats.totalFetched} raw jobs from API`);
     console.log('');

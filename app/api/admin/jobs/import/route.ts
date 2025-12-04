@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
-import { fetchJobsFreeTier } from '@/lib/jobs-api/jsearch';
+import { fetchJobs } from '@/lib/jobs-api/jsearch';
 import { getTopJobs, deduplicateJobs } from '@/lib/jobs-api/filter';
 import { mapJSearchJobs } from '@/lib/jobs-api/mapper';
 import { ImportStats } from '@/lib/jobs-api/types';
@@ -17,6 +17,8 @@ export async function POST(request: NextRequest) {
     // Parse request body for options
     const body = await request.json().catch(() => ({}));
     const limit = body.limit || 100;
+    const pages = body.pages || 5;
+    const dateFilter = body.dateFilter || 'week';
 
     const stats: ImportStats = {
       totalFetched: 0,
@@ -29,10 +31,10 @@ export async function POST(request: NextRequest) {
     };
 
     // Step 1: Fetch jobs from JSearch API
-    console.log('Fetching jobs from JSearch API...');
-    const rawJobs = await fetchJobsFreeTier();
+    console.log(`Fetching jobs from JSearch API (${pages} pages, dateFilter: ${dateFilter})...`);
+    const rawJobs = await fetchJobs({ pages, datePosted: dateFilter });
     stats.totalFetched = rawJobs.length;
-    stats.apiCallsUsed = 100;
+    stats.apiCallsUsed = pages;
 
     // Step 2: Score and filter jobs
     console.log('Scoring and filtering jobs...');
