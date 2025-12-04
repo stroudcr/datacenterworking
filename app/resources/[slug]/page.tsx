@@ -39,6 +39,8 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
   const description = resource.description;
   const url = `${siteUrl}/resources/${slug}`;
 
+  const ogImage = `${siteUrl}/images/og-image.jpg`;
+
   return {
     title,
     description,
@@ -56,12 +58,21 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
       authors: resource.author ? [resource.author] : undefined,
       tags: resource.tags,
       section: resource.category,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: resource.title,
+        },
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       creator: '@workindatacenter',
+      images: [ogImage],
     },
   };
 }

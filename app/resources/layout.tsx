@@ -12,11 +12,20 @@ export const metadata: Metadata = {
     description: 'In-depth guides, industry reports, salary data, and career resources to help you succeed in the data center industry.',
     url: `${siteUrl}/resources`,
     siteName: 'Work In Data Center',
+    images: [
+      {
+        url: `${siteUrl}/images/og-image.jpg`,
+        width: 1200,
+        height: 630,
+        alt: 'Work In Data Center Resources',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Resources & Insights | Work In Data Center',
     description: 'In-depth guides, industry reports, salary data, and career resources to help you succeed in the data center industry.',
+    images: [`${siteUrl}/images/og-image.jpg`],
   },
   alternates: {
     canonical: `${siteUrl}/resources`,
