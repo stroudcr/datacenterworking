@@ -4,9 +4,18 @@ import { getSession } from '@/lib/auth';
 import { Button } from './Button';
 import { UserMenu } from './UserMenu';
 import { HeaderNav } from './HeaderNav';
+import { MobileMenuButton } from './MobileMenuButton';
 
 export async function HeaderServer() {
   const session = await getSession();
+
+  const user = session
+    ? {
+        name: session.name || session.email.split('@')[0],
+        email: session.email,
+        role: session.role,
+      }
+    : null;
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-white/10">
@@ -29,28 +38,34 @@ export async function HeaderServer() {
           {/* Navigation - Client Component for active link highlighting */}
           <HeaderNav />
 
-          {/* Auth Section */}
+          {/* Auth Section & Mobile Menu */}
           <div className="flex items-center gap-3">
-            {session ? (
-              <UserMenu
-                name={session.name || session.email.split('@')[0]}
-                email={session.email}
-                role={session.role}
-              />
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="primary" size="sm">
-                    Get Started
-                  </Button>
-                </Link>
-              </>
-            )}
+            {/* Mobile Menu Button - Client Component */}
+            <MobileMenuButton user={user} />
+
+            {/* Desktop Auth */}
+            <div className="hidden md:flex items-center gap-3">
+              {session ? (
+                <UserMenu
+                  name={session.name || session.email.split('@')[0]}
+                  email={session.email}
+                  role={session.role}
+                />
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button variant="ghost" size="sm">
+                      Sign In
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button variant="primary" size="sm">
+                      Get Started
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         </div>
       </div>
