@@ -32,6 +32,14 @@ export function HeaderNav() {
       >
         Post a Job
       </Link>
+      <Link
+        href="/contact"
+        className={`text-sm font-medium transition-colors ${
+          pathname === '/contact' ? 'text-ice-400' : 'text-silver-300 hover:text-white'
+        }`}
+      >
+        Contact
+      </Link>
     </nav>
   );
 }
