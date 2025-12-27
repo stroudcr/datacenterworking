@@ -7,7 +7,7 @@ import { JobListingsClient } from '@/components/JobListingsClient';
 import { Briefcase, TrendingUp, Shield } from 'lucide-react';
 import type { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
 // Cache this page for 60 seconds to reduce database operations
 export const revalidate = 60;

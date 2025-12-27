@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (employerEmail && shouldSendEmail) {
-      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+      const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
       const applicantsPageUrl = job.userId
         ? `${baseUrl}/dashboard/employer/jobs/${job.id}/applicants`
         : `${baseUrl}/jobs/manage/${job.id}?token=${job.managementToken}`;

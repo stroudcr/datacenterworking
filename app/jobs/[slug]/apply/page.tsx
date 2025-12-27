@@ -50,7 +50,7 @@ const getJobBySlug = cache(async (slug: string) => {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ApplyPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   const result = await getJobBySlug(slug);
 

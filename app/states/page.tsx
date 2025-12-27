@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export const revalidate = 60;
 
 export default async function StatesPage() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
   const allStates = getAllStates();
 
   // Get job counts per state

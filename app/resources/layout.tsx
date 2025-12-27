@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
 export const metadata: Metadata = {
   title: 'Resources & Insights | Work In Data Center',

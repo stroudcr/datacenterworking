@@ -6,7 +6,7 @@ import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import { Footer } from '@/components/Footer';
 import { Analytics } from '@vercel/analytics/next';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   // Calculate tomorrow's date range
   const tomorrow = addDays(new Date(), 1);

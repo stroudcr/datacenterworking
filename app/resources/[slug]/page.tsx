@@ -27,7 +27,7 @@ interface ResourcePageProps {
 export async function generateMetadata({ params }: ResourcePageProps): Promise<Metadata> {
   const { slug } = await params;
   const resource = getResourceBySlug(slug);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   if (!resource) {
     return {
@@ -87,7 +87,7 @@ export async function generateStaticParams() {
 export default async function ResourcePage({ params }: ResourcePageProps) {
   const { slug } = await params;
   const resource = getResourceBySlug(slug);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   if (!resource) {
     notFound();

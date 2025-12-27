@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       });
 
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://workindatacenter.com');
+                      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.workindatacenter.com');
 
       // Send emails (non-blocking - failures won't affect webhook processing)
       console.log('[WEBHOOK] Payment completed, checking for job and email...');

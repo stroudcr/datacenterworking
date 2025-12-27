@@ -29,6 +29,30 @@ interface JobPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Generate static params for all active jobs at build time
+// This pre-renders job pages for better SEO and performance
+export async function generateStaticParams() {
+  const jobs = await db.job.findMany({
+    where: {
+      status: 'ACTIVE',
+      expiresAt: {
+        gte: new Date(),
+      },
+    },
+    select: {
+      slug: true,
+    },
+    take: 100, // Limit to most recent 100 jobs for build performance
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return jobs.map((job) => ({
+    slug: job.slug,
+  }));
+}
+
 // Cached job fetch function to deduplicate queries between metadata and page render
 // This ensures we only query the database once per request, not twice
 const getJobBySlug = cache(async (slug: string) => {
@@ -61,7 +85,7 @@ const getJobBySlug = cache(async (slug: string) => {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: JobPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   const result = await getJobBySlug(slug);
 
@@ -166,7 +190,7 @@ export default async function JobPage({ params }: JobPageProps) {
   const isExpired = new Date(job.expiresAt) < new Date();
 
   // Generate JSON-LD structured data for SEO (Schema.org JobPosting)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
   const jobPostingSchema = {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',

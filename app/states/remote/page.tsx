@@ -5,7 +5,7 @@ import { JobListingsClient } from '@/components/JobListingsClient';
 import { MapPin, Briefcase, Globe } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
 export const metadata: Metadata = {
   title: 'Remote Data Center Jobs | Work From Anywhere | Work In Data Center',

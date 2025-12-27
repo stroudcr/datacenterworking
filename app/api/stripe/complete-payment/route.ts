@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
 
     // Send emails (non-blocking)
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://workindatacenter.com');
+                    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.workindatacenter.com');
 
     if (updatedPayment.job) {
       const job = updatedPayment.job;

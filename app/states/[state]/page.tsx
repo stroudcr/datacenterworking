@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
   }
 
   const stateAbbr = getStateAbbreviation(stateName);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   // Get job count for description
   const jobCount = await db.job.count({
@@ -79,7 +79,7 @@ export default async function StatePage({ params }: StatePageProps) {
   }
 
   const stateAbbr = getStateAbbreviation(stateName);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://workindatacenter.com';
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   // Fetch jobs for this state
   const jobs = await db.job.findMany({
