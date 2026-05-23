@@ -5,20 +5,19 @@ import { HeaderServer } from '@/components/HeaderServer';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import { Footer } from '@/components/Footer';
 import { Analytics } from '@vercel/analytics/next';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Work In Data Center - Premium Data Center Career Opportunities',
-    template: '%s | Work In Data Center',
+    default: `${SITE_NAME} - Premium Data Center Career Opportunities`,
+    template: `%s | ${SITE_NAME}`,
   },
-  description: 'Find top data center jobs in operations, engineering, IT, security, and more. Post jobs and connect with qualified professionals in the data center industry.',
+  description: SITE_DESCRIPTION,
   keywords: ['data center jobs', 'data center careers', 'data center operations', 'data center engineering', 'IT infrastructure jobs', 'CDCP', 'data center technician'],
-  authors: [{ name: 'Work In Data Center' }],
-  creator: 'Work In Data Center',
-  publisher: 'Work In Data Center',
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
   formatDetection: {
     email: false,
     address: false,
@@ -31,24 +30,24 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: siteUrl,
-    siteName: 'Work In Data Center',
-    title: 'Work In Data Center - Premium Data Center Career Opportunities',
-    description: 'Find top data center jobs in operations, engineering, IT, security, and more. Post jobs and connect with qualified professionals.',
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    title: `${SITE_NAME} - Premium Data Center Career Opportunities`,
+    description: SITE_DESCRIPTION,
     images: [
       {
-        url: `${siteUrl}/images/og-image.jpg`,
+        url: absoluteUrl('/images/og-image.jpg'),
         width: 1200,
         height: 630,
-        alt: 'Work In Data Center - Find Your Next Data Center Job',
+        alt: `${SITE_NAME} - Find Your Next Data Center Job`,
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Work In Data Center - Premium Data Center Career Opportunities',
+    title: `${SITE_NAME} - Premium Data Center Career Opportunities`,
     description: 'Find top data center jobs in operations, engineering, IT, security, and more.',
-    images: [`${siteUrl}/images/og-image.jpg`],
+    images: [absoluteUrl('/images/og-image.jpg')],
   },
   robots: {
     index: true,
@@ -61,9 +60,6 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
-  alternates: {
-    canonical: siteUrl,
-  },
 };
 
 export default function RootLayout({
@@ -75,10 +71,10 @@ export default function RootLayout({
   const organizationSchema = {
     '@context': 'https://schema.org',
     '@type': 'Organization',
-    name: 'Work In Data Center',
+    name: SITE_NAME,
     alternateName: 'WorkInDataCenter',
-    url: siteUrl,
-    logo: `${siteUrl}/images/NavLogo.png`,
+    url: SITE_URL,
+    logo: absoluteUrl('/images/NavLogo.png'),
     description: 'Premium job board connecting data center professionals with top employers across operations, engineering, IT infrastructure, and more.',
     email: 'info@workindatacenter.com',
     foundingDate: '2024',

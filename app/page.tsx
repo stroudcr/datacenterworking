@@ -6,21 +6,44 @@ import { Newsletter } from '@/components/Newsletter';
 import { JobListingsClient } from '@/components/JobListingsClient';
 import { Briefcase, TrendingUp, Shield } from 'lucide-react';
 import type { Metadata } from 'next';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
+import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 // Cache this page for 60 seconds to reduce database operations
 export const revalidate = 60;
 
-export const metadata: Metadata = {
-  title: 'Find Data Center Jobs | WorkInDataCenter.com',
-  description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, security clearance positions, and more.',
-  openGraph: {
-    title: 'Find Data Center Jobs | WorkInDataCenter.com',
-    description: 'Browse premium data center career opportunities. Find jobs in operations, engineering, IT infrastructure, and more.',
-    url: siteUrl,
-  },
-};
+type HomeSearchParams = Record<string, string | string[] | undefined>;
+
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<HomeSearchParams>;
+}): Promise<Metadata> {
+  const params = await searchParams;
+  const hasQueryParams = Object.values(params).some((value) =>
+    Array.isArray(value) ? value.length > 0 : Boolean(value)
+  );
+
+  return {
+    title: 'Data Center Jobs',
+    description:
+      'Browse premium data center career opportunities in operations, engineering, IT infrastructure, security clearance positions, and more.',
+    openGraph: {
+      title: 'Data Center Jobs',
+      description:
+        'Browse premium data center career opportunities in operations, engineering, IT infrastructure, and more.',
+      url: SITE_URL,
+    },
+    alternates: {
+      canonical: SITE_URL,
+    },
+    robots: hasQueryParams
+      ? {
+          index: false,
+          follow: true,
+        }
+      : undefined,
+  };
+}
 
 export default async function Home({
   searchParams,
@@ -77,40 +100,28 @@ export default async function Home({
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: 'Work In Data Center',
-    url: siteUrl,
+    url: SITE_URL,
     description: 'Premium data center job board connecting professionals with top employers',
     potentialAction: {
       '@type': 'SearchAction',
       target: {
         '@type': 'EntryPoint',
-        urlTemplate: `${siteUrl}/?search={search_term_string}`,
+        urlTemplate: `${SITE_URL}/?search={search_term_string}`,
       },
       'query-input': 'required name=search_term_string',
     },
   };
 
-  // ItemList schema for job listings
+  // Keep the listing schema generic; detailed JobPosting schema lives on job detail pages.
   const itemListSchema = jobs.length > 0 ? {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
+    numberOfItems: jobs.length,
     itemListElement: jobs.slice(0, 10).map((job, index) => ({
       '@type': 'ListItem',
       position: index + 1,
-      item: {
-        '@type': 'JobPosting',
-        title: job.title,
-        description: job.description.slice(0, 200),
-        datePosted: job.createdAt.toISOString(),
-        hiringOrganization: {
-          '@type': 'Organization',
-          name: job.company,
-        },
-        jobLocation: {
-          '@type': 'Place',
-          address: job.location,
-        },
-        url: `${siteUrl}/jobs/${job.slug}`,
-      },
+      name: `${job.title} at ${job.company}`,
+      url: absoluteUrl(`/jobs/${job.slug}`),
     })),
   } : null;
 

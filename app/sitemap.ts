@@ -2,73 +2,94 @@ import { MetadataRoute } from 'next';
 import { db } from '@/lib/db';
 import { resources } from '@/lib/resources-data';
 import { getAllStates } from '@/lib/locations';
+import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 // Cache sitemap for 1 hour to reduce database operations from frequent crawler requests
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
+  const activeJobsWhere = {
+    status: 'ACTIVE' as const,
+    expiresAt: {
+      gte: new Date(),
+    },
+  };
 
   // Fetch all active jobs for dynamic sitemap
   const jobs = await db.job.findMany({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: {
-        gte: new Date(),
-      },
-    },
+    where: activeJobsWhere,
     select: {
       slug: true,
       updatedAt: true,
     },
   });
 
+  const activeStatesByCount = await db.job.groupBy({
+    by: ['state'],
+    where: {
+      ...activeJobsWhere,
+      country: 'US',
+      state: { not: null },
+    },
+    _count: {
+      id: true,
+    },
+  });
+
+  const remoteJobCount = await db.job.count({
+    where: {
+      ...activeJobsWhere,
+      country: 'US',
+      state: null,
+    },
+  });
+
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: siteUrl,
+      url: SITE_URL,
       lastModified: new Date(),
       changeFrequency: 'daily',
       priority: 1.0,
     },
     {
-      url: `${siteUrl}/about`,
+      url: absoluteUrl('/about'),
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
     },
     {
-      url: `${siteUrl}/pricing`,
+      url: absoluteUrl('/pricing'),
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/contact`,
+      url: absoluteUrl('/contact'),
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.5,
     },
     {
-      url: `${siteUrl}/post-job`,
+      url: absoluteUrl('/post-job'),
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.8,
     },
     {
-      url: `${siteUrl}/resources`,
+      url: absoluteUrl('/resources'),
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,
     },
     {
-      url: `${siteUrl}/privacy`,
+      url: absoluteUrl('/privacy'),
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.3,
     },
     {
-      url: `${siteUrl}/terms`,
+      url: absoluteUrl('/terms'),
       lastModified: new Date(),
       changeFrequency: 'yearly',
       priority: 0.3,
@@ -77,7 +98,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Dynamic job pages
   const jobPages: MetadataRoute.Sitemap = jobs.map((job) => ({
-    url: `${siteUrl}/jobs/${job.slug}`,
+    url: absoluteUrl(`/jobs/${job.slug}`),
     lastModified: job.updatedAt,
     changeFrequency: 'weekly' as const,
     priority: 0.8,
@@ -85,7 +106,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Resource pages
   const resourcePages: MetadataRoute.Sitemap = resources.map((resource) => ({
-    url: `${siteUrl}/resources/${resource.slug}`,
+    url: absoluteUrl(`/resources/${resource.slug}`),
     lastModified: new Date(resource.date),
     changeFrequency: 'monthly' as const,
     priority: 0.7,
@@ -93,29 +114,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // State pages
   const allStates = getAllStates();
-  const statePages: MetadataRoute.Sitemap = [
-    // States index page
-    {
-      url: `${siteUrl}/states`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    // Remote jobs page
-    {
-      url: `${siteUrl}/states/remote`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    // Individual state pages
-    ...allStates.map((state) => ({
-      url: `${siteUrl}/states/${state.slug}`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    })),
-  ];
+  const activeStateCodes = new Set(
+    activeStatesByCount
+      .map((stateCount) => stateCount.state)
+      .filter((state): state is string => Boolean(state))
+  );
+  const hasUsJobs = activeStateCodes.size > 0 || remoteJobCount > 0;
+  const statePages: MetadataRoute.Sitemap = hasUsJobs
+    ? [
+        {
+          url: absoluteUrl('/states'),
+          lastModified: new Date(),
+          changeFrequency: 'daily' as const,
+          priority: 0.9,
+        },
+        ...(remoteJobCount > 0
+          ? [
+              {
+                url: absoluteUrl('/states/remote'),
+                lastModified: new Date(),
+                changeFrequency: 'daily' as const,
+                priority: 0.9,
+              },
+            ]
+          : []),
+        // Individual state pages with active jobs only.
+        ...allStates.filter((state) => activeStateCodes.has(state.abbreviation)).map((state) => ({
+          url: absoluteUrl(`/states/${state.slug}`),
+          lastModified: new Date(),
+          changeFrequency: 'daily' as const,
+          priority: 0.9,
+        })),
+      ]
+    : [];
 
   return [...staticPages, ...jobPages, ...resourcePages, ...statePages];
 }

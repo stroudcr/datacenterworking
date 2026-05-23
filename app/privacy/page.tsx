@@ -1,10 +1,19 @@
 import { GlassCard } from '@/components/GlassCard';
 import { Shield, Eye, Lock, AlertTriangle, Info, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Privacy Policy - Work In Data Center',
+  title: 'Privacy Policy',
   description: 'Learn how Work In Data Center collects, uses, and protects your personal information. GDPR and CCPA compliant privacy policy.',
+  alternates: {
+    canonical: absoluteUrl('/privacy'),
+  },
+  openGraph: {
+    title: 'Privacy Policy',
+    description: 'Learn how Work In Data Center collects, uses, and protects your personal information.',
+    url: absoluteUrl('/privacy'),
+  },
 };
 
 export default function PrivacyPage() {

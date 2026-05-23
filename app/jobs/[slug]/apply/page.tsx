@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import Link from 'next/link';
 import { Building2, MapPin, DollarSign } from 'lucide-react';
+import { SITE_NAME, absoluteUrl } from '@/lib/site-config';
 
 // Cache this page for 5 minutes
 export const revalidate = 300;
@@ -50,7 +51,6 @@ const getJobBySlug = cache(async (slug: string) => {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: ApplyPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   const result = await getJobBySlug(slug);
 
@@ -63,11 +63,15 @@ export async function generateMetadata({ params }: ApplyPageProps): Promise<Meta
   const { job } = result;
   if (!job) {
     return {
-      title: 'Job Not Found | Work In Data Center',
+      title: 'Job Not Found',
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   }
 
-  const title = `Apply to ${job.title} at ${job.company} | Work In Data Center`;
+  const title = `Apply to ${job.title} at ${job.company}`;
   const description = `Submit your application for ${job.title} at ${job.company}. Upload your resume and cover letter to apply.`;
 
   return {
@@ -76,8 +80,8 @@ export async function generateMetadata({ params }: ApplyPageProps): Promise<Meta
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/jobs/${slug}/apply`,
-      siteName: 'Work In Data Center',
+      url: absoluteUrl(`/jobs/${slug}/apply`),
+      siteName: SITE_NAME,
       images: job.companyLogo ? [
         {
           url: job.companyLogo,

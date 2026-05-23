@@ -4,24 +4,44 @@ import { db } from '@/lib/db';
 import { getAllStates } from '@/lib/locations';
 import { GlassCard } from '@/components/GlassCard';
 import { MapPin, Briefcase } from 'lucide-react';
-
-export const metadata: Metadata = {
-  title: 'Browse Data Center Jobs by State | Work In Data Center',
-  description:
-    'Find data center jobs across all 50 US states. Browse opportunities in facilities, engineering, IT, operations, and more by location.',
-  openGraph: {
-    title: 'Browse Data Center Jobs by State',
-    description:
-      'Find data center jobs across all 50 US states. Browse opportunities in facilities, engineering, IT, operations, and more by location.',
-    url: `${process.env.NEXT_PUBLIC_SITE_URL}/states`,
-  },
-};
+import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
 
+export async function generateMetadata(): Promise<Metadata> {
+  const activeUsJobCount = await db.job.count({
+    where: {
+      status: 'ACTIVE',
+      expiresAt: { gte: new Date() },
+      country: 'US',
+    },
+  });
+
+  return {
+    title: 'Browse Data Center Jobs by State',
+    description:
+      'Find data center jobs across the United States. Browse opportunities in facilities, engineering, IT, operations, and more by location.',
+    openGraph: {
+      title: 'Browse Data Center Jobs by State',
+      description:
+        'Find data center jobs across the United States. Browse opportunities in facilities, engineering, IT, operations, and more by location.',
+      url: absoluteUrl('/states'),
+    },
+    alternates: {
+      canonical: absoluteUrl('/states'),
+    },
+    robots:
+      activeUsJobCount > 0
+        ? undefined
+        : {
+            index: false,
+            follow: true,
+          },
+  };
+}
+
 export default async function StatesPage() {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
   const allStates = getAllStates();
 
   // Get job counts per state
@@ -71,6 +91,7 @@ export default async function StatesPage() {
   });
 
   const totalJobs = Object.values(stateJobCounts).reduce((sum, count) => sum + count, 0);
+  const statesWithOpenRoles = sortedStates.filter((state) => state.jobCount > 0);
 
   // Structured data for breadcrumbs
   const breadcrumbSchema = {
@@ -81,13 +102,13 @@ export default async function StatesPage() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: siteUrl,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'States',
-        item: `${siteUrl}/states`,
+        item: absoluteUrl('/states'),
       },
     ],
   };
@@ -106,8 +127,12 @@ export default async function StatesPage() {
             Browse Data Center Jobs by State
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-            Explore {totalJobs.toLocaleString()} active data center opportunities across the United States.
-            Find your next career in facilities, engineering, IT, operations, and more.
+            {totalJobs > 0
+              ? `Explore ${totalJobs.toLocaleString()} active data center ${
+                  totalJobs === 1 ? 'opportunity' : 'opportunities'
+                } across the United States.`
+              : 'Browse data center hiring markets across the United States.'}{' '}
+            Find roles in facilities, engineering, IT, operations, and more.
           </p>
         </div>
 
@@ -138,11 +163,13 @@ export default async function StatesPage() {
 
         {/* States Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {sortedStates.map((state) => (
-            <Link key={state.abbreviation} href={`/states/${state.slug}`}>
+          {sortedStates.map((state) => {
+            const card = (
               <GlassCard
-                className={`hover:scale-[1.02] transition-transform duration-200 cursor-pointer h-full ${
-                  state.jobCount === 0 ? 'opacity-60' : ''
+                className={`h-full ${
+                  state.jobCount > 0
+                    ? 'hover:scale-[1.02] transition-transform duration-200 cursor-pointer'
+                    : 'opacity-60'
                 }`}
               >
                 <div className="flex flex-col">
@@ -160,8 +187,16 @@ export default async function StatesPage() {
                   </div>
                 </div>
               </GlassCard>
-            </Link>
-          ))}
+            );
+
+            return state.jobCount > 0 ? (
+              <Link key={state.abbreviation} href={`/states/${state.slug}`}>
+                {card}
+              </Link>
+            ) : (
+              <div key={state.abbreviation}>{card}</div>
+            );
+          })}
         </div>
 
         {/* Info Section */}
@@ -173,6 +208,16 @@ export default async function StatesPage() {
               climate preferences, or proximity to major tech hubs. Our state-specific job pages make it
               easy to find the perfect role in your desired location.
             </p>
+            {statesWithOpenRoles.length > 0 && (
+              <p className="text-gray-300 mb-4">
+                Current listings are available in{' '}
+                {statesWithOpenRoles
+                  .slice(0, 6)
+                  .map((state) => state.name)
+                  .join(', ')}
+                {statesWithOpenRoles.length > 6 ? ', and additional markets' : ''}.
+              </p>
+            )}
             <p className="text-gray-400 text-sm">
               Major data center hubs include Virginia (Ashburn - Data Center Alley), Texas (Dallas, Austin),
               California (Silicon Valley), Illinois (Chicago), and the Pacific Northwest (Oregon, Washington).

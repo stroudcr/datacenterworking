@@ -21,12 +21,27 @@ import Link from 'next/link';
 import { isLegacyId } from '@/lib/slugify';
 import type { Metadata } from 'next';
 import { cache } from 'react';
+import { SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 // Cache this page for 5 minutes to reduce database operations
 export const revalidate = 300;
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
+}
+
+function getSchemaEmploymentType(type: string) {
+  const normalized = type.toLowerCase();
+
+  if (normalized.includes('full')) return 'FULL_TIME';
+  if (normalized.includes('part')) return 'PART_TIME';
+  if (normalized.includes('contract')) return 'CONTRACTOR';
+  if (normalized.includes('temporary')) return 'TEMPORARY';
+  if (normalized.includes('intern')) return 'INTERN';
+  if (normalized.includes('per diem')) return 'PER_DIEM';
+  if (normalized.includes('remote')) return 'OTHER';
+
+  return 'OTHER';
 }
 
 // Generate static params for all active jobs at build time
@@ -85,7 +100,6 @@ const getJobBySlug = cache(async (slug: string) => {
 // Generate metadata for SEO
 export async function generateMetadata({ params }: JobPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   const result = await getJobBySlug(slug);
 
@@ -99,11 +113,15 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
   const { job } = result;
   if (!job) {
     return {
-      title: 'Job Not Found | Work In Data Center',
+      title: 'Job Not Found',
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   }
 
-  const title = `${job.title} at ${job.company} | Work In Data Center`;
+  const title = `${job.title} at ${job.company}`;
   const description = job.description.slice(0, 160) + (job.description.length > 160 ? '...' : '');
 
   return {
@@ -112,8 +130,8 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/jobs/${slug}`,
-      siteName: 'Work In Data Center',
+      url: absoluteUrl(`/jobs/${slug}`),
+      siteName: SITE_NAME,
       images: job.companyLogo ? [
         {
           url: job.companyLogo,
@@ -132,7 +150,7 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
       images: job.companyLogo ? [job.companyLogo] : [],
     },
     alternates: {
-      canonical: `${siteUrl}/jobs/${slug}`,
+      canonical: absoluteUrl(`/jobs/${slug}`),
     },
   };
 }
@@ -188,9 +206,9 @@ export default async function JobPage({ params }: JobPageProps) {
   // This prevents the database write from delaying page render
 
   const isExpired = new Date(job.expiresAt) < new Date();
+  const isRemote = job.location.toLowerCase().includes('remote') || (!job.state && job.country === 'US');
 
   // Generate JSON-LD structured data for SEO (Schema.org JobPosting)
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
   const jobPostingSchema = {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
@@ -198,7 +216,8 @@ export default async function JobPage({ params }: JobPageProps) {
     description: job.description,
     datePosted: job.createdAt.toISOString(),
     validThrough: job.expiresAt.toISOString(),
-    employmentType: job.type.toUpperCase().replace('-', '_'), // FULL_TIME, PART_TIME, CONTRACT
+    employmentType: getSchemaEmploymentType(job.type),
+    url: absoluteUrl(`/jobs/${job.slug}`),
     hiringOrganization: {
       '@type': 'Organization',
       name: job.company,
@@ -213,6 +232,13 @@ export default async function JobPage({ params }: JobPageProps) {
         addressCountry: 'US',
       },
     },
+    ...(isRemote && {
+      jobLocationType: 'TELECOMMUTE',
+      applicantLocationRequirements: {
+        '@type': 'Country',
+        name: 'United States',
+      },
+    }),
     ...(job.salaryMin && job.salaryMax && {
       baseSalary: {
         '@type': 'MonetaryAmount',
@@ -237,16 +263,24 @@ export default async function JobPage({ params }: JobPageProps) {
         },
       },
     }),
-    ...(job.applyUrl && {
+    ...((job.enableInternalApplications || job.applyEmail || job.applyUrl) && {
       directApply: true,
-      applicationContact: {
-        '@type': 'ContactPoint',
-        url: job.applyUrl,
-      },
+      ...(job.applyUrl && {
+        applicationContact: {
+          '@type': 'ContactPoint',
+          url: job.applyUrl,
+        },
+      }),
+      ...(job.applyEmail && {
+        applicationContact: {
+          '@type': 'ContactPoint',
+          email: job.applyEmail,
+        },
+      }),
     }),
     identifier: {
       '@type': 'PropertyValue',
-      name: 'Work In Data Center',
+      name: SITE_NAME,
       value: job.id,
     },
     industry: 'Data Centers',
@@ -268,25 +302,25 @@ export default async function JobPage({ params }: JobPageProps) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: siteUrl,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Jobs',
-        item: `${siteUrl}/#jobs`,
+        item: `${SITE_URL}/#jobs`,
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: job.category,
-        item: `${siteUrl}/?category=${encodeURIComponent(job.category)}`,
+        item: `${SITE_URL}/?category=${encodeURIComponent(job.category)}`,
       },
       {
         '@type': 'ListItem',
         position: 4,
         name: job.title,
-        item: `${siteUrl}/jobs/${job.slug}`,
+        item: absoluteUrl(`/jobs/${job.slug}`),
       },
     ],
   };

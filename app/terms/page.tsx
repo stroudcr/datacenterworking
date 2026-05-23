@@ -1,10 +1,19 @@
 import { GlassCard } from '@/components/GlassCard';
 import { Scale, AlertTriangle, Info } from 'lucide-react';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Terms of Service - Work In Data Center',
+  title: 'Terms of Service',
   description: 'Terms and conditions for using Work In Data Center job board platform. Read our terms of service for employers and job seekers.',
+  alternates: {
+    canonical: absoluteUrl('/terms'),
+  },
+  openGraph: {
+    title: 'Terms of Service',
+    description: 'Terms and conditions for using Work In Data Center job board platform.',
+    url: absoluteUrl('/terms'),
+  },
 };
 
 export default function TermsPage() {

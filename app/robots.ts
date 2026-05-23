@@ -1,40 +1,50 @@
 import { MetadataRoute } from 'next';
+import { absoluteUrl } from '@/lib/site-config';
 
 export default function robots(): MetadataRoute.Robots {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
+  const privatePaths = [
+    '/api/',
+    '/dashboard/',
+    '/admin/',
+    '/applications/',
+    '/jobs/manage/',
+    '/login',
+    '/register',
+    '/post-job/success',
+  ];
 
   return {
     rules: [
       {
         userAgent: '*',
         allow: '/',
-        disallow: ['/api/', '/dashboard/', '/admin/'],
+        disallow: privatePaths,
       },
       {
         // OpenAI ChatGPT crawler - allows crawling for ChatGPT search and citations
         userAgent: 'OAI-SearchBot',
         allow: '/',
-        disallow: ['/api/', '/dashboard/', '/admin/'],
+        disallow: privatePaths,
       },
       {
         // OpenAI GPTBot - allows content to be used in AI training
         userAgent: 'GPTBot',
         allow: '/',
-        disallow: ['/api/', '/dashboard/', '/admin/'],
+        disallow: privatePaths,
       },
       {
         // Google's main crawler
         userAgent: 'Googlebot',
         allow: '/',
-        disallow: ['/api/', '/dashboard/', '/admin/'],
+        disallow: privatePaths,
       },
       {
         // Bing crawler (used by SearchGPT)
         userAgent: 'Bingbot',
         allow: '/',
-        disallow: ['/api/', '/dashboard/', '/admin/'],
+        disallow: privatePaths,
       },
     ],
-    sitemap: `${siteUrl}/sitemap.xml`,
+    sitemap: absoluteUrl('/sitemap.xml'),
   };
 }

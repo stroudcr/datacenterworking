@@ -15,6 +15,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { getResourceBySlug, resources } from '@/lib/resources-data';
+import { SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 // Revalidate page every hour
 export const revalidate = 3600;
@@ -27,19 +28,22 @@ interface ResourcePageProps {
 export async function generateMetadata({ params }: ResourcePageProps): Promise<Metadata> {
   const { slug } = await params;
   const resource = getResourceBySlug(slug);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   if (!resource) {
     return {
-      title: 'Resource Not Found | Work In Data Center',
+      title: 'Resource Not Found',
+      robots: {
+        index: false,
+        follow: true,
+      },
     };
   }
 
-  const title = `${resource.title} | Work In Data Center`;
+  const title = resource.title;
   const description = resource.description;
-  const url = `${siteUrl}/resources/${slug}`;
+  const url = absoluteUrl(`/resources/${slug}`);
 
-  const ogImage = `${siteUrl}/images/og-image.jpg`;
+  const ogImage = absoluteUrl('/images/og-image.jpg');
 
   return {
     title,
@@ -51,7 +55,7 @@ export async function generateMetadata({ params }: ResourcePageProps): Promise<M
       title,
       description,
       url,
-      siteName: 'Work In Data Center',
+      siteName: SITE_NAME,
       type: 'article',
       publishedTime: resource.date,
       modifiedTime: resource.date,
@@ -87,7 +91,6 @@ export async function generateStaticParams() {
 export default async function ResourcePage({ params }: ResourcePageProps) {
   const { slug } = await params;
   const resource = getResourceBySlug(slug);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   if (!resource) {
     notFound();
@@ -135,16 +138,16 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
     dateModified: resource.date,
     author: {
       '@type': 'Organization',
-      name: resource.author || 'Work In Data Center Team',
-      url: siteUrl,
+      name: resource.author || `${SITE_NAME} Team`,
+      url: SITE_URL,
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Work In Data Center',
-      url: siteUrl,
+      name: SITE_NAME,
+      url: SITE_URL,
       logo: {
         '@type': 'ImageObject',
-        url: `${siteUrl}/logo.png`,
+        url: absoluteUrl('/images/NavLogo.png'),
       },
     },
     articleSection: resource.category,
@@ -152,7 +155,7 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
     wordCount,
     mainEntityOfPage: {
       '@type': 'WebPage',
-      '@id': `${siteUrl}/resources/${slug}`,
+      '@id': absoluteUrl(`/resources/${slug}`),
     },
   };
 
@@ -165,19 +168,19 @@ export default async function ResourcePage({ params }: ResourcePageProps) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: siteUrl,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Resources',
-        item: `${siteUrl}/resources`,
+        item: absoluteUrl('/resources'),
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: resource.title,
-        item: `${siteUrl}/resources/${slug}`,
+        item: absoluteUrl(`/resources/${slug}`),
       },
     ],
   };

@@ -6,6 +6,7 @@ import { getAllStates, getStateFromSlug, getStateAbbreviation } from '@/lib/loca
 import { JobListingsClient } from '@/components/JobListingsClient';
 import { MapPin, Briefcase, Building2 } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
+import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 interface StatePageProps {
   params: Promise<{
@@ -33,7 +34,6 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
   }
 
   const stateAbbr = getStateAbbreviation(stateName);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   // Get job count for description
   const jobCount = await db.job.count({
@@ -45,8 +45,11 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
     },
   });
 
-  const title = `Data Center Jobs in ${stateName} | Work In Data Center`;
-  const description = `Browse ${jobCount} active data center jobs in ${stateName}. Find opportunities in facilities, engineering, IT, operations, and more. Apply today!`;
+  const title = `Data Center Jobs in ${stateName}`;
+  const hasActiveJobs = jobCount > 0;
+  const description = hasActiveJobs
+    ? `Browse ${jobCount} active data center jobs in ${stateName}. Find opportunities in facilities, engineering, IT, operations, and more.`
+    : `Track data center jobs in ${stateName} and explore resources for landing technician, facilities, engineering, and operations roles.`;
 
   return {
     title,
@@ -54,7 +57,7 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
     openGraph: {
       title,
       description,
-      url: `${siteUrl}/states/${stateSlug}`,
+      url: absoluteUrl(`/states/${stateSlug}`),
     },
     twitter: {
       card: 'summary_large_image',
@@ -62,8 +65,14 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
       description,
     },
     alternates: {
-      canonical: `${siteUrl}/states/${stateSlug}`,
+      canonical: absoluteUrl(`/states/${stateSlug}`),
     },
+    robots: hasActiveJobs
+      ? undefined
+      : {
+          index: false,
+          follow: true,
+        },
   };
 }
 
@@ -79,7 +88,6 @@ export default async function StatePage({ params }: StatePageProps) {
   }
 
   const stateAbbr = getStateAbbreviation(stateName);
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
 
   // Fetch jobs for this state
   const jobs = await db.job.findMany({
@@ -137,19 +145,19 @@ export default async function StatePage({ params }: StatePageProps) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: siteUrl,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'States',
-        item: `${siteUrl}/states`,
+        item: absoluteUrl('/states'),
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: stateName,
-        item: `${siteUrl}/states/${stateSlug}`,
+        item: absoluteUrl(`/states/${stateSlug}`),
       },
     ],
   };
@@ -160,7 +168,7 @@ export default async function StatePage({ params }: StatePageProps) {
     '@type': 'CollectionPage',
     name: `Data Center Jobs in ${stateName}`,
     description: `Browse data center opportunities in ${stateName}`,
-    url: `${siteUrl}/states/${stateSlug}`,
+    url: absoluteUrl(`/states/${stateSlug}`),
     numberOfItems: jobs.length,
   };
 
@@ -259,6 +267,43 @@ export default async function StatePage({ params }: StatePageProps) {
             </GlassCard>
           </div>
         )}
+
+        <div className="mb-8">
+          <GlassCard>
+            <h2 className="text-xl font-semibold text-white mb-3">
+              Data Center Hiring in {stateName}
+            </h2>
+            <div className="space-y-3 text-gray-300">
+              <p>
+                Data center teams in {stateName} typically hire across critical facilities,
+                electrical and mechanical maintenance, network operations, security, logistics,
+                and site reliability support. Listings here are limited to active roles so closed
+                jobs do not waste applicants' time after they expire.
+              </p>
+              <p>
+                {jobs.length > 0
+                  ? `Current openings in ${stateName} are concentrated in ${
+                      uniqueCities.length > 0
+                        ? uniqueCities.slice(0, 4).join(', ')
+                        : 'the listed locations below'
+                    }${uniqueCities.length > 4 ? ', and nearby markets' : ''}.`
+                  : `There are no active ${stateName} listings right now, and this directory updates automatically when new roles are available.`}
+              </p>
+            </div>
+            {topCategories.length > 0 && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {topCategories.map((cat) => (
+                  <span
+                    key={cat.category}
+                    className="px-3 py-1 bg-white/5 rounded-full text-sm text-gray-300 border border-white/10"
+                  >
+                    {cat.category} ({cat._count.id})
+                  </span>
+                ))}
+              </div>
+            )}
+          </GlassCard>
+        </div>
 
         {/* Job Listings */}
         <Suspense fallback={<div className="text-center py-12 text-gray-400">Loading jobs...</div>}>

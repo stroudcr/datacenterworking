@@ -15,10 +15,19 @@ import {
   HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'Pricing - Work In Data Center',
+  title: 'Pricing',
   description: 'Simple, transparent pricing for data center employers. Post jobs and connect with top talent.',
+  alternates: {
+    canonical: absoluteUrl('/pricing'),
+  },
+  openGraph: {
+    title: 'Pricing for Data Center Job Posts',
+    description: 'Simple, transparent pricing for data center employers. Post jobs and connect with top talent.',
+    url: absoluteUrl('/pricing'),
+  },
 };
 
 export default function PricingPage() {

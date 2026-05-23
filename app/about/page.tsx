@@ -18,10 +18,19 @@ import {
   BarChart
 } from 'lucide-react';
 import Link from 'next/link';
+import { absoluteUrl } from '@/lib/site-config';
 
 export const metadata = {
-  title: 'About Us - Work In Data Center',
+  title: 'About Us',
   description: 'Learn about our mission to connect data center professionals with opportunity. Specialized job board focused 100% on data center careers.',
+  alternates: {
+    canonical: absoluteUrl('/about'),
+  },
+  openGraph: {
+    title: 'About Work In Data Center',
+    description: 'Learn about our mission to connect data center professionals with opportunity. Specialized job board focused 100% on data center careers.',
+    url: absoluteUrl('/about'),
+  },
 };
 
 export default function AboutPage() {

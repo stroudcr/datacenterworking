@@ -4,32 +4,48 @@ import { db } from '@/lib/db';
 import { JobListingsClient } from '@/components/JobListingsClient';
 import { MapPin, Briefcase, Globe } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
-
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.workindatacenter.com';
-
-export const metadata: Metadata = {
-  title: 'Remote Data Center Jobs | Work From Anywhere | Work In Data Center',
-  description:
-    'Browse remote data center jobs that allow you to work from anywhere. Find opportunities in IT, cloud infrastructure, network operations, security, and more.',
-  openGraph: {
-    title: 'Remote Data Center Jobs | Work From Anywhere',
-    description:
-      'Browse remote data center jobs that allow you to work from anywhere. Find opportunities in IT, cloud infrastructure, network operations, security, and more.',
-    url: `${siteUrl}/states/remote`,
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Remote Data Center Jobs',
-    description:
-      'Browse remote data center jobs that allow you to work from anywhere.',
-  },
-  alternates: {
-    canonical: `${siteUrl}/states/remote`,
-  },
-};
+import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
+
+export async function generateMetadata(): Promise<Metadata> {
+  const remoteJobCount = await db.job.count({
+    where: {
+      status: 'ACTIVE',
+      expiresAt: { gte: new Date() },
+      country: 'US',
+      state: null,
+    },
+  });
+
+  return {
+    title: 'Remote Data Center Jobs | Work From Anywhere',
+    description:
+      'Browse remote data center jobs in IT, cloud infrastructure, network operations, security, and more.',
+    openGraph: {
+      title: 'Remote Data Center Jobs | Work From Anywhere',
+      description:
+        'Browse remote data center jobs in IT, cloud infrastructure, network operations, security, and more.',
+      url: absoluteUrl('/states/remote'),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Remote Data Center Jobs',
+      description: 'Browse remote data center jobs that allow you to work from anywhere.',
+    },
+    alternates: {
+      canonical: absoluteUrl('/states/remote'),
+    },
+    robots:
+      remoteJobCount > 0
+        ? undefined
+        : {
+            index: false,
+            follow: true,
+          },
+  };
+}
 
 export default async function RemoteJobsPage() {
   // Fetch remote jobs (no state assigned)
@@ -71,19 +87,19 @@ export default async function RemoteJobsPage() {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: siteUrl,
+        item: SITE_URL,
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'States',
-        item: `${siteUrl}/states`,
+        item: absoluteUrl('/states'),
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: 'Remote Jobs',
-        item: `${siteUrl}/states/remote`,
+        item: absoluteUrl('/states/remote'),
       },
     ],
   };
@@ -94,7 +110,7 @@ export default async function RemoteJobsPage() {
     '@type': 'CollectionPage',
     name: 'Remote Data Center Jobs',
     description: 'Browse remote data center jobs that allow you to work from anywhere',
-    url: `${siteUrl}/states/remote`,
+    url: absoluteUrl('/states/remote'),
     numberOfItems: jobs.length,
   };
 
