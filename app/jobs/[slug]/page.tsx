@@ -121,7 +121,9 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
     };
   }
 
-  const title = `${job.title} at ${job.company}`;
+  const jobTitle = job.title.trim();
+  const companyName = job.company.trim();
+  const title = `${jobTitle} at ${companyName}`;
   const description = job.description.slice(0, 160) + (job.description.length > 160 ? '...' : '');
 
   return {
@@ -137,7 +139,7 @@ export async function generateMetadata({ params }: JobPageProps): Promise<Metada
           url: job.companyLogo,
           width: 1200,
           height: 630,
-          alt: `${job.company} logo`,
+          alt: `${companyName} logo`,
         }
       ] : [],
       locale: 'en_US',
@@ -207,12 +209,14 @@ export default async function JobPage({ params }: JobPageProps) {
 
   const isExpired = new Date(job.expiresAt) < new Date();
   const isRemote = job.location.toLowerCase().includes('remote') || (!job.state && job.country === 'US');
+  const jobTitle = job.title.trim();
+  const companyName = job.company.trim();
 
   // Generate JSON-LD structured data for SEO (Schema.org JobPosting)
   const jobPostingSchema = {
     '@context': 'https://schema.org',
     '@type': 'JobPosting',
-    title: job.title,
+    title: jobTitle,
     description: job.description,
     datePosted: job.createdAt.toISOString(),
     validThrough: job.expiresAt.toISOString(),
@@ -220,7 +224,7 @@ export default async function JobPage({ params }: JobPageProps) {
     url: absoluteUrl(`/jobs/${job.slug}`),
     hiringOrganization: {
       '@type': 'Organization',
-      name: job.company,
+      name: companyName,
       ...(job.companyLogo && { logo: job.companyLogo }),
     },
     jobLocation: {
@@ -319,7 +323,7 @@ export default async function JobPage({ params }: JobPageProps) {
       {
         '@type': 'ListItem',
         position: 4,
-        name: job.title,
+        name: jobTitle,
         item: absoluteUrl(`/jobs/${job.slug}`),
       },
     ],
@@ -354,12 +358,12 @@ export default async function JobPage({ params }: JobPageProps) {
             {job.companyLogo ? (
               <img
                 src={job.companyLogo}
-                alt={job.company}
+                alt={companyName}
                 className="w-20 h-20 rounded-xl object-cover glass"
               />
             ) : (
               <div className="w-20 h-20 rounded-xl glass flex items-center justify-center text-2xl text-ice-400 font-bold">
-                {job.company.charAt(0)}
+                {companyName.charAt(0)}
               </div>
             )}
 
@@ -373,10 +377,10 @@ export default async function JobPage({ params }: JobPageProps) {
                       Featured
                     </div>
                   )}
-                  <h1 className="text-3xl font-bold text-white mb-2">{job.title}</h1>
+                  <h1 className="text-3xl font-bold text-white mb-2">{jobTitle}</h1>
                   <div className="flex items-center gap-2 text-silver-300">
                     <Building2 className="w-5 h-5" />
-                    <span className="text-lg">{job.company}</span>
+                    <span className="text-lg">{companyName}</span>
                   </div>
                 </div>
 
@@ -529,8 +533,8 @@ export default async function JobPage({ params }: JobPageProps) {
                   {(job.enableInternalApplications || (!job.applyUrl && !job.applyEmail)) && (
                     <ApplyButton
                       jobId={job.id}
-                      jobTitle={job.title}
-                      companyName={job.company}
+                      jobTitle={jobTitle}
+                      companyName={companyName}
                       jobSlug={job.slug}
                     />
                   )}
@@ -544,8 +548,8 @@ export default async function JobPage({ params }: JobPageProps) {
                 About the Company
               </h3>
               <div className="space-y-2 text-silver-300">
-                <p className="font-medium text-white">{job.company}</p>
-                {job.user?.company && job.user.company !== job.company && (
+                <p className="font-medium text-white">{companyName}</p>
+                {job.user?.company && job.user.company !== companyName && (
                   <p className="text-sm">Posted by: {job.user.company}</p>
                 )}
               </div>
