@@ -98,7 +98,7 @@ export const ManagementLink = ({ jobTitle, company, managementUrl }: ManagementL
 
           <Text style={text}>
             Want to create an employer account for easier job management?{' '}
-            <Link href={`${baseUrl}/register?role=employer`} style={link}>
+            <Link href={`${baseUrl}/register?role=EMPLOYER`} style={link}>
               Register here
             </Link>{' '}
             to access your employer dashboard and manage all your job postings in one place.

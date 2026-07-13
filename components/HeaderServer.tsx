@@ -58,7 +58,7 @@ export async function HeaderServer() {
                       Sign In
                     </Button>
                   </Link>
-                  <Link href="/register">
+                  <Link href="/register?role=EMPLOYER">
                     <Button variant="primary" size="sm">
                       Get Started
                     </Button>

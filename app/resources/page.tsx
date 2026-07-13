@@ -187,7 +187,7 @@ export default function ResourcesPage() {
               Ready to Find Your Next Opportunity?
             </h2>
             <p className="text-lg text-silver-300 mb-6">
-              Browse thousands of data center jobs from top employers.
+              Browse current data center jobs from employers across the industry.
             </p>
             <a
               href="/"

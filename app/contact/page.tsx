@@ -344,7 +344,7 @@ export default function ContactPage() {
                 How do I post a job?
               </h3>
               <p className="text-silver-400 text-sm">
-                Click "Post a Job" in the navigation, fill out the simple form (takes less than 5 minutes), and complete payment via Stripe. Your job goes live immediately after payment.
+                Click “Post a Job,” complete the listing details, and pay through Stripe. Your job is activated after payment is confirmed.
               </p>
             </GlassCard>
 

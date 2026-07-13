@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { resources } from '@/lib/resources-data';
 import { getAllStates } from '@/lib/locations';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
+import { employerPages } from '@/lib/employer-pages';
 
 // Cache sitemap for 1 hour to reduce database operations from frequent crawler requests
 export const revalidate = 3600;
@@ -52,6 +53,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'daily',
       priority: 1.0,
     },
+    {
+      url: absoluteUrl('/employers'),
+      lastModified: new Date(),
+      changeFrequency: 'monthly',
+      priority: 0.9,
+    },
+    ...Object.keys(employerPages).map((slug) => ({
+      url: absoluteUrl(`/employers/${slug}`),
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.8,
+    })),
     {
       url: absoluteUrl('/about'),
       lastModified: new Date(),

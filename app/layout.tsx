@@ -5,6 +5,7 @@ import { HeaderServer } from '@/components/HeaderServer';
 import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import { Footer } from '@/components/Footer';
 import { Analytics } from '@vercel/analytics/next';
+import { AttributionCapture } from '@/components/AttributionCapture';
 import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 export const metadata: Metadata = {
@@ -116,6 +117,7 @@ export default function RootLayout({
         </Suspense>
         {children}
         <Footer />
+        <Suspense fallback={null}><AttributionCapture /></Suspense>
         <Analytics />
       </body>
     </html>

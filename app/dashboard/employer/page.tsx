@@ -243,7 +243,7 @@ export default async function EmployerDashboard() {
           <GlassCard>
             <h3 className="text-lg font-semibold text-white mb-3">Need More Visibility?</h3>
             <p className="text-silver-400 text-sm mb-4">
-              Upgrade to a featured listing to get 7 days of homepage placement, priority in search, and social media promotion.
+              Upgrade to a featured listing for 7 days of homepage placement, priority in search, and a Featured badge.
             </p>
             <Link href="/post-job">
               <Button variant="primary" fullWidth>

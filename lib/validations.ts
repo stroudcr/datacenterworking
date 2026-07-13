@@ -56,9 +56,23 @@ export const contactSchema = z.object({
   message: z.string().min(10, 'Message must be at least 10 characters').max(1000, 'Message must be less than 1000 characters'),
 });
 
+export const employerLeadSchema = z.object({
+  name: z.string().trim().min(2).max(100),
+  workEmail: z.string().trim().email().max(200),
+  company: z.string().trim().min(2).max(150),
+  inquiryType: z.enum(['SINGLE_ROLE', 'VOLUME_HIRING', 'RECRUITER_AGENCY', 'PARTNERSHIP']),
+  hiringVolume: z.enum(['ONE', 'TWO_TO_FIVE', 'SIX_TO_TWENTY', 'TWENTY_PLUS']),
+  roles: z.string().trim().min(2).max(500),
+  locations: z.string().trim().max(500).optional().or(z.literal('')),
+  timeline: z.enum(['NOW', 'THIRTY_DAYS', 'NINETY_DAYS', 'EXPLORING']),
+  notes: z.string().trim().max(1500).optional().or(z.literal('')),
+  attribution: z.unknown().optional(),
+});
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;
 export type JobInput = z.infer<typeof jobSchema>;
 export type ApplicationInput = z.infer<typeof applicationSchema>;
 export type NewsletterInput = z.infer<typeof newsletterSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
+export type EmployerLeadInput = z.infer<typeof employerLeadSchema>;

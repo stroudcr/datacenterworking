@@ -22,6 +22,7 @@ export function MobileMenuButton({ user }: MobileMenuButtonProps) {
   const navLinks = [
     { href: '/', label: 'Browse Jobs', active: pathname === '/' },
     { href: '/states', label: 'Browse by State', active: pathname?.startsWith('/states') },
+    { href: '/employers', label: 'For Employers', active: pathname?.startsWith('/employers') },
     { href: '/pricing', label: 'Pricing', active: pathname === '/pricing' },
     { href: '/post-job', label: 'Post a Job', active: pathname === '/post-job' },
     { href: '/contact', label: 'Contact', active: pathname === '/contact' },
@@ -69,7 +70,7 @@ export function MobileMenuButton({ user }: MobileMenuButtonProps) {
                         Sign In
                       </Button>
                     </Link>
-                    <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                    <Link href="/register?role=EMPLOYER" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="primary" size="sm" className="w-full justify-center">
                         Get Started
                       </Button>

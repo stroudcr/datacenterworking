@@ -29,52 +29,53 @@ model User {
 }
 
 model Job {
-  id               String        @id @default(cuid())
-  slug             String        @unique
-  title            String
-  company          String
-  companyLogo      String?
-  location         String
-  city             String?
-  state            String?
-  country          String        @default("US")
-  type             String
-  category         String
-  shift            String?
-  clearance        String?
-  certifications   String?
-  description      String
-  requirements     String
-  salary           String?
-  salaryMin        Int?
-  salaryMax        Int?
-  hourlyRate       String?
-  hourlyRateMin    Float?
-  hourlyRateMax    Float?
-  applyUrl         String?
-  applyEmail       String?
-  enableInternalApplications Boolean @default(false)
-  tags             String[]
-  status           JobStatus     @default(ACTIVE)
-  isFeatured       Boolean       @default(false)
-  featuredUntil    DateTime?
-  expiresAt        DateTime
-  viewCount        Int           @default(0)
-  applicationCount Int           @default(0)
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
-  email            String?
-  managementToken  String?       @unique
-  userId           String?
+  id                         String        @id @default(cuid())
+  slug                       String        @unique
+  title                      String
+  company                    String
+  companyLogo                String?
+  location                   String
+  city                       String?
+  state                      String?
+  country                    String        @default("US")
+  type                       String
+  category                   String
+  shift                      String?
+  clearance                  String?
+  certifications             String?
+  description                String
+  requirements               String
+  salary                     String?
+  salaryMin                  Int?
+  salaryMax                  Int?
+  hourlyRate                 String?
+  hourlyRateMin              Float?
+  hourlyRateMax              Float?
+  applyUrl                   String?
+  applyEmail                 String?
+  enableInternalApplications Boolean       @default(false)
+  tags                       String[]
+  status                     JobStatus     @default(ACTIVE)
+  isFeatured                 Boolean       @default(false)
+  featuredUntil              DateTime?
+  expiresAt                  DateTime
+  viewCount                  Int           @default(0)
+  applicationCount           Int           @default(0)
+  applyClickCount            Int           @default(0)
+  createdAt                  DateTime      @default(now())
+  updatedAt                  DateTime      @updatedAt
+  email                      String?
+  managementToken            String?       @unique
+  userId                     String?
   // External job tracking
-  source           JobSource     @default(INTERNAL)
-  externalId       String?       @unique
-  sourceUrl        String?
-  lastSynced       DateTime?
-  applications     Application[]
-  user             User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  payment          Payment?
-  savedBy          SavedJob[]
+  source                     JobSource     @default(INTERNAL)
+  externalId                 String?       @unique
+  sourceUrl                  String?
+  lastSynced                 DateTime?
+  applications               Application[]
+  user                       User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payment                    Payment?
+  savedBy                    SavedJob[]
 
   @@index([slug])
   @@index([status])
@@ -134,11 +135,35 @@ model Payment {
   status          String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  firstTouch      Json?
+  lastTouch       Json?
   job             Job      @relation(fields: [jobId], references: [id], onDelete: Cascade)
   user            User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([stripeSessionId])
+}
+
+model EmployerLead {
+  id           String              @id @default(cuid())
+  name         String
+  workEmail    String
+  company      String
+  inquiryType  EmployerInquiryType
+  hiringVolume HiringVolume
+  roles        String
+  locations    String?
+  timeline     HiringTimeline
+  notes        String?
+  status       EmployerLeadStatus  @default(NEW)
+  firstTouch   Json?
+  lastTouch    Json?
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([workEmail])
 }
 
 model Newsletter {
@@ -187,4 +212,32 @@ enum JobStatus {
 enum JobSource {
   INTERNAL
   EXTERNAL_JSEARCH
+}
+
+enum EmployerInquiryType {
+  SINGLE_ROLE
+  VOLUME_HIRING
+  RECRUITER_AGENCY
+  PARTNERSHIP
+}
+
+enum HiringVolume {
+  ONE
+  TWO_TO_FIVE
+  SIX_TO_TWENTY
+  TWENTY_PLUS
+}
+
+enum HiringTimeline {
+  NOW
+  THIRTY_DAYS
+  NINETY_DAYS
+  EXPLORING
+}
+
+enum EmployerLeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CLOSED
 }

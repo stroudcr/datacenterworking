@@ -6,6 +6,7 @@ import { Button } from '@/components/Button';
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { ClearPostJobDraft } from '@/components/ClearPostJobDraft';
 
 interface PageProps {
   searchParams: Promise<{ session_id?: string }>;
@@ -48,6 +49,7 @@ export default async function PostJobSuccessPage({ searchParams }: PageProps) {
 
     return (
       <div className="min-h-screen py-12 px-4">
+        <ClearPostJobDraft amount={(checkoutSession.amount_total || 0) / 100} featured={job.isFeatured} />
         <div className="container mx-auto max-w-4xl">
           {/* Success Header */}
           <div className="text-center mb-8">

@@ -29,6 +29,7 @@ export function JobListingsClient({
   initialSort,
 }: JobListingsClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [sortTimestamp] = useState(() => Date.now());
   const searchParams = useSearchParams();
 
   // Get current filters from URL (for instant updates)
@@ -62,6 +63,9 @@ export function JobListingsClient({
 
     // Apply sorting
     const sorted = [...filtered].sort((a, b) => {
+      const aFeatured = a.isFeatured && a.featuredUntil && new Date(a.featuredUntil).getTime() >= sortTimestamp ? 1 : 0;
+      const bFeatured = b.isFeatured && b.featuredUntil && new Date(b.featuredUntil).getTime() >= sortTimestamp ? 1 : 0;
+      if (aFeatured !== bFeatured) return bFeatured - aFeatured;
       if (sort === 'applications') {
         return b.applicationCount - a.applicationCount;
       }
@@ -70,7 +74,7 @@ export function JobListingsClient({
     });
 
     return sorted;
-  }, [jobs, category, type, shift, clearance, certifications, sort]);
+  }, [jobs, category, type, shift, clearance, certifications, sort, sortTimestamp]);
 
   const activeFilterCount = [category, type, shift, clearance, certifications].filter(Boolean).length;
 

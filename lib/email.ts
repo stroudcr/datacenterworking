@@ -7,7 +7,9 @@ import { NewApplication } from '@/emails/NewApplication';
 import { ContactForm } from '@/emails/ContactForm';
 import { JobExpirationReminder } from '@/emails/JobExpirationReminder';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Resend now validates constructor input eagerly. Individual send functions still
+// short-circuit when the key is absent, while this placeholder keeps builds safe.
+const resend = new Resend(process.env.RESEND_API_KEY || 're_not_configured');
 
 // Enhanced logging helper
 function logEmailError(emailType: string, error: any, recipient: string) {

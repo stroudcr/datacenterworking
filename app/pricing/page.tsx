@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { absoluteUrl } from '@/lib/site-config';
+import { FunnelView } from '@/components/FunnelLink';
 
 export const metadata = {
   title: 'Pricing',
@@ -36,7 +37,7 @@ export default function PricingPage() {
     'Visible in all job searches',
     'Company logo & branding',
     'Detailed job description with rich text',
-    'Application tracking & analytics',
+    'Application tracking for on-site applications',
     'Filter by security clearance & certifications',
     'Mobile-optimized job posting',
     'Direct apply or redirect to your ATS',
@@ -47,14 +48,13 @@ export default function PricingPage() {
     'Homepage placement for 7 days',
     'Priority placement in search results',
     'Highlighted with star badge & border',
-    'Featured in email alerts to subscribers',
-    'Social media promotion across our channels',
-    '3x more visibility than standard listings',
-    'Premium support & dedicated assistance',
+    'Featured badge and visual emphasis',
+    'Seven days of Featured priority',
   ];
 
   return (
     <div className="min-h-screen">
+      <FunnelView event="pricing_view" />
       {/* Hero Section */}
       <section className="py-20 px-4">
         <div className="container mx-auto max-w-6xl text-center">
@@ -68,7 +68,7 @@ export default function PricingPage() {
             </span>
           </h1>
           <p className="text-xl text-silver-300 mb-8 max-w-3xl mx-auto">
-            Skip the noise. Connect directly with qualified data center professionals who have the clearances, certifications, and experience you need.
+            Publish your role on a job board focused on data center operations, facilities, construction and infrastructure work.
           </p>
 
           {/* Quick Stats */}
@@ -80,8 +80,8 @@ export default function PricingPage() {
             </GlassCard>
             <GlassCard className="text-center">
               <Clock className="w-8 h-8 text-ice-400 mx-auto mb-2" />
-              <div className="text-3xl font-bold text-white">&lt;5 min</div>
-              <div className="text-sm text-silver-400">Job Posting Time</div>
+              <div className="text-3xl font-bold text-white">30 days</div>
+              <div className="text-sm text-silver-400">Active Listing Term</div>
             </GlassCard>
             <GlassCard className="text-center">
               <Shield className="w-8 h-8 text-ice-400 mx-auto mb-2" />
@@ -114,7 +114,7 @@ export default function PricingPage() {
               Why Data Center Employers Choose Us
             </h2>
             <p className="text-lg text-silver-300 max-w-2xl mx-auto">
-              Traditional job boards waste your time with unqualified applicants. We're different.
+              Use industry-specific fields and categories to describe the role clearly.
             </p>
           </div>
 
@@ -125,7 +125,7 @@ export default function PricingPage() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Niche Targeting</h3>
               <p className="text-sm text-silver-400">
-                100% data center professionals. No generic applicants.
+                A job taxonomy focused entirely on data center work.
               </p>
             </GlassCard>
 
@@ -133,7 +133,7 @@ export default function PricingPage() {
               <div className="inline-flex p-3 rounded-xl bg-ice-500/20 mb-4">
                 <Award className="w-6 h-6 text-ice-400" />
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Pre-Qualified Talent</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">Relevant Role Details</h3>
               <p className="text-sm text-silver-400">
                 Filter by security clearance, certifications, and shift availability.
               </p>
@@ -145,7 +145,7 @@ export default function PricingPage() {
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">Fast & Simple</h3>
               <p className="text-sm text-silver-400">
-                Post in under 5 minutes. No complex forms or lengthy processes.
+                Preview your listing, choose an application route, and pay securely through Stripe.
               </p>
             </GlassCard>
 
@@ -182,7 +182,7 @@ export default function PricingPage() {
               description="Perfect for most hiring needs"
               features={standardFeatures}
               ctaText="Post Standard Job"
-              ctaLink="/post-job"
+              ctaLink="/post-job?plan=standard"
             />
 
             {/* Featured Listing */}
@@ -194,7 +194,7 @@ export default function PricingPage() {
               highlighted={true}
               badge="MOST POPULAR"
               ctaText="Post Featured Job"
-              ctaLink="/post-job"
+              ctaLink="/post-job?plan=featured"
             />
           </div>
 
@@ -211,7 +211,7 @@ export default function PricingPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Star className="w-5 h-5 text-ice-400" />
-                <span>Edit Anytime During Listing</span>
+                <span>Choose your application route</span>
               </div>
             </div>
           </div>
@@ -282,7 +282,7 @@ export default function PricingPage() {
                     </td>
                   </tr>
                   <tr className="border-b border-white/5">
-                    <td className="py-4 px-4">Email Alert Inclusion</td>
+                    <td className="py-4 px-4">Featured Badge</td>
                     <td className="text-center py-4 px-4">
                       <span className="text-silver-500">—</span>
                     </td>
@@ -291,7 +291,7 @@ export default function PricingPage() {
                     </td>
                   </tr>
                   <tr className="border-b border-white/5">
-                    <td className="py-4 px-4">Social Media Promotion</td>
+                    <td className="py-4 px-4">Featured Priority (7 days)</td>
                     <td className="text-center py-4 px-4">
                       <span className="text-silver-500">—</span>
                     </td>
@@ -383,7 +383,7 @@ export default function PricingPage() {
                 What makes Featured listings worth the upgrade?
               </h3>
               <p className="text-silver-300 text-sm">
-                Featured listings receive 3x more views on average. They appear at the top of the homepage, get priority in search results, are highlighted in email alerts, and receive social media promotion. Perfect for urgent or hard-to-fill roles.
+                Featured listings receive priority above standard listings for seven days and are visually highlighted with a Featured badge. After that, the listing remains active for the rest of its 30-day term.
               </p>
             </GlassCard>
           </div>
@@ -401,15 +401,15 @@ export default function PricingPage() {
               </span>
             </h2>
             <p className="text-xl text-silver-300 mb-8 max-w-2xl mx-auto">
-              Join leading data center companies who trust us to connect them with qualified talent. Post your job in less than 5 minutes.
+              Publish a clear data center job listing or contact us to discuss multiple roles and locations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/post-job">
+              <Link href="/post-job?plan=standard">
                 <Button variant="primary" size="lg">
                   Post a Job Now - $249
                 </Button>
               </Link>
-              <Link href="/register">
+              <Link href="/register?role=EMPLOYER">
                 <Button variant="outline" size="lg">
                   Create Employer Account
                 </Button>

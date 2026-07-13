@@ -44,6 +44,7 @@ export default async function AdminPanel() {
       createdAt: 'desc',
     },
   });
+  const employerLeads = await db.employerLead.findMany({ orderBy: { createdAt: 'desc' }, take: 100 });
 
   // Fetch stats
   const totalUsers = await db.user.count();
@@ -187,6 +188,11 @@ export default async function AdminPanel() {
               <ImportJobsButton disabled={!process.env.RAPIDAPI_KEY} />
             </div>
           </div>
+        </GlassCard>
+
+        <GlassCard className="mb-8">
+          <h2 className="text-2xl font-semibold text-white mb-6">Employer inquiries</h2>
+          {employerLeads.length === 0 ? <p className="text-silver-400">No employer inquiries yet.</p> : <div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr className="border-b border-white/10 text-left text-silver-400"><th className="p-3">Received</th><th className="p-3">Contact</th><th className="p-3">Need</th><th className="p-3">Roles</th><th className="p-3">Status</th></tr></thead><tbody>{employerLeads.map((lead) => <tr key={lead.id} className="border-b border-white/5 align-top"><td className="p-3 text-silver-300">{format(lead.createdAt, 'MMM d, yyyy')}</td><td className="p-3"><p className="font-medium text-white">{lead.name} · {lead.company}</p><a className="text-ice-400" href={`mailto:${lead.workEmail}`}>{lead.workEmail}</a></td><td className="p-3 text-silver-300">{lead.inquiryType.replaceAll('_',' ')}<br/>{lead.hiringVolume.replaceAll('_',' ')} · {lead.timeline.replaceAll('_',' ')}</td><td className="max-w-sm p-3 text-silver-300">{lead.roles}{lead.locations ? <><br/><span className="text-silver-500">{lead.locations}</span></> : null}</td><td className="p-3 text-ice-300">{lead.status}</td></tr>)}</tbody></table></div>}
         </GlassCard>
 
         {/* Jobs Management */}

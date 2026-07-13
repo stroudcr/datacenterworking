@@ -6,6 +6,7 @@ import { Button } from '@/components/Button';
 import { SaveJobButton } from '@/components/SaveJobButton';
 import { ViewTracker } from '@/components/ViewTracker';
 import { ApplyButton } from '@/components/ApplyButton';
+import { TrackedApplyLink } from '@/components/TrackedApplyLink';
 import {
   MapPin,
   Clock,
@@ -515,20 +516,20 @@ export default async function JobPage({ params }: JobPageProps) {
               ) : (
                 <div className="space-y-3">
                   {job.applyUrl && (
-                    <a href={job.applyUrl} target="_blank" rel="noopener noreferrer">
+                    <TrackedApplyLink jobId={job.id} href={job.applyUrl}>
                       <Button variant="primary" fullWidth>
                         <ExternalLink className="w-4 h-4 mr-2" />
                         Apply on Company Site
                       </Button>
-                    </a>
+                    </TrackedApplyLink>
                   )}
                   {job.applyEmail && (
-                    <a href={`mailto:${job.applyEmail}`}>
+                    <TrackedApplyLink jobId={job.id} href={`mailto:${job.applyEmail}`}>
                       <Button variant={job.applyUrl ? 'outline' : 'primary'} fullWidth>
                         <Mail className="w-4 h-4 mr-2" />
                         Email Application
                       </Button>
-                    </a>
+                    </TrackedApplyLink>
                   )}
                   {(job.enableInternalApplications || (!job.applyUrl && !job.applyEmail)) && (
                     <ApplyButton

@@ -38,7 +38,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/register"
+                  href="/register?role=JOB_SEEKER"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >
                   Create Account
@@ -61,6 +61,14 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
+                  href="/employers"
+                  className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
+                >
+                  Employer Overview
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/post-job"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >
@@ -69,7 +77,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/register"
+                  href="/register?role=EMPLOYER"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >
                   Employer Sign Up
@@ -138,7 +146,7 @@ export function Footer() {
         <div className="pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm text-silver-400">
-              © 2025 Work In Data Center. All rights reserved.
+              © {new Date().getFullYear()} Work In Data Center. All rights reserved.
             </p>
             <p className="text-sm text-silver-400">
               Premium Data Center Careers

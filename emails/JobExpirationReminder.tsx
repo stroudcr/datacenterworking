@@ -102,7 +102,7 @@ export const JobExpirationReminder = ({
 
           <Section style={tipBox}>
             <Text style={tipText}>
-              <strong>💡 Tip:</strong> Jobs posted on Work In Data Center remain active for 30 days. Featured listings get 3x more visibility and stay at the top of search results for 7 days.
+              <strong>Tip:</strong> Jobs remain active for 30 days. Featured listings receive priority placement for 7 days.
             </Text>
           </Section>
 

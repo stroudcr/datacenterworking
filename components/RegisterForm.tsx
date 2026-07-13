@@ -10,6 +10,7 @@ import { GlassCard } from '@/components/GlassCard';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 import { UserPlus, Briefcase, User } from 'lucide-react';
+import { normalizePublicRole } from '@/lib/roles';
 
 export function RegisterForm() {
   const router = useRouter();
@@ -19,10 +20,10 @@ export function RegisterForm() {
 
   // Get email and role from URL params if provided
   const emailParam = searchParams.get('email');
-  const roleParam = searchParams.get('role') as 'EMPLOYER' | 'JOB_SEEKER' | null;
+  const roleParam = normalizePublicRole(searchParams.get('role'));
 
   const [selectedRole, setSelectedRole] = useState<'EMPLOYER' | 'JOB_SEEKER'>(
-    roleParam || 'JOB_SEEKER'
+    roleParam
   );
 
   const {
@@ -33,7 +34,7 @@ export function RegisterForm() {
   } = useForm<RegisterInput>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      role: roleParam || 'JOB_SEEKER',
+      role: roleParam,
       email: emailParam || '',
     },
   });

@@ -8,6 +8,7 @@ import { addDays } from 'date-fns';
 import { generateJobSlug } from '@/lib/slugify';
 import { generateManagementToken } from '@/lib/tokens';
 import { parseLocation } from '@/lib/locations';
+import { sanitizeAttribution } from '@/lib/attribution';
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,8 @@ export async function POST(request: NextRequest) {
     const session = await getSession();
 
     const body = await request.json();
-    const { isFeatured, ...jobData } = body;
+    const { isFeatured, attribution, ...jobData } = body;
+    const touch = sanitizeAttribution(attribution);
 
     // Validate job data
     const validatedData = jobSchema.parse(jobData);
@@ -83,27 +85,33 @@ export async function POST(request: NextRequest) {
       return updatedJob;
     });
 
-    // Create Stripe checkout session
-    const checkoutSession = await createCheckoutSession({
-      userId: session?.userId || null,
-      jobId: job.id,
-      isFeatured: isFeatured || false,
-      email: validatedData.email,
-    });
-
-    // Create payment record
-    await db.payment.create({
-      data: {
+    let checkoutSession;
+    try {
+      checkoutSession = await createCheckoutSession({
         userId: session?.userId || null,
         jobId: job.id,
-        stripeSessionId: checkoutSession.id,
-        amount: isFeatured
-          ? PRICING.BASE_LISTING + PRICING.FEATURED_UPGRADE
-          : PRICING.BASE_LISTING,
         isFeatured: isFeatured || false,
-        status: 'pending',
-      },
-    });
+        email: validatedData.email,
+      });
+
+      await db.payment.create({
+        data: {
+          userId: session?.userId || null,
+          jobId: job.id,
+          stripeSessionId: checkoutSession.id,
+          amount: isFeatured
+            ? PRICING.BASE_LISTING + PRICING.FEATURED_UPGRADE
+            : PRICING.BASE_LISTING,
+          isFeatured: isFeatured || false,
+          status: 'pending',
+          firstTouch: touch.firstTouch || undefined,
+          lastTouch: touch.lastTouch || undefined,
+        },
+      });
+    } catch (checkoutError) {
+      await db.job.update({ where: { id: job.id }, data: { status: 'DELETED' } }).catch(() => undefined);
+      throw checkoutError;
+    }
 
     return NextResponse.json({
       jobId: job.id,

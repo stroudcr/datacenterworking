@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { jobSchema, type JobInput } from '@/lib/validations';
@@ -13,9 +13,13 @@ import { JobCardPreview } from '@/components/JobCardPreview';
 import { CloudinaryUploadWidget } from '@/components/CloudinaryUploadWidget';
 import { QuillEditor } from '@/components/QuillEditor';
 import { Briefcase, DollarSign, Star, Eye } from 'lucide-react';
+import { ATTRIBUTION_KEY } from '@/lib/attribution';
+import { trackFunnel } from '@/lib/analytics';
+import { POST_JOB_DRAFT_KEY, readValidDraft, resolveFeaturedPlan } from '@/lib/post-job-draft';
 
 export default function PostJobPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [isFeatured, setIsFeatured] = useState(false);
@@ -23,6 +27,7 @@ export default function PostJobPage() {
   const [tagInput, setTagInput] = useState('');
   const [compensationType, setCompensationType] = useState<'salary' | 'hourly'>('salary');
   const [applicationMethod, setApplicationMethod] = useState<'internal' | 'external' | 'email'>('internal');
+  const [draftReady, setDraftReady] = useState(false);
 
   const {
     register,
@@ -30,6 +35,7 @@ export default function PostJobPage() {
     formState: { errors },
     setValue,
     control,
+    reset,
   } = useForm<JobInput>({
     resolver: zodResolver(jobSchema),
   });
@@ -47,6 +53,31 @@ export default function PostJobPage() {
   const watchedHourlyRateMax = useWatch({ control, name: 'hourlyRateMax' });
   const watchedDescription = useWatch({ control, name: 'description' });
   const watchedRequirements = useWatch({ control, name: 'requirements' });
+  const watchedForm = useWatch({ control });
+
+  useEffect(() => {
+    const plan = searchParams.get('plan');
+    let restoredFeatured = false;
+    try {
+      const draft = readValidDraft(localStorage.getItem(POST_JOB_DRAFT_KEY));
+      if (draft) {
+        reset(draft.form || {}); setTags(draft.tags || []); setCompensationType(draft.compensationType || 'salary');
+        setApplicationMethod(draft.applicationMethod || 'internal'); restoredFeatured = Boolean(draft.isFeatured);
+      } else localStorage.removeItem(POST_JOB_DRAFT_KEY);
+    } catch { localStorage.removeItem(POST_JOB_DRAFT_KEY); }
+    setIsFeatured(resolveFeaturedPlan(plan, restoredFeatured));
+    setDraftReady(true);
+    if (searchParams.get('payment') === 'cancelled') trackFunnel('checkout_cancelled');
+    trackFunnel('post_job_start', { plan: plan === 'featured' ? 'featured' : 'standard' });
+  }, [reset, searchParams]);
+
+  useEffect(() => {
+    if (!draftReady) return;
+    const timer = window.setTimeout(() => {
+      localStorage.setItem(POST_JOB_DRAFT_KEY, JSON.stringify({ version: 1, savedAt: Date.now(), form: watchedForm, tags, compensationType, applicationMethod, isFeatured }));
+    }, 500);
+    return () => window.clearTimeout(timer);
+  }, [watchedForm, tags, compensationType, applicationMethod, isFeatured, draftReady]);
 
   // Clear unused compensation fields when toggling between salary and hourly
   useEffect(() => {
@@ -89,6 +120,7 @@ export default function PostJobPage() {
           enableInternalApplications: applicationMethod === 'internal',
           applyUrl: applicationMethod === 'external' ? data.applyUrl : undefined,
           applyEmail: applicationMethod === 'email' ? data.applyEmail : undefined,
+          attribution: (() => { try { return JSON.parse(localStorage.getItem(ATTRIBUTION_KEY) || 'null'); } catch { return null; } })(),
         }),
       });
 
@@ -100,6 +132,7 @@ export default function PostJobPage() {
 
       // Redirect to Stripe checkout
       if (result.checkoutUrl) {
+        trackFunnel('checkout_started', { plan: isFeatured ? 'featured' : 'standard', amount: totalPrice });
         window.location.href = result.checkoutUrl;
       }
     } catch (err: any) {
@@ -121,13 +154,17 @@ export default function PostJobPage() {
           </div>
           <h1 className="text-4xl font-bold text-white mb-2">Post a Job</h1>
           <p className="text-silver-400">
-            Reach qualified data center professionals
+            Advertise directly to the data center community
           </p>
+          <button type="button" className="mt-3 text-sm text-silver-400 underline hover:text-white" onClick={() => { localStorage.removeItem(POST_JOB_DRAFT_KEY); reset({ tags: [] }); setTags([]); setIsFeatured(false); setCompensationType('salary'); setApplicationMethod('internal'); router.replace('/post-job?plan=standard'); }}>
+            Discard saved draft
+          </button>
         </div>
 
-        <div className="lg:grid lg:grid-cols-[1fr,480px] lg:gap-8 lg:items-start">
+        {searchParams.get('payment') === 'cancelled' && <div className="mb-6 rounded-lg border border-amber-400/30 bg-amber-500/10 p-4 text-amber-200">Checkout was cancelled. Your saved job draft is ready below.</div>}
+        <form onSubmit={handleSubmit(onSubmit, () => trackFunnel('post_job_validation_error'))} className="lg:grid lg:grid-cols-[1fr,480px] lg:gap-8 lg:items-start">
           {/* Left Column: Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="space-y-6">
           {error && (
             <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400">
               {error}
@@ -553,7 +590,14 @@ export default function PostJobPage() {
               )}
             </div>
           </GlassCard>
-        </form>
+          <GlassCard className="lg:hidden">
+            <label className="flex cursor-pointer items-start gap-3"><input type="checkbox" checked={isFeatured} onChange={(event) => { setIsFeatured(event.target.checked); if (event.target.checked) trackFunnel('featured_selected'); }} className="mt-1"/><span><span className="font-semibold text-white">Featured priority for 7 days (+${PRICING.FEATURED_UPGRADE / 100})</span><span className="mt-1 block text-sm text-silver-400">Priority above standard listings plus a Featured badge.</span></span></label>
+          </GlassCard>
+          <div className="lg:hidden sticky bottom-3 z-20 rounded-xl border border-white/10 bg-slate-950/95 p-4 shadow-2xl">
+            <div className="mb-3 flex justify-between font-semibold text-white"><span>{isFeatured ? 'Featured listing' : 'Standard listing'}</span><span>${totalPrice}</span></div>
+            <Button type="submit" variant="primary" size="lg" fullWidth disabled={loading}>{loading ? 'Creating checkout…' : `Continue to secure checkout — $${totalPrice}`}</Button>
+          </div>
+        </div>
 
           {/* Right Column: Preview */}
           <div className="hidden lg:block self-start" style={{ position: 'sticky', top: '6.5rem' }}>
@@ -589,7 +633,7 @@ export default function PostJobPage() {
                       type="checkbox"
                       id="featured"
                       checked={isFeatured}
-                      onChange={(e) => setIsFeatured(e.target.checked)}
+                      onChange={(e) => { setIsFeatured(e.target.checked); if (e.target.checked) trackFunnel('featured_selected'); }}
                       className="mt-1"
                     />
                     <label htmlFor="featured" className="flex-1 cursor-pointer">
@@ -605,8 +649,7 @@ export default function PostJobPage() {
                       <ul className="text-sm text-silver-300 space-y-1 ml-7">
                         <li>• Homepage placement for 7 days</li>
                         <li>• Priority in search results</li>
-                        <li>• Social media promotion</li>
-                        <li>• Highlighted in email alerts</li>
+                        <li>• Featured badge and visual emphasis</li>
                       </ul>
                     </label>
                   </div>
@@ -637,12 +680,12 @@ export default function PostJobPage() {
 
                 {/* Submit Button */}
                 <Button
-                  type="submit"
+                  type="button"
                   variant="primary"
                   size="lg"
                   fullWidth
                   disabled={loading}
-                  onClick={handleSubmit(onSubmit)}
+                  onClick={handleSubmit(onSubmit, () => trackFunnel('post_job_validation_error'))}
                 >
                   {loading ? 'Creating...' : `Post a Job ($${totalPrice})`}
                 </Button>
@@ -652,7 +695,7 @@ export default function PostJobPage() {
                 </p>
               </div>
             </div>
-        </div>
+        </form>
       </div>
     </div>
   );

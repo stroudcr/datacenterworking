@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import { PRICING } from './constants';
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2025-02-24.acacia',
+  apiVersion: '2026-06-24.dahlia',
 });
 
 export async function createCheckoutSession({
@@ -29,7 +29,6 @@ export async function createCheckoutSession({
   }
 
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
     customer_email: email,
     line_items: [
       {

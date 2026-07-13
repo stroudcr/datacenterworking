@@ -40,11 +40,11 @@ export const EmployerWelcome = ({ name, company }: EmployerWelcomeProps) => {
             <Heading style={h2}>What You Can Do Now:</Heading>
 
             <Text style={bulletPoint}>
-              <strong>Post Your First Job</strong> - Reach thousands of qualified data center professionals actively seeking opportunities.
+              <strong>Post Your First Job</strong> - Advertise to people searching specifically for data center work.
             </Text>
 
             <Text style={bulletPoint}>
-              <strong>Featured Listings</strong> - Upgrade to featured status to get 3x more visibility and appear at the top of search results.
+              <strong>Featured Listings</strong> - Upgrade for seven days of priority placement and a Featured badge.
             </Text>
 
             <Text style={bulletPoint}>
@@ -98,7 +98,7 @@ export const EmployerWelcome = ({ name, company }: EmployerWelcomeProps) => {
             </Text>
 
             <Text style={smallText}>
-              All listings include unlimited applicants, full analytics, and applicant management tools.
+              Listings support on-site applications, an application email, or a direct link to your ATS.
             </Text>
           </Section>
 

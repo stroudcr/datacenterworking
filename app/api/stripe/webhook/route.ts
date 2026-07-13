@@ -4,24 +4,6 @@ import { db } from '@/lib/db';
 import { sendManagementLinkEmail, sendPaymentConfirmation } from '@/lib/email';
 import Stripe from 'stripe';
 
-// GET endpoint for debugging webhook configuration
-export async function GET() {
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-
-  return NextResponse.json({
-    status: 'webhook_endpoint_active',
-    configured: !!webhookSecret,
-    webhookSecretPrefix: webhookSecret ? webhookSecret.substring(0, 10) : 'NOT_SET',
-    siteUrl: siteUrl || 'NOT_SET',
-    expectedUrl: `${siteUrl}/api/stripe/webhook`,
-    timestamp: new Date().toISOString(),
-    message: webhookSecret
-      ? 'Webhook endpoint is configured. Verify this secret matches your Stripe Dashboard endpoint.'
-      : 'ERROR: STRIPE_WEBHOOK_SECRET is not set in environment variables.'
-  });
-}
-
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
@@ -38,9 +20,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook not configured' }, { status: 500 });
   }
 
-  // Log webhook secret prefix for debugging (first 10 chars only)
-  console.log('Webhook verification attempt with secret prefix:', webhookSecret.substring(0, 10));
-
   let event: Stripe.Event;
 
   try {
@@ -51,11 +30,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error: any) {
     console.error('Webhook signature verification failed:', error.message);
-    console.error('This usually means:');
-    console.error('1. The STRIPE_WEBHOOK_SECRET does not match the endpoint configured in Stripe Dashboard');
-    console.error('2. You are using a local CLI secret (from "stripe listen") for a production URL');
-    console.error('3. The webhook endpoint URL in Stripe Dashboard does not match your actual URL');
-    console.error('Current site URL:', process.env.NEXT_PUBLIC_SITE_URL);
     return NextResponse.json(
       { error: 'Invalid signature' },
       { status: 400 }
@@ -71,28 +45,27 @@ export async function POST(request: NextRequest) {
 
       // Update payment status and activate job in a transaction
       // This ensures atomicity - both operations succeed or both fail
-      const payment = await db.$transaction(async (tx) => {
-        const updatedPayment = await tx.payment.update({
-          where: { stripeSessionId: session.id },
+      const result = await db.$transaction(async (tx) => {
+        const claimed = await tx.payment.updateMany({
+          where: { stripeSessionId: session.id, status: { not: 'completed' } },
           data: {
             status: 'completed',
             stripePaymentId: session.payment_intent as string,
           },
-          include: {
-            job: true,
-          },
+        });
+        const updatedPayment = await tx.payment.findUniqueOrThrow({
+          where: { stripeSessionId: session.id }, include: { job: true },
         });
 
-        // Activate the job now that payment is confirmed
-        if (updatedPayment.jobId) {
+        if (claimed.count === 1 && updatedPayment.jobId) {
           await tx.job.update({
             where: { id: updatedPayment.jobId },
             data: { status: 'ACTIVE' },
           });
         }
-
-        return updatedPayment;
+        return { payment: updatedPayment, shouldNotify: claimed.count === 1 };
       });
+      const { payment, shouldNotify } = result;
 
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.workindatacenter.com');
@@ -101,7 +74,7 @@ export async function POST(request: NextRequest) {
       console.log('[WEBHOOK] Payment completed, checking for job and email...');
       console.log('[WEBHOOK] Payment has job:', !!payment.job);
 
-      if (payment.job) {
+      if (shouldNotify && payment.job) {
         const job = payment.job;
         const jobUrl = `${baseUrl}/jobs/${job.slug}`;
         const managementUrl = job.managementToken
@@ -111,17 +84,8 @@ export async function POST(request: NextRequest) {
         // Determine recipient email (guest job email or user email)
         const recipientEmail = job.email;
 
-        console.log('[WEBHOOK] Job details:', {
-          jobId: job.id,
-          jobTitle: job.title,
-          recipientEmail: recipientEmail || 'NULL/UNDEFINED',
-          hasManagementToken: !!job.managementToken,
-          hasUserId: !!job.userId,
-        });
-
         // Send management link email for guest users (no userId)
         if (!job.userId && job.managementToken && recipientEmail) {
-          console.log('[WEBHOOK] Sending management link email to:', recipientEmail);
           try {
             const result = await sendManagementLinkEmail({
               to: recipientEmail,
@@ -129,7 +93,6 @@ export async function POST(request: NextRequest) {
               company: job.company,
               managementUrl: managementUrl!,
             });
-            console.log('[WEBHOOK] Management link email result:', result);
           } catch (error) {
             console.error('[WEBHOOK] Management link email error:', error);
           }
@@ -143,7 +106,6 @@ export async function POST(request: NextRequest) {
 
         // Send payment confirmation email to all users
         if (recipientEmail) {
-          console.log('[WEBHOOK] Sending payment confirmation email to:', recipientEmail);
           try {
             const result = await sendPaymentConfirmation({
               to: recipientEmail,
@@ -155,14 +117,13 @@ export async function POST(request: NextRequest) {
               jobUrl,
               managementUrl: !job.userId ? managementUrl : undefined, // Only include for guests
             });
-            console.log('[WEBHOOK] Payment confirmation email result:', result);
           } catch (error) {
             console.error('[WEBHOOK] Payment confirmation email error:', error);
           }
         } else {
           console.error('[WEBHOOK] ❌ No recipient email available for payment confirmation. Job ID:', job.id);
         }
-      } else {
+      } else if (shouldNotify) {
         console.error('[WEBHOOK] ❌ Payment has no associated job! Payment ID:', payment.id);
       }
 
@@ -176,8 +137,10 @@ export async function POST(request: NextRequest) {
       // Mark payment as failed and delete job in a transaction
       // This ensures atomicity - both operations succeed or both fail
       await db.$transaction(async (tx) => {
-        const payment = await tx.payment.update({
-          where: { stripeSessionId: session.id },
+        const payment = await tx.payment.findUnique({ where: { stripeSessionId: session.id } });
+        if (!payment || payment.status === 'completed') return;
+        await tx.payment.update({
+          where: { id: payment.id },
           data: { status: 'failed' },
         });
 
