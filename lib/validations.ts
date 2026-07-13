@@ -14,6 +14,11 @@ export const loginSchema = z.object({
   password: z.string().min(1, 'Password is required'),
 });
 
+const optionalNonNegativeNumber = z.preprocess(
+  (value) => (value === '' || value == null || (typeof value === 'number' && Number.isNaN(value)) ? undefined : value),
+  z.number().min(0).optional()
+);
+
 export const jobSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters'),
   company: z.string().min(2, 'Company name is required'),
@@ -26,10 +31,10 @@ export const jobSchema = z.object({
   certifications: z.enum(['CDCP (Certified Data Centre Professional)', 'CDCS (Certified Data Centre Specialist)', 'CDCE (Certified Data Centre Expert)', 'Uptime Institute ATD/ATS/AOS', 'CCNA / CCNP / CCIE (Cisco networking)', 'CompTIA A+ / Network+ / Server+', 'PMP (Project Management Professional)', 'PE License (Professional Engineer)', 'Journeyman Electrician'] as const).optional().or(z.literal('')),
   description: z.string().min(50, 'Description must be at least 50 characters'),
   requirements: z.string().min(20, 'Requirements must be at least 20 characters'),
-  salaryMin: z.number().min(0).nullish().transform(val => (val == null || Number.isNaN(val)) ? undefined : val),
-  salaryMax: z.number().min(0).nullish().transform(val => (val == null || Number.isNaN(val)) ? undefined : val),
-  hourlyRateMin: z.number().min(0).nullish().transform(val => (val == null || Number.isNaN(val)) ? undefined : val),
-  hourlyRateMax: z.number().min(0).nullish().transform(val => (val == null || Number.isNaN(val)) ? undefined : val),
+  salaryMin: optionalNonNegativeNumber,
+  salaryMax: optionalNonNegativeNumber,
+  hourlyRateMin: optionalNonNegativeNumber,
+  hourlyRateMax: optionalNonNegativeNumber,
   applyUrl: z.string().url().optional().or(z.literal('')),
   applyEmail: z.string().email().optional().or(z.literal('')),
   enableInternalApplications: z.boolean().optional(),
