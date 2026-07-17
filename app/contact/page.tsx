@@ -238,10 +238,10 @@ export default function ContactPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">Email Support</h3>
                     <a
-                      href="mailto:support@workindatacenter.com"
+                      href="mailto:workindatacenter@welldiem.com"
                       className="text-ice-400 hover:text-ice-300 transition-colors text-sm"
                     >
-                      support@workindatacenter.com
+                      workindatacenter@welldiem.com
                     </a>
                   </div>
                 </div>
