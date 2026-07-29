@@ -24,8 +24,9 @@ import type { Metadata } from 'next';
 import { cache } from 'react';
 import { SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
 
-// Cache this page for 5 minutes to reduce database operations
-export const revalidate = 300;
+// This page reads cookie-backed session state, so it must use one consistent
+// rendering mode for generated, newly created, and unknown job slugs.
+export const dynamic = 'force-dynamic';
 
 interface JobPageProps {
   params: Promise<{ slug: string }>;
@@ -43,30 +44,6 @@ function getSchemaEmploymentType(type: string) {
   if (normalized.includes('remote')) return 'OTHER';
 
   return 'OTHER';
-}
-
-// Generate static params for all active jobs at build time
-// This pre-renders job pages for better SEO and performance
-export async function generateStaticParams() {
-  const jobs = await db.job.findMany({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: {
-        gte: new Date(),
-      },
-    },
-    select: {
-      slug: true,
-    },
-    take: 100, // Limit to most recent 100 jobs for build performance
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
-
-  return jobs.map((job) => ({
-    slug: job.slug,
-  }));
 }
 
 // Cached job fetch function to deduplicate queries between metadata and page render
@@ -173,7 +150,7 @@ export default async function JobPage({ params }: JobPageProps) {
   }
 
   const { job } = result;
-  if (!job || job.status !== 'ACTIVE') {
+  if (!job || job.status !== 'ACTIVE' || job.expiresAt <= new Date()) {
     notFound();
   }
 
@@ -208,7 +185,6 @@ export default async function JobPage({ params }: JobPageProps) {
   // Note: View count increment moved to client-side component for non-blocking behavior
   // This prevents the database write from delaying page render
 
-  const isExpired = new Date(job.expiresAt) < new Date();
   const isRemote = job.location.toLowerCase().includes('remote') || (!job.state && job.country === 'US');
   const jobTitle = job.title.trim();
   const companyName = job.company.trim();
@@ -508,10 +484,6 @@ export default async function JobPage({ params }: JobPageProps) {
                       View Application
                     </Button>
                   </Link>
-                </div>
-              ) : isExpired ? (
-                <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">
-                  This job posting has expired
                 </div>
               ) : (
                 <div className="space-y-3">
