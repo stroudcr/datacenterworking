@@ -9,11 +9,24 @@ import { Mail, Check } from 'lucide-react';
 interface NewsletterProps {
   showHeader?: boolean;
   buttonText?: string;
+  categories?: string[];
+  title?: string;
+  description?: string;
+  successDescription?: string;
+  accent?: {
+    primary: string;
+    secondary: string;
+  };
 }
 
 export function Newsletter({
   showHeader = true,
-  buttonText = 'Subscribe to Alerts'
+  buttonText = 'Subscribe to Alerts',
+  categories = ['All'],
+  title = 'Get Job Alerts',
+  description = 'Subscribe to receive new job postings in your inbox',
+  successDescription = "You'll receive job alerts for your selected categories.",
+  accent,
 }: NewsletterProps = {}) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -31,7 +44,7 @@ export function Newsletter({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          categories: ['All'], // Default to all job categories
+          categories,
         }),
       });
 
@@ -61,7 +74,7 @@ export function Newsletter({
             Successfully Subscribed!
           </h3>
           <p className="text-silver-400">
-            You'll receive job alerts for your selected categories.
+            {successDescription}
           </p>
         </div>
       </GlassCard>
@@ -72,15 +85,18 @@ export function Newsletter({
     <GlassCard>
       {showHeader && (
         <div className="flex items-start gap-4 mb-6">
-          <div className="p-3 rounded-xl bg-gradient-to-br from-ice-500 to-ice-600">
+          <div
+            className="p-3 rounded-xl bg-gradient-to-br from-ice-500 to-ice-600"
+            style={accent ? { backgroundImage: `linear-gradient(135deg, ${accent.primary}, ${accent.secondary})` } : undefined}
+          >
             <Mail className="w-6 h-6 text-white" />
           </div>
           <div>
             <h3 className="text-2xl font-semibold text-white mb-2">
-              Get Job Alerts
+              {title}
             </h3>
             <p className="text-silver-400">
-              Subscribe to receive new job postings in your inbox
+              {description}
             </p>
           </div>
         </div>

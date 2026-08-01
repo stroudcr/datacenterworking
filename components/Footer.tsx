@@ -46,6 +46,14 @@ export function Footer() {
               </li>
               <li>
                 <Link
+                  href="/states"
+                  className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
+                >
+                  Browse by State
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/#newsletter"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >

@@ -25,6 +25,14 @@ export function HeaderNav() {
         For Employers
       </Link>
       <Link
+        href="/states"
+        className={`text-sm font-medium transition-colors ${
+          pathname?.startsWith('/states') ? 'text-ice-400' : 'text-silver-300 hover:text-white'
+        }`}
+      >
+        Browse by State
+      </Link>
+      <Link
         href="/pricing"
         className={`text-sm font-medium transition-colors ${
           pathname === '/pricing' ? 'text-ice-400' : 'text-silver-300 hover:text-white'

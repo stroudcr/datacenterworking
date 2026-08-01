@@ -17,6 +17,13 @@ interface JobListingsClientProps {
   initialClearance?: string;
   initialCertifications?: string;
   initialSort?: string;
+  basePath?: string;
+  accent?: {
+    primary: string;
+    secondary: string;
+  };
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
 export function JobListingsClient({
@@ -27,6 +34,10 @@ export function JobListingsClient({
   initialClearance,
   initialCertifications,
   initialSort,
+  basePath = '/',
+  accent,
+  emptyTitle = 'No jobs found',
+  emptyDescription = 'Try adjusting your filters.',
 }: JobListingsClientProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortTimestamp] = useState(() => Date.now());
@@ -78,6 +89,15 @@ export function JobListingsClient({
 
   const activeFilterCount = [category, type, shift, clearance, certifications].filter(Boolean).length;
 
+  if (jobs.length === 0) {
+    return (
+      <GlassCard className="py-14 text-center md:py-18">
+        <h3 className="text-2xl font-semibold text-white">{emptyTitle}</h3>
+        <p className="mx-auto mt-3 max-w-2xl text-silver-400">{emptyDescription}</p>
+      </GlassCard>
+    );
+  }
+
   return (
     <>
       {/* Mobile Filter Toggle Button */}
@@ -104,6 +124,8 @@ export function JobListingsClient({
           certifications={certifications}
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
+          basePath={basePath}
+          accent={accent}
         />
 
         {/* Job Listings */}
@@ -112,19 +134,18 @@ export function JobListingsClient({
             <h2 className="text-2xl font-bold text-white">
               {category || type || shift || clearance || certifications || 'All Jobs'} ({filteredAndSortedJobs.length})
             </h2>
-            <SortSelect />
+            <SortSelect basePath={basePath} />
           </div>
 
           {filteredAndSortedJobs.length === 0 ? (
             <GlassCard className="text-center py-12">
-              <p className="text-silver-400 text-lg">
-                No jobs found. Try adjusting your filters.
-              </p>
+              <h3 className="text-xl font-semibold text-white">{emptyTitle}</h3>
+              <p className="mt-2 text-silver-400">{emptyDescription}</p>
             </GlassCard>
           ) : (
             <div className="grid grid-cols-1 gap-6">
               {filteredAndSortedJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <JobCard key={job.id} job={job} accent={accent} />
               ))}
             </div>
           )}

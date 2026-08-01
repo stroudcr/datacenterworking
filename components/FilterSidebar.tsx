@@ -12,6 +12,11 @@ interface FilterSidebarProps {
   certifications?: string;
   isOpen?: boolean;
   onClose?: () => void;
+  basePath?: string;
+  accent?: {
+    primary: string;
+    secondary: string;
+  };
 }
 
 export function FilterSidebar({
@@ -22,6 +27,8 @@ export function FilterSidebar({
   certifications,
   isOpen = true,
   onClose,
+  basePath = '/',
+  accent,
 }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -38,7 +45,7 @@ export function FilterSidebar({
     }
 
     const queryString = params.toString();
-    const newUrl = queryString ? `/?${queryString}` : '/';
+    const newUrl = queryString ? `${basePath}?${queryString}` : basePath;
 
     // Use router.replace to update URL without reload or scroll jump
     router.replace(newUrl, { scroll: false });
@@ -84,7 +91,7 @@ export function FilterSidebar({
           {/* Clear All Button */}
           {activeFilterCount > 0 && (
             <button
-              onClick={() => router.replace('/', { scroll: false })}
+              onClick={() => router.replace(basePath, { scroll: false })}
               className="block w-full px-4 py-2 text-center text-sm font-medium text-ice-400 bg-white/5 rounded-lg hover:bg-white/10 transition-colors border border-white/10"
             >
               Clear All Filters
@@ -102,6 +109,7 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
+                style={!category && accent ? { backgroundColor: accent.primary } : undefined}
               >
                 All Categories
               </button>
@@ -114,6 +122,7 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
+                  style={category === cat && accent ? { backgroundColor: accent.primary } : undefined}
                 >
                   {cat}
                 </button>
@@ -132,6 +141,7 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
+                style={!type && accent ? { backgroundColor: accent.secondary } : undefined}
               >
                 All Types
               </button>
@@ -144,6 +154,7 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
+                  style={type === jobType && accent ? { backgroundColor: accent.secondary } : undefined}
                 >
                   {jobType}
                 </button>
@@ -162,6 +173,7 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
+                style={!shift && accent ? { backgroundColor: accent.primary } : undefined}
               >
                 All Shifts
               </button>
@@ -174,6 +186,7 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
+                  style={shift === shiftReq && accent ? { backgroundColor: accent.primary } : undefined}
                 >
                   {shiftReq}
                 </button>
@@ -192,6 +205,7 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
+                style={!clearance && accent ? { backgroundColor: accent.secondary } : undefined}
               >
                 All Clearances
               </button>
@@ -204,6 +218,7 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
+                  style={clearance === clearanceLevel && accent ? { backgroundColor: accent.secondary } : undefined}
                 >
                   {clearanceLevel}
                 </button>
@@ -222,6 +237,7 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
+                style={!certifications && accent ? { backgroundColor: accent.primary } : undefined}
               >
                 All Certifications
               </button>
@@ -234,6 +250,7 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
+                  style={certifications === cert && accent ? { backgroundColor: accent.primary } : undefined}
                 >
                   {cert}
                 </button>

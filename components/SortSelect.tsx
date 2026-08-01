@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export function SortSelect() {
+export function SortSelect({ basePath = '/' }: { basePath?: string }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const currentSort = searchParams.get('sort') || 'latest';
@@ -10,7 +10,7 @@ export function SortSelect() {
   const handleChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('sort', value);
-    router.replace(`/?${params.toString()}`, { scroll: false });
+    router.replace(`${basePath}?${params.toString()}`, { scroll: false });
   };
 
   return (

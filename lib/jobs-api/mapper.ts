@@ -1,11 +1,15 @@
 import { ScoredJob } from './types';
 import { JOB_CATEGORIES, JOB_TYPES } from '../constants';
+import { parseLocation } from '../locations';
 
 export interface MappedJob {
   title: string;
   company: string;
   companyLogo?: string;
   location: string;
+  city: string | null;
+  state: string | null;
+  country: string;
   type: string;
   category: string;
   shift?: string;
@@ -316,9 +320,12 @@ function generateSlugFromExternal(title: string, externalId: string): string {
  */
 export function mapJSearchJobToSchema(job: ScoredJob): MappedJob {
   // Parse location
-  const location = job.job_city && job.job_state
+  const location = job.job_is_remote
+    ? 'Remote'
+    : job.job_city && job.job_state
     ? `${job.job_city}, ${job.job_state}`
     : job.job_city || job.job_state || job.job_country;
+  const parsedLocation = parseLocation(location);
 
   // Generate slug from title and external ID
   const slug = generateSlugFromExternal(job.job_title, job.job_id);
@@ -349,6 +356,9 @@ export function mapJSearchJobToSchema(job: ScoredJob): MappedJob {
     company: job.employer_name,
     companyLogo: job.employer_logo,
     location,
+    city: parsedLocation.city,
+    state: parsedLocation.state,
+    country: parsedLocation.country,
     type: mapEmploymentType(job.job_employment_type),
     category: inferCategory(job.job_title, job.job_description),
     shift: inferShift(job.job_description),

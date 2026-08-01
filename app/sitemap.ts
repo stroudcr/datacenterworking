@@ -25,18 +25,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   });
 
-  const activeStatesByCount = await db.job.groupBy({
-    by: ['state'],
-    where: {
-      ...activeJobsWhere,
-      country: 'US',
-      state: { not: null },
-    },
-    _count: {
-      id: true,
-    },
-  });
-
   const remoteJobCount = await db.job.count({
     where: {
       ...activeJobsWhere,
@@ -127,39 +115,31 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // State pages
   const allStates = getAllStates();
-  const activeStateCodes = new Set(
-    activeStatesByCount
-      .map((stateCount) => stateCount.state)
-      .filter((state): state is string => Boolean(state))
-  );
-  const hasUsJobs = activeStateCodes.size > 0 || remoteJobCount > 0;
-  const statePages: MetadataRoute.Sitemap = hasUsJobs
-    ? [
-        {
-          url: absoluteUrl('/states'),
-          lastModified: new Date(),
-          changeFrequency: 'daily' as const,
-          priority: 0.9,
-        },
-        ...(remoteJobCount > 0
-          ? [
-              {
-                url: absoluteUrl('/states/remote'),
-                lastModified: new Date(),
-                changeFrequency: 'daily' as const,
-                priority: 0.9,
-              },
-            ]
-          : []),
-        // Individual state pages with active jobs only.
-        ...allStates.filter((state) => activeStateCodes.has(state.abbreviation)).map((state) => ({
-          url: absoluteUrl(`/states/${state.slug}`),
-          lastModified: new Date(),
-          changeFrequency: 'daily' as const,
-          priority: 0.9,
-        })),
-      ]
-    : [];
+  const stateContentReviewedAt = new Date('2026-08-01T00:00:00.000Z');
+  const statePages: MetadataRoute.Sitemap = [
+    {
+      url: absoluteUrl('/states'),
+      lastModified: stateContentReviewedAt,
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    ...(remoteJobCount > 0
+      ? [
+          {
+            url: absoluteUrl('/states/remote'),
+            lastModified: new Date(),
+            changeFrequency: 'daily' as const,
+            priority: 0.8,
+          },
+        ]
+      : []),
+    ...allStates.map((state) => ({
+      url: absoluteUrl(`/states/${state.slug}`),
+      lastModified: stateContentReviewedAt,
+      changeFrequency: 'daily' as const,
+      priority: 0.8,
+    })),
+  ];
 
   return [...staticPages, ...jobPages, ...resourcePages, ...statePages];
 }

@@ -1,41 +1,42 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { db } from '@/lib/db';
-import { getAllStates, getStateFromSlug, getStateAbbreviation } from '@/lib/locations';
+import { Bell, BriefcaseBusiness, MapPin } from 'lucide-react';
 import { JobListingsClient } from '@/components/JobListingsClient';
-import { MapPin, Briefcase, Building2 } from 'lucide-react';
-import { GlassCard } from '@/components/GlassCard';
+import { Newsletter } from '@/components/Newsletter';
+import { StateCareerGuide } from '@/components/StateCareerGuide';
+import { StateOutline } from '@/components/StateOutline';
+import { db } from '@/lib/db';
+import { getAllStates, getStateAbbreviation, getStateFromSlug } from '@/lib/locations';
+import {
+  buildStateFaqs,
+  getStateProfile,
+  possessiveStateName,
+} from '@/lib/state-profiles';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 
+type StateSearchParams = Record<string, string | string[] | undefined>;
+
 interface StatePageProps {
-  params: Promise<{
-    state: string;
-  }>;
+  params: Promise<{ state: string }>;
+  searchParams: Promise<StateSearchParams>;
 }
 
-// Generate static params for all states at build time
+export const revalidate = 60;
+
 export async function generateStaticParams() {
-  const allStates = getAllStates();
-  return allStates.map((state) => ({
-    state: state.slug,
-  }));
+  return getAllStates().map((state) => ({ state: state.slug }));
 }
 
-// Generate metadata for SEO
-export async function generateMetadata({ params }: StatePageProps): Promise<Metadata> {
-  const { state: stateSlug } = await params;
+export async function generateMetadata({ params, searchParams }: StatePageProps): Promise<Metadata> {
+  const [{ state: stateSlug }, query] = await Promise.all([params, searchParams]);
   const stateName = getStateFromSlug(stateSlug);
 
-  if (!stateName) {
-    return {
-      title: 'State Not Found',
-    };
-  }
+  if (!stateName) return { title: 'State Not Found' };
 
   const stateAbbr = getStateAbbreviation(stateName);
-
-  // Get job count for description
   const jobCount = await db.job.count({
     where: {
       status: 'ACTIVE',
@@ -44,302 +45,235 @@ export async function generateMetadata({ params }: StatePageProps): Promise<Meta
       state: stateAbbr,
     },
   });
-
+  const hasQueryParams = Object.values(query).some((value) =>
+    Array.isArray(value) ? value.length > 0 : Boolean(value)
+  );
   const title = `Data Center Jobs in ${stateName}`;
-  const hasActiveJobs = jobCount > 0;
-  const description = hasActiveJobs
-    ? `Browse ${jobCount} active data center jobs in ${stateName}. Find opportunities in facilities, engineering, IT, operations, and more.`
-    : `Track data center jobs in ${stateName} and explore resources for landing technician, facilities, engineering, and operations roles.`;
+  const description = jobCount > 0
+    ? `Browse ${jobCount} active data center ${jobCount === 1 ? 'job' : 'jobs'} in ${stateName}, plus a state-specific career guide covering power, cooling, technical skills, and training.`
+    : `Explore data center careers in ${stateName}, including state-specific guidance on power, cooling, technical skills, training, and future job openings.`;
 
   return {
     title,
     description,
+    alternates: { canonical: absoluteUrl(`/states/${stateSlug}`) },
     openGraph: {
       title,
       description,
       url: absoluteUrl(`/states/${stateSlug}`),
+      images: [{ url: absoluteUrl('/images/state-hero-grid.png') }],
     },
-    twitter: {
-      card: 'summary_large_image',
-      title,
-      description,
-    },
-    alternates: {
-      canonical: absoluteUrl(`/states/${stateSlug}`),
-    },
-    robots: hasActiveJobs
-      ? undefined
-      : {
-          index: false,
-          follow: true,
-        },
+    twitter: { card: 'summary_large_image', title, description },
+    robots: hasQueryParams ? { index: false, follow: true } : undefined,
   };
 }
 
-// Revalidate every 60 seconds
-export const revalidate = 60;
-
-export default async function StatePage({ params }: StatePageProps) {
-  const { state: stateSlug } = await params;
+export default async function StatePage({ params, searchParams }: StatePageProps) {
+  const [{ state: stateSlug }, query] = await Promise.all([params, searchParams]);
   const stateName = getStateFromSlug(stateSlug);
 
-  if (!stateName) {
-    notFound();
-  }
+  if (!stateName) notFound();
 
   const stateAbbr = getStateAbbreviation(stateName);
+  const profile = getStateProfile(stateAbbr);
+  if (!stateAbbr || !profile) notFound();
 
-  // Fetch jobs for this state
-  const jobs = await db.job.findMany({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      state: stateAbbr,
-    },
-    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-    take: 150,
-  });
+  const now = new Date();
+  const where = {
+    status: 'ACTIVE' as const,
+    expiresAt: { gte: now },
+    country: 'US',
+    state: stateAbbr,
+  };
+  const [jobs, totalJobCount, categoryCounts] = await Promise.all([
+    db.job.findMany({
+      where,
+      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
+      take: 150,
+    }),
+    db.job.count({ where }),
+    db.job.groupBy({
+      by: ['category'],
+      where,
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+      take: 6,
+    }),
+  ]);
+  const activeCategories = categoryCounts.map((item) => item.category);
+  const faqs = buildStateFaqs(profile, activeCategories);
+  const possessiveName = possessiveStateName(stateName);
+  const pageUrl = absoluteUrl(`/states/${stateSlug}`);
+  const initial = (key: string) => {
+    const value = query[key];
+    return Array.isArray(value) ? value[0] : value;
+  };
 
-  // Get unique cities in this state
-  const cities = await db.job.findMany({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      state: stateAbbr,
-      city: { not: null },
-    },
-    select: {
-      city: true,
-    },
-    distinct: ['city'],
-  });
-
-  const uniqueCities = cities.map((c) => c.city).filter(Boolean) as string[];
-
-  // Get job counts by category for this state
-  const categoryCounts = await db.job.groupBy({
-    by: ['category'],
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      state: stateAbbr,
-    },
-    _count: {
-      id: true,
-    },
-  });
-
-  const topCategories = categoryCounts
-    .sort((a, b) => b._count.id - a._count.id)
-    .slice(0, 5);
-
-  // Structured data for breadcrumbs
   const breadcrumbSchema = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
-        name: 'Home',
-        item: SITE_URL,
-      },
-      {
-        '@type': 'ListItem',
-        position: 2,
-        name: 'States',
-        item: absoluteUrl('/states'),
-      },
-      {
-        '@type': 'ListItem',
-        position: 3,
-        name: stateName,
-        item: absoluteUrl(`/states/${stateSlug}`),
-      },
+      { '@type': 'ListItem', position: 1, name: 'Home', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'States', item: absoluteUrl('/states') },
+      { '@type': 'ListItem', position: 3, name: stateName, item: pageUrl },
     ],
   };
-
-  // Structured data for job collection
   const collectionSchema = {
     '@context': 'https://schema.org',
     '@type': 'CollectionPage',
     name: `Data Center Jobs in ${stateName}`,
-    description: `Browse data center opportunities in ${stateName}`,
-    url: absoluteUrl(`/states/${stateSlug}`),
-    numberOfItems: jobs.length,
+    description: `Data center job listings and career guidance for ${stateName}.`,
+    url: pageUrl,
+    numberOfItems: totalJobCount,
+    mainEntity: {
+      '@type': 'ItemList',
+      numberOfItems: totalJobCount,
+      itemListElement: jobs.slice(0, 10).map((job, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: `${job.title} at ${job.company}`,
+        url: absoluteUrl(`/jobs/${job.slug}`),
+      })),
+    },
+  };
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: { '@type': 'Answer', text: faq.answer },
+    })),
   };
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }}
-      />
+    <main className="min-h-screen">
+      {[breadcrumbSchema, collectionSchema, faqSchema].map((schema, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
 
-      <div className="container mx-auto px-4 py-12">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-4">
-            <MapPin className="w-8 h-8 text-blue-400" />
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-100 to-blue-300 bg-clip-text text-transparent">
-              Data Center Jobs in {stateName}
-            </h1>
-          </div>
-          <p className="text-xl text-gray-300">
-            {jobs.length === 0
-              ? `No active data center jobs in ${stateName} at the moment. Check back soon!`
-              : `Browse ${jobs.length} active ${jobs.length === 1 ? 'opportunity' : 'opportunities'} in ${stateName}`}
-          </p>
-        </div>
+      <section className="relative isolate overflow-hidden border-b border-white/10 px-4 py-7 md:py-8">
+        <Image
+          src="/images/state-hero-grid.png"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-center opacity-75"
+        />
+        <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(4,10,26,0.97)_0%,rgba(4,10,26,0.82)_48%,rgba(4,10,26,0.28)_100%)]" />
+        <div className="container mx-auto max-w-7xl">
+          <nav className="mb-5 flex items-center gap-2 text-sm text-silver-400" aria-label="Breadcrumb">
+            <Link href="/" className="hover:text-white">Jobs</Link>
+            <span aria-hidden="true">/</span>
+            <Link href="/states" className="hover:text-white">States</Link>
+            <span aria-hidden="true">/</span>
+            <span className="text-silver-200">{stateName}</span>
+          </nav>
 
-        {/* Stats Cards */}
-        {jobs.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {/* Job Count */}
-            <GlassCard>
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
-                  <Briefcase className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-gray-400 text-sm">Active Jobs</p>
-                  <p className="text-2xl font-bold text-white">{jobs.length}</p>
-                </div>
-              </div>
-            </GlassCard>
-
-            {/* Cities */}
-            {uniqueCities.length > 0 && (
-              <GlassCard>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center">
-                    <MapPin className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-gray-400 text-sm">Cities</p>
-                    <p className="text-2xl font-bold text-white">{uniqueCities.length}</p>
-                  </div>
-                </div>
-              </GlassCard>
-            )}
-
-            {/* Top Category */}
-            {topCategories.length > 0 && (
-              <GlassCard>
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-green-600 flex items-center justify-center">
-                    <Building2 className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-gray-400 text-sm">Top Category</p>
-                    <p className="text-sm font-semibold text-white truncate">
-                      {topCategories[0].category}
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-            )}
-          </div>
-        )}
-
-        {/* Cities in this state */}
-        {uniqueCities.length > 0 && (
-          <div className="mb-8">
-            <GlassCard>
-              <h2 className="text-xl font-semibold text-white mb-3">Cities in {stateName}</h2>
-              <div className="flex flex-wrap gap-2">
-                {uniqueCities.sort().map((city) => (
-                  <span
-                    key={city}
-                    className="px-3 py-1 bg-white/5 rounded-full text-sm text-gray-300 border border-white/10"
-                  >
-                    {city}
-                  </span>
-                ))}
-              </div>
-            </GlassCard>
-          </div>
-        )}
-
-        <div className="mb-8">
-          <GlassCard>
-            <h2 className="text-xl font-semibold text-white mb-3">
-              Data Center Hiring in {stateName}
-            </h2>
-            <div className="space-y-3 text-gray-300">
-              <p>
-                Data center teams in {stateName} typically hire across critical facilities,
-                electrical and mechanical maintenance, network operations, security, logistics,
-                and site reliability support. Listings here are limited to active roles so closed
-                jobs do not waste applicants' time after they expire.
-              </p>
-              <p>
-                {jobs.length > 0
-                  ? `Current openings in ${stateName} are concentrated in ${
-                      uniqueCities.length > 0
-                        ? uniqueCities.slice(0, 4).join(', ')
-                        : 'the listed locations below'
-                    }${uniqueCities.length > 4 ? ', and nearby markets' : ''}.`
-                  : `There are no active ${stateName} listings right now, and this directory updates automatically when new roles are available.`}
-              </p>
-            </div>
-            {topCategories.length > 0 && (
-              <div className="mt-4 flex flex-wrap gap-2">
-                {topCategories.map((cat) => (
-                  <span
-                    key={cat.category}
-                    className="px-3 py-1 bg-white/5 rounded-full text-sm text-gray-300 border border-white/10"
-                  >
-                    {cat.category} ({cat._count.id})
-                  </span>
-                ))}
-              </div>
-            )}
-          </GlassCard>
-        </div>
-
-        {/* Job Listings */}
-        <Suspense fallback={<div className="text-center py-12 text-gray-400">Loading jobs...</div>}>
-          <JobListingsClient
-            jobs={jobs}
-            initialCategory=""
-            initialType=""
-            initialShift=""
-            initialClearance=""
-            initialCertifications=""
-            initialSort="latest"
-          />
-        </Suspense>
-
-        {/* No Jobs Message */}
-        {jobs.length === 0 && (
-          <div className="mt-8">
-            <GlassCard className="text-center py-12">
-              <MapPin className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold text-white mb-2">
-                No Jobs Available in {stateName}
-              </h2>
-              <p className="text-gray-400 mb-6">
-                We don't currently have any active job listings in {stateName}, but new opportunities
-                are added daily.
-              </p>
-              <a
-                href="/states"
-                className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 transition-all"
+          <div className="grid items-center gap-8 lg:grid-cols-[1.08fr_0.92fr]">
+            <div className="max-w-3xl">
+              <p
+                className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.2em]"
+                style={{ color: profile.accentFrom }}
               >
-                Browse All States
-              </a>
-            </GlassCard>
+                <MapPin className="h-4 w-4" aria-hidden="true" />
+                {stateName} career hub
+              </p>
+              <h1 className="text-5xl font-black leading-[0.98] tracking-tight text-white sm:text-6xl">
+                Power {possessiveName}
+                <br />
+                <span
+                  className="bg-clip-text text-transparent"
+                  style={{ backgroundImage: `linear-gradient(90deg, ${profile.accentFrom}, ${profile.accentTo})` }}
+                >
+                  Digital Future
+                </span>
+              </h1>
+              <h2 className="mt-4 text-2xl font-semibold text-white md:text-3xl">
+                Data Center Jobs in {stateName}
+              </h2>
+              <p className="mt-3 max-w-2xl text-lg leading-8 text-silver-300">
+                Explore roles that support the power, cooling, connectivity, construction, and
+                round-the-clock operations behind {stateName}&apos;s digital infrastructure.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-5">
+                <span className="inline-flex items-center gap-2 text-sm font-semibold text-white">
+                  {totalJobCount > 0
+                    ? `${totalJobCount.toLocaleString()} active ${totalJobCount === 1 ? 'job' : 'jobs'}`
+                    : '0 active jobs · career guide below'}
+                </span>
+                <a
+                  href="#state-job-alerts"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-silver-300 hover:text-white"
+                >
+                  <Bell className="h-4 w-4" aria-hidden="true" /> Get {stateName} job alerts
+                </a>
+              </div>
+            </div>
+            <StateOutline
+              abbreviation={stateAbbr}
+              accentFrom={profile.accentFrom}
+              accentTo={profile.accentTo}
+            />
           </div>
-        )}
-      </div>
-    </>
+        </div>
+      </section>
+
+      <section id="state-jobs" className="scroll-mt-24 px-4 py-10 md:py-12">
+        <div className="container mx-auto max-w-7xl">
+          <div className="mb-8 flex flex-col justify-between gap-4 border-b border-white/10 pb-7 sm:flex-row sm:items-end">
+            <div>
+              <p
+                className="mb-2 text-sm font-semibold uppercase tracking-[0.18em]"
+                style={{ color: profile.accentFrom }}
+              >
+                Current opportunities
+              </p>
+              <h2 className="text-3xl font-bold text-white md:text-4xl">
+                Data center jobs in {stateName}
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 text-silver-300">
+              <BriefcaseBusiness className="h-5 w-5" style={{ color: profile.accentTo }} aria-hidden="true" />
+              <span>{totalJobCount.toLocaleString()} active {totalJobCount === 1 ? 'listing' : 'listings'}</span>
+            </div>
+          </div>
+
+          <Suspense fallback={<div className="py-16 text-center text-silver-400">Loading jobs…</div>}>
+            <JobListingsClient
+              jobs={jobs}
+              initialCategory={initial('category')}
+              initialType={initial('type')}
+              initialShift={initial('shift')}
+              initialClearance={initial('clearance')}
+              initialCertifications={initial('certifications')}
+              initialSort={initial('sort') || 'latest'}
+              basePath={`/states/${stateSlug}`}
+              accent={{ primary: profile.accentFrom, secondary: profile.accentTo }}
+              emptyTitle={`No active ${stateName} jobs match right now`}
+              emptyDescription={`The ${stateName} career guide and alert signup below are still available while you wait for the next listing.`}
+            />
+          </Suspense>
+
+          <div id="state-job-alerts" className="mt-16 scroll-mt-24">
+            <Newsletter
+              title={`Get ${stateName} job alerts`}
+              description={`Be notified when new data center opportunities are added for ${stateName}.`}
+              successDescription={`You'll receive alerts when new ${stateName} data center jobs are posted.`}
+              categories={[`State:${stateAbbr}`]}
+              buttonText={`Subscribe to ${stateAbbr} alerts`}
+              accent={{ primary: profile.accentFrom, secondary: profile.accentTo }}
+            />
+          </div>
+
+          <StateCareerGuide profile={profile} activeCategories={activeCategories} />
+        </div>
+      </section>
+    </main>
   );
 }

@@ -3,21 +3,14 @@ import Link from 'next/link';
 import { db } from '@/lib/db';
 import { getAllStates } from '@/lib/locations';
 import { GlassCard } from '@/components/GlassCard';
-import { MapPin, Briefcase } from 'lucide-react';
+import { ArrowRight, MapPin, Briefcase } from 'lucide-react';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
+import { getStateProfile } from '@/lib/state-profiles';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const activeUsJobCount = await db.job.count({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-    },
-  });
-
   return {
     title: 'Browse Data Center Jobs by State',
     description:
@@ -31,13 +24,6 @@ export async function generateMetadata(): Promise<Metadata> {
     alternates: {
       canonical: absoluteUrl('/states'),
     },
-    robots:
-      activeUsJobCount > 0
-        ? undefined
-        : {
-            index: false,
-            follow: true,
-          },
   };
 }
 
@@ -164,37 +150,30 @@ export default async function StatesPage() {
         {/* States Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedStates.map((state) => {
-            const card = (
+            const profile = getStateProfile(state.abbreviation);
+            return (
+              <Link key={state.abbreviation} href={`/states/${state.slug}`} className="group">
               <GlassCard
-                className={`h-full ${
-                  state.jobCount > 0
-                    ? 'hover:scale-[1.02] transition-transform duration-200 cursor-pointer'
-                    : 'opacity-60'
-                }`}
+                className="h-full cursor-pointer transition-transform duration-200 group-hover:-translate-y-1"
+                style={profile ? { borderColor: `${profile.accentFrom}35` } : undefined}
               >
                 <div className="flex flex-col">
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-lg font-semibold text-white">{state.name}</h3>
-                    <span className="text-xs text-gray-400 font-mono">{state.abbreviation}</span>
+                    <span className="text-xs font-mono" style={{ color: profile?.accentFrom }}>{state.abbreviation}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-blue-400 mt-auto">
-                    <Briefcase className="w-4 h-4" />
-                    <span className="text-sm font-medium">
+                  <div className="mt-auto flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-2 text-sm font-medium text-silver-300">
+                      <Briefcase className="w-4 h-4" style={{ color: profile?.accentTo }} aria-hidden="true" />
                       {state.jobCount === 0
-                        ? 'No jobs available'
+                        ? 'Career guide · 0 jobs'
                         : `${state.jobCount} ${state.jobCount === 1 ? 'job' : 'jobs'}`}
                     </span>
+                    <ArrowRight className="h-4 w-4 text-silver-500 transition-transform group-hover:translate-x-1" aria-hidden="true" />
                   </div>
                 </div>
               </GlassCard>
-            );
-
-            return state.jobCount > 0 ? (
-              <Link key={state.abbreviation} href={`/states/${state.slug}`}>
-                {card}
               </Link>
-            ) : (
-              <div key={state.abbreviation}>{card}</div>
             );
           })}
         </div>
@@ -204,9 +183,9 @@ export default async function StatesPage() {
           <GlassCard className="max-w-3xl mx-auto">
             <h2 className="text-2xl font-bold mb-4 text-white">Why Browse by State?</h2>
             <p className="text-gray-300 mb-4">
-              Data center professionals often seek opportunities in specific regions due to cost of living,
-              climate preferences, or proximity to major tech hubs. Our state-specific job pages make it
-              easy to find the perfect role in your desired location.
+              Each state page combines current job listings with useful career context about energy,
+              climate resilience, technical workforce pathways, and job preparation. Every guide remains
+              available between hiring cycles, so you can research a market before the next role appears.
             </p>
             {statesWithOpenRoles.length > 0 && (
               <p className="text-gray-300 mb-4">
@@ -218,10 +197,7 @@ export default async function StatesPage() {
                 {statesWithOpenRoles.length > 6 ? ', and additional markets' : ''}.
               </p>
             )}
-            <p className="text-gray-400 text-sm">
-              Major data center hubs include Virginia (Ashburn - Data Center Alley), Texas (Dallas, Austin),
-              California (Silicon Valley), Illinois (Chicago), and the Pacific Northwest (Oregon, Washington).
-            </p>
+            <p className="text-gray-400 text-sm">Job counts reflect active listings and update as roles are added or expire.</p>
           </GlassCard>
         </div>
       </div>

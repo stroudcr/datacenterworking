@@ -1,14 +1,14 @@
 import { db } from '@/lib/db';
 import { JobCard } from '@/components/JobCard';
-import { GlassCard } from '@/components/GlassCard';
 import { SearchBar } from '@/components/SearchBar';
 import { Newsletter } from '@/components/Newsletter';
 import { JobListingsClient } from '@/components/JobListingsClient';
-import { Briefcase, TrendingUp, Shield } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
 import type { Metadata } from 'next';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
+import { getStateFullName, getStateSlug } from '@/lib/locations';
 
 // Cache this page for 60 seconds to reduce database operations
 export const revalidate = 60;
@@ -92,9 +92,20 @@ export default async function Home({
     .filter((job) => job.isFeatured && job.featuredUntil && job.featuredUntil >= now)
     .slice(0, 3);
 
-  // Get total active jobs count (only needed for display, not for filtering)
-  const totalActiveJobs = await db.job.count({
-    where: activeJobsWhere,
+  const stateCounts = await db.job.groupBy({
+    by: ['state'],
+    where: {
+      ...activeJobsWhere,
+      country: 'US',
+      state: { not: null },
+    },
+    _count: { id: true },
+    orderBy: { _count: { id: 'desc' } },
+    take: 6,
+  });
+  const leadingStates = stateCounts.flatMap((item) => {
+    const name = getStateFullName(item.state);
+    return name ? [{ name, slug: getStateSlug(name), count: item._count.id }] : [];
   });
 
   // WebSite schema with SearchAction for sitelinks searchbox
@@ -160,6 +171,38 @@ export default async function Home({
           <div className="max-w-2xl mx-auto">
             <SearchBar initialSearch={search} />
           </div>
+        </div>
+      </section>
+
+      <section className="px-4 pb-8">
+        <div className="container mx-auto max-w-6xl border-y border-white/10 py-8">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-ice-400">Explore locally</p>
+              <h2 className="mt-2 text-2xl font-bold text-white">Find data center jobs in your state</h2>
+            </div>
+            <Link href="/states" className="inline-flex items-center gap-2 text-sm font-semibold text-ice-400 hover:text-ice-300">
+              Browse every state <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+          {leadingStates.length > 0 ? (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {leadingStates.map((state) => (
+                <Link
+                  key={state.slug}
+                  href={`/states/${state.slug}`}
+                  className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 transition-colors hover:border-ice-400/40 hover:bg-white/[0.06]"
+                >
+                  <span className="flex items-center gap-2 font-medium text-white">
+                    <MapPin className="h-4 w-4 text-ice-400" aria-hidden="true" /> {state.name}
+                  </span>
+                  <span className="text-sm text-silver-400 group-hover:text-silver-200">{state.count} {state.count === 1 ? 'job' : 'jobs'}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-5 text-silver-400">Explore all 50 states and the District of Columbia for state-specific career guidance and future openings.</p>
+          )}
         </div>
       </section>
 
