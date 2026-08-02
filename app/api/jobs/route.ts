@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
           location: validatedData.location,
           city: parsedLocation.city,
           state: parsedLocation.state,
+          locationStates: parsedLocation.states,
+          isRemote: parsedLocation.isRemote,
           country: parsedLocation.country,
           type: validatedData.type,
           category: validatedData.category,

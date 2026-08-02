@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
       status: 'ACTIVE',
       expiresAt: { gte: new Date() },
       country: 'US',
-      state: null,
+      isRemote: true,
     },
   });
 
@@ -48,13 +48,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RemoteJobsPage() {
-  // Fetch remote jobs (no state assigned)
+  // Fetch jobs explicitly marked as remote.
   const jobs = await db.job.findMany({
     where: {
       status: 'ACTIVE',
       expiresAt: { gte: new Date() },
       country: 'US',
-      state: null,
+      isRemote: true,
     },
     orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
     take: 150,
@@ -67,7 +67,7 @@ export default async function RemoteJobsPage() {
       status: 'ACTIVE',
       expiresAt: { gte: new Date() },
       country: 'US',
-      state: null,
+      isRemote: true,
     },
     _count: {
       id: true,

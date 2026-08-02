@@ -40,6 +40,7 @@ async function main() {
     totalFetched: 0,
     totalScored: 0,
     totalImported: 0,
+    totalUpdated: 0,
     totalSkipped: 0,
     duplicates: 0,
     errors: 0,
@@ -122,7 +123,11 @@ async function main() {
           });
 
           if (existing) {
-            stats.totalSkipped++;
+            await db.job.update({
+              where: { id: existing.id },
+              data: job,
+            });
+            stats.totalUpdated++;
             continue;
           }
 
@@ -158,6 +163,7 @@ async function main() {
 
     if (!isDryRun) {
       console.log(`Imported:            ${stats.totalImported} ✅`);
+      console.log(`Updated:             ${stats.totalUpdated} ✅`);
       console.log(`Skipped (existing):  ${stats.totalSkipped}`);
       console.log(`Errors:              ${stats.errors}`);
     }

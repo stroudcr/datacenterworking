@@ -6,7 +6,9 @@
 export interface ParsedLocation {
   city: string | null;
   state: string | null;
+  states: string[];
   country: string;
+  isRemote: boolean;
 }
 
 /**
@@ -87,6 +89,9 @@ export const STATE_CODES = Object.values(US_STATES);
  */
 export const STATE_NAMES = Object.keys(US_STATES).sort();
 
+const STATE_ENTRIES = Object.entries(US_STATES);
+const LOCATION_SEPARATOR = /\s*(?:\/|\||;)\s*|\n+/;
+
 /**
  * Keywords that indicate a remote job
  */
@@ -126,58 +131,50 @@ const MULTI_LOCATION_KEYWORDS = [
  */
 export function parseLocation(location: string): ParsedLocation {
   if (!location || typeof location !== 'string') {
-    return { city: null, state: null, country: 'US' };
+    return { city: null, state: null, states: [], country: 'US', isRemote: false };
   }
 
   const trimmed = location.trim();
   const lowerTrimmed = trimmed.toLowerCase();
+  const isRemote = REMOTE_KEYWORDS.some(keyword => lowerTrimmed.includes(keyword));
 
-  // Check if it's a remote job
-  if (REMOTE_KEYWORDS.some(keyword => lowerTrimmed.includes(keyword))) {
-    return { city: null, state: null, country: 'US' };
+  if (isRemote) {
+    return { city: null, state: null, states: [], country: 'US', isRemote: true };
   }
 
-  // Check if it's a multi-location job
   if (MULTI_LOCATION_KEYWORDS.some(keyword => lowerTrimmed.includes(keyword))) {
-    return { city: null, state: null, country: 'US' };
+    return { city: null, state: null, states: [], country: 'US', isRemote: false };
   }
 
-  // Parse "City, ST" or "City, State" format
-  const parts = trimmed.split(',').map(p => p.trim());
+  const locationParts = trimmed.split(LOCATION_SEPARATOR).map(part => part.trim()).filter(Boolean);
+  const states: string[] = [];
 
-  if (parts.length >= 2) {
-    const city = parts[0];
-    const stateInput = parts[1];
+  for (const locationPart of locationParts) {
+    const commaParts = locationPart.split(',').map(part => part.trim()).filter(Boolean);
+    const candidates = commaParts.length > 1 ? commaParts.slice(1) : commaParts;
 
-    // Check if it's a 2-letter state code
-    if (stateInput.length === 2) {
-      const upperState = stateInput.toUpperCase();
-      if (STATE_CODES.includes(upperState)) {
-        return { city, state: upperState, country: 'US' };
+    for (const candidate of candidates) {
+      const stateCode = getStateAbbreviation(candidate);
+      if (stateCode && !states.includes(stateCode)) {
+        states.push(stateCode);
+        break;
       }
     }
-
-    // Check if it's a full state name
-    const stateAbbr = US_STATES[stateInput];
-    if (stateAbbr) {
-      return { city, state: stateAbbr, country: 'US' };
-    }
-
-    // Try case-insensitive match for full state name
-    const matchedState = Object.entries(US_STATES).find(
-      ([fullName]) => fullName.toLowerCase() === stateInput.toLowerCase()
-    );
-
-    if (matchedState) {
-      return { city, state: matchedState[1], country: 'US' };
-    }
   }
 
-  // If we can't parse it, return null for state but keep the first part as city
+  const firstLocationParts = locationParts[0]?.split(',').map(part => part.trim()) || [];
+  const city = firstLocationParts.length > 1
+    ? firstLocationParts[0] || null
+    : states.length > 0
+      ? null
+      : firstLocationParts[0] || null;
+
   return {
-    city: parts[0] || null,
-    state: null,
+    city,
+    state: states[0] || null,
+    states,
     country: 'US',
+    isRemote: false,
   };
 }
 
@@ -200,7 +197,15 @@ export function getStateFullName(abbreviation: string | null): string | null {
  */
 export function getStateAbbreviation(fullName: string | null): string | null {
   if (!fullName) return null;
-  return US_STATES[fullName] || null;
+  const normalized = fullName.trim();
+  const upper = normalized.toUpperCase();
+
+  if (STATE_CODES.includes(upper)) return upper;
+
+  const matchedState = STATE_ENTRIES.find(
+    ([stateName]) => stateName.toLowerCase() === normalized.toLowerCase()
+  );
+  return matchedState?.[1] || null;
 }
 
 /**

@@ -7,7 +7,8 @@ import type { Metadata } from 'next';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
-import { getStateFullName, getStateSlug } from '@/lib/locations';
+import { getStateAbbreviation, getStateFullName, getStateSlug } from '@/lib/locations';
+import { getActiveStateJobCounts } from '@/lib/job-location-counts';
 
 // Cache this page for 60 seconds to reduce database operations
 export const revalidate = 60;
@@ -53,7 +54,8 @@ export default async function Home({
 }) {
   const params = await searchParams;
   const category = params.category;
-  const search = params.search;
+  const search = params.search?.trim();
+  const searchState = getStateAbbreviation(search || null);
   const sort = params.sort || 'latest';
   const type = params.type;
   const shift = params.shift;
@@ -70,42 +72,43 @@ export default async function Home({
 
   // Fetch ALL active jobs for client-side filtering (cached for 60 seconds)
   // Note: Removed server-side filters (category, type, shift, etc.) for instant filtering
-  const jobs = await db.job.findMany({
-    where: {
-      ...activeJobsWhere,
-      // Keep search filter on server-side (more complex, involves text search)
-      ...(search && {
-        OR: [
-          { title: { contains: search, mode: 'insensitive' } },
-          { company: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
-    },
-    orderBy: { createdAt: 'desc' }, // Default sort, client will handle sorting
-    take: 150, // Increased limit for client-side filtering
-  });
+  const [jobs, stateJobCounts] = await Promise.all([
+    db.job.findMany({
+      where: {
+        ...activeJobsWhere,
+        ...(search && {
+          OR: [
+            { title: { contains: search, mode: 'insensitive' } },
+            { company: { contains: search, mode: 'insensitive' } },
+            { description: { contains: search, mode: 'insensitive' } },
+            { location: { contains: search, mode: 'insensitive' } },
+            ...(searchState
+              ? [
+                  { state: searchState },
+                  { locationStates: { has: searchState } },
+                ]
+              : []),
+          ],
+        }),
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 150,
+    }),
+    getActiveStateJobCounts(now),
+  ]);
 
   // Get featured jobs (filter from main query results to avoid separate DB call)
   const featuredJobs = jobs
     .filter((job) => job.isFeatured && job.featuredUntil && job.featuredUntil >= now)
     .slice(0, 3);
 
-  const stateCounts = await db.job.groupBy({
-    by: ['state'],
-    where: {
-      ...activeJobsWhere,
-      country: 'US',
-      state: { not: null },
-    },
-    _count: { id: true },
-    orderBy: { _count: { id: 'desc' } },
-    take: 6,
-  });
-  const leadingStates = stateCounts.flatMap((item) => {
-    const name = getStateFullName(item.state);
-    return name ? [{ name, slug: getStateSlug(name), count: item._count.id }] : [];
-  });
+  const leadingStates = Object.entries(stateJobCounts)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, 6)
+    .flatMap(([state, count]) => {
+      const name = getStateFullName(state);
+      return name ? [{ name, slug: getStateSlug(name), count }] : [];
+    });
 
   // WebSite schema with SearchAction for sitelinks searchbox
   const websiteSchema = {

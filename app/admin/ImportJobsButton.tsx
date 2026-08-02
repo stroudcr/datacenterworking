@@ -83,6 +83,7 @@ export function ImportJobsButton({ disabled }: ImportJobsButtonProps) {
             <p>Fetched: {stats.totalFetched} jobs</p>
             <p>Relevant: {stats.totalScored} jobs</p>
             <p>Imported: {stats.totalImported} jobs</p>
+            <p>Updated: {stats.totalUpdated} existing jobs</p>
             <p>Skipped: {stats.totalSkipped} (duplicates)</p>
             {stats.errors > 0 && (
               <p className="text-red-400">Errors: {stats.errors}</p>

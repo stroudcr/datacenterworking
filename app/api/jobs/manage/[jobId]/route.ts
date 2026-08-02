@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { parseLocation } from '@/lib/locations';
 
 interface RouteContext {
   params: Promise<{ jobId: string }>;
@@ -67,6 +68,10 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       );
     }
 
+    const parsedLocation = typeof updates.location === 'string'
+      ? parseLocation(updates.location)
+      : null;
+
     // Update job (only allow certain fields)
     const allowedUpdates = {
       title: updates.title,
@@ -89,6 +94,13 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       applyUrl: updates.applyUrl,
       applyEmail: updates.applyEmail,
       tags: updates.tags,
+      ...(parsedLocation && {
+        city: parsedLocation.city,
+        state: parsedLocation.state,
+        locationStates: parsedLocation.states,
+        isRemote: parsedLocation.isRemote,
+        country: parsedLocation.country,
+      }),
     };
 
     const updatedJob = await db.job.update({

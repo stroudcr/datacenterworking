@@ -38,12 +38,13 @@ export async function generateMetadata({ params, searchParams }: StatePageProps)
   if (!stateName) return { title: 'State Not Found' };
 
   const stateAbbr = getStateAbbreviation(stateName);
+  if (!stateAbbr) return { title: 'State Not Found' };
   const jobCount = await db.job.count({
     where: {
       status: 'ACTIVE',
       expiresAt: { gte: new Date() },
       country: 'US',
-      state: stateAbbr,
+      locationStates: { has: stateAbbr },
     },
   });
   const hasQueryParams = Object.values(query).some((value) =>
@@ -84,7 +85,7 @@ export default async function StatePage({ params, searchParams }: StatePageProps
     status: 'ACTIVE' as const,
     expiresAt: { gte: now },
     country: 'US',
-    state: stateAbbr,
+    locationStates: { has: stateAbbr },
   };
   const [jobs, totalJobCount, categoryCounts] = await Promise.all([
     db.job.findMany({
