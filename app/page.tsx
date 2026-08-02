@@ -174,38 +174,6 @@ export default async function Home({
         </div>
       </section>
 
-      <section className="px-4 pb-8">
-        <div className="container mx-auto max-w-6xl border-y border-white/10 py-8">
-          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-ice-400">Explore locally</p>
-              <h2 className="mt-2 text-2xl font-bold text-white">Find data center jobs in your state</h2>
-            </div>
-            <Link href="/states" className="inline-flex items-center gap-2 text-sm font-semibold text-ice-400 hover:text-ice-300">
-              Browse every state <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          {leadingStates.length > 0 ? (
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {leadingStates.map((state) => (
-                <Link
-                  key={state.slug}
-                  href={`/states/${state.slug}`}
-                  className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 transition-colors hover:border-ice-400/40 hover:bg-white/[0.06]"
-                >
-                  <span className="flex items-center gap-2 font-medium text-white">
-                    <MapPin className="h-4 w-4 text-ice-400" aria-hidden="true" /> {state.name}
-                  </span>
-                  <span className="text-sm text-silver-400 group-hover:text-silver-200">{state.count} {state.count === 1 ? 'job' : 'jobs'}</span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="mt-5 text-silver-400">Explore all 50 states and the District of Columbia for state-specific career guidance and future openings.</p>
-          )}
-        </div>
-      </section>
-
       {/* Featured Jobs */}
       {featuredJobs.length > 0 && (
         <section className="py-12 px-4 bg-gradient-to-b from-transparent to-black/20">
@@ -248,6 +216,38 @@ export default async function Home({
             initialCertifications={certifications}
             initialSort={sort}
           />
+        </div>
+      </section>
+
+      <section className="px-4 pb-8">
+        <div className="container mx-auto max-w-6xl border-y border-white/10 py-8">
+          <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.16em] text-ice-400">Explore locally</p>
+              <h2 className="mt-2 text-2xl font-bold text-white">Find data center jobs in your state</h2>
+            </div>
+            <Link href="/states" className="inline-flex items-center gap-2 text-sm font-semibold text-ice-400 hover:text-ice-300">
+              Browse every state <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+          {leadingStates.length > 0 ? (
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {leadingStates.map((state) => (
+                <Link
+                  key={state.slug}
+                  href={`/states/${state.slug}`}
+                  className="group flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 transition-colors hover:border-ice-400/40 hover:bg-white/[0.06]"
+                >
+                  <span className="flex items-center gap-2 font-medium text-white">
+                    <MapPin className="h-4 w-4 text-ice-400" aria-hidden="true" /> {state.name}
+                  </span>
+                  <span className="text-sm text-silver-400 group-hover:text-silver-200">{state.count} {state.count === 1 ? 'job' : 'jobs'}</span>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-5 text-silver-400">Explore all 50 states and the District of Columbia for state-specific career guidance and future openings.</p>
+          )}
         </div>
       </section>
     </main>
