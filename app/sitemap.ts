@@ -29,7 +29,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     where: {
       ...activeJobsWhere,
       country: 'US',
-      state: null,
+      isRemote: true,
     },
   });
 

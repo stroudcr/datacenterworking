@@ -77,6 +77,7 @@ export interface ImportStats {
   totalFetched: number;
   totalScored: number;
   totalImported: number;
+  totalUpdated: number;
   totalSkipped: number;
   duplicates: number;
   errors: number;

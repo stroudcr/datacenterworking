@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { getAllStates } from '../lib/locations';
+import { getAllStates, getStateAbbreviation, parseLocation } from '../lib/locations';
 import { mapJSearchJobToSchema } from '../lib/jobs-api/mapper';
 import { buildStateFaqs, getStateProfile, getStateSourceLinks } from '../lib/state-profiles';
 import type { ScoredJob } from '../lib/jobs-api/types';
@@ -50,6 +50,8 @@ test('imported jobs retain parsed state fields for state page discovery', () => 
   assert.equal(mapped.location, 'Richmond, Virginia');
   assert.equal(mapped.city, 'Richmond');
   assert.equal(mapped.state, 'VA');
+  assert.deepEqual(mapped.locationStates, ['VA']);
+  assert.equal(mapped.isRemote, false);
   assert.equal(mapped.country, 'US');
 });
 
@@ -59,4 +61,24 @@ test('remote imports are not assigned to a state page', () => {
   assert.equal(mapped.location, 'Remote');
   assert.equal(mapped.city, null);
   assert.equal(mapped.state, null);
+  assert.deepEqual(mapped.locationStates, []);
+  assert.equal(mapped.isRemote, true);
+});
+
+test('multi-location jobs are associated with every unique state and are not remote', () => {
+  const parsed = parseLocation(
+    'Livingston, NJ / New York, NY / Sunnyvale, CA / San Francisco, CA / Bellevue, WA'
+  );
+
+  assert.equal(parsed.city, 'Livingston');
+  assert.equal(parsed.state, 'NJ');
+  assert.deepEqual(parsed.states, ['NJ', 'NY', 'CA', 'WA']);
+  assert.equal(parsed.isRemote, false);
+});
+
+test('standalone state names and search aliases resolve to state codes', () => {
+  assert.deepEqual(parseLocation('Arizona').states, ['AZ']);
+  assert.equal(getStateAbbreviation('New Jersey'), 'NJ');
+  assert.equal(getStateAbbreviation('new jersey'), 'NJ');
+  assert.equal(getStateAbbreviation('tx'), 'TX');
 });

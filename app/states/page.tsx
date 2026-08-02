@@ -5,6 +5,7 @@ import { getAllStates } from '@/lib/locations';
 import { GlassCard } from '@/components/GlassCard';
 import { ArrowRight, MapPin, Briefcase } from 'lucide-react';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
+import { getActiveStateJobCounts } from '@/lib/job-location-counts';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
@@ -28,38 +29,27 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function StatesPage() {
   const allStates = getAllStates();
+  const now = new Date();
 
-  // Get job counts per state
-  const jobCountsByState = await db.job.groupBy({
-    by: ['state'],
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      state: { not: null },
-    },
-    _count: {
-      id: true,
-    },
-  });
-
-  // Get remote job count
-  const remoteJobCount = await db.job.count({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      state: null,
-    },
-  });
-
-  // Create a map of state abbreviation to job count
-  const stateJobCounts = jobCountsByState.reduce((acc, item) => {
-    if (item.state) {
-      acc[item.state] = item._count.id;
-    }
-    return acc;
-  }, {} as Record<string, number>);
+  const [stateJobCounts, remoteJobCount, totalJobs] = await Promise.all([
+    getActiveStateJobCounts(now),
+    db.job.count({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: { gte: now },
+        country: 'US',
+        isRemote: true,
+      },
+    }),
+    db.job.count({
+      where: {
+        status: 'ACTIVE',
+        expiresAt: { gte: now },
+        country: 'US',
+        locationStates: { isEmpty: false },
+      },
+    }),
+  ]);
 
   // Add job counts to states
   const statesWithCounts = allStates.map((state) => ({
@@ -75,7 +65,6 @@ export default async function StatesPage() {
     return a.name.localeCompare(b.name);
   });
 
-  const totalJobs = Object.values(stateJobCounts).reduce((sum, count) => sum + count, 0);
   const statesWithOpenRoles = sortedStates.filter((state) => state.jobCount > 0);
 
   // Structured data for breadcrumbs

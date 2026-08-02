@@ -185,7 +185,7 @@ export default async function JobPage({ params }: JobPageProps) {
   // Note: View count increment moved to client-side component for non-blocking behavior
   // This prevents the database write from delaying page render
 
-  const isRemote = job.location.toLowerCase().includes('remote') || (!job.state && job.country === 'US');
+  const isRemote = job.isRemote;
   const jobTitle = job.title.trim();
   const companyName = job.company.trim();
 

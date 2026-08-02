@@ -9,6 +9,8 @@ export interface MappedJob {
   location: string;
   city: string | null;
   state: string | null;
+  locationStates: string[];
+  isRemote: boolean;
   country: string;
   type: string;
   category: string;
@@ -358,6 +360,8 @@ export function mapJSearchJobToSchema(job: ScoredJob): MappedJob {
     location,
     city: parsedLocation.city,
     state: parsedLocation.state,
+    locationStates: parsedLocation.states,
+    isRemote: parsedLocation.isRemote,
     country: parsedLocation.country,
     type: mapEmploymentType(job.job_employment_type),
     category: inferCategory(job.job_title, job.job_description),

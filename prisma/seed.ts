@@ -1,5 +1,6 @@
 import { PrismaClient, JobStatus } from '@prisma/client';
 import { hash } from 'bcryptjs';
+import { parseLocation } from '../lib/locations';
 
 const prisma = new PrismaClient();
 
@@ -982,9 +983,15 @@ Fiber Responsibilities:
   ];
 
   for (const jobData of jobs) {
+    const parsedLocation = parseLocation(jobData.location);
     const job = await prisma.job.create({
       data: {
         ...jobData,
+        city: parsedLocation.city,
+        state: parsedLocation.state,
+        locationStates: parsedLocation.states,
+        isRemote: parsedLocation.isRemote,
+        country: parsedLocation.country,
         userId: employer.id,
         slug: jobData.title
           .toLowerCase()

@@ -20,6 +20,8 @@ async function main() {
       location: true,
       city: true,
       state: true,
+      locationStates: true,
+      isRemote: true,
       country: true,
     },
   });
@@ -35,15 +37,20 @@ async function main() {
 
   for (const job of jobs) {
     try {
-      // Skip if already has parsed data
-      if (job.city !== null || job.state !== null) {
-        console.log(`⏭️  Skipping job ${job.id} - already has parsed location data`);
+      // Parse the location
+      const parsed = parseLocation(job.location);
+
+      const isUnchanged = job.city === parsed.city
+        && job.state === parsed.state
+        && job.country === parsed.country
+        && job.isRemote === parsed.isRemote
+        && job.locationStates.length === parsed.states.length
+        && job.locationStates.every((state, index) => state === parsed.states[index]);
+
+      if (isUnchanged) {
         skipped++;
         continue;
       }
-
-      // Parse the location
-      const parsed = parseLocation(job.location);
 
       // Update the job
       await prisma.job.update({
@@ -51,6 +58,8 @@ async function main() {
         data: {
           city: parsed.city,
           state: parsed.state,
+          locationStates: parsed.states,
+          isRemote: parsed.isRemote,
           country: parsed.country,
         },
       });
@@ -63,7 +72,7 @@ async function main() {
       }
 
       console.log(
-        `✅ Updated job ${job.id}: "${job.location}" → City: ${parsed.city || 'null'}, State: ${parsed.state || 'null'}, Country: ${parsed.country}`
+        `✅ Updated job ${job.id}: "${job.location}" → City: ${parsed.city || 'null'}, States: ${parsed.states.join(', ') || 'none'}, Remote: ${parsed.isRemote}`
       );
       updated++;
     } catch (error) {

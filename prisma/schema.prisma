@@ -37,6 +37,8 @@ model Job {
   location                   String
   city                       String?
   state                      String?
+  locationStates             String[]      @default([])
+  isRemote                   Boolean       @default(false)
   country                    String        @default("US")
   type                       String
   category                   String
@@ -94,6 +96,8 @@ model Job {
   @@index([country, state])
   @@index([country])
   @@index([state])
+  @@index([isRemote])
+  @@index([locationStates], type: Gin)
 }
 
 model Application {

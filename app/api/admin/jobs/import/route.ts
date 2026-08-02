@@ -24,6 +24,7 @@ export async function POST(request: NextRequest) {
       totalFetched: 0,
       totalScored: 0,
       totalImported: 0,
+      totalUpdated: 0,
       totalSkipped: 0,
       duplicates: 0,
       errors: 0,
@@ -60,7 +61,11 @@ export async function POST(request: NextRequest) {
         });
 
         if (existing) {
-          stats.totalSkipped++;
+          await db.job.update({
+            where: { id: existing.id },
+            data: job,
+          });
+          stats.totalUpdated++;
           continue;
         }
 
@@ -86,7 +91,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       stats,
-      message: `Successfully imported ${stats.totalImported} jobs`,
+      message: `Imported ${stats.totalImported} jobs and refreshed ${stats.totalUpdated} existing jobs`,
     });
   } catch (error: any) {
     console.error('Import jobs error:', error);
