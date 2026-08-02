@@ -5,7 +5,6 @@ import { getAllStates } from '@/lib/locations';
 import { GlassCard } from '@/components/GlassCard';
 import { ArrowRight, MapPin, Briefcase } from 'lucide-react';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
-import { getStateProfile } from '@/lib/state-profiles';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
@@ -129,7 +128,7 @@ export default async function StatesPage() {
               <GlassCard className="hover:scale-[1.02] transition-transform duration-200 cursor-pointer">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-ice-400 to-ice-700">
                       <MapPin className="w-6 h-6 text-white" />
                     </div>
                     <div>
@@ -150,21 +149,19 @@ export default async function StatesPage() {
         {/* States Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {sortedStates.map((state) => {
-            const profile = getStateProfile(state.abbreviation);
             return (
               <Link key={state.abbreviation} href={`/states/${state.slug}`} className="group">
               <GlassCard
-                className="h-full cursor-pointer transition-transform duration-200 group-hover:-translate-y-1"
-                style={profile ? { borderColor: `${profile.accentFrom}35` } : undefined}
+                className="h-full cursor-pointer border-ice-500/20 transition-transform duration-200 group-hover:-translate-y-1 group-hover:border-ice-400/45"
               >
                 <div className="flex flex-col">
                   <div className="flex items-start justify-between mb-2">
                     <h3 className="text-lg font-semibold text-white">{state.name}</h3>
-                    <span className="text-xs font-mono" style={{ color: profile?.accentFrom }}>{state.abbreviation}</span>
+                    <span className="font-mono text-xs text-ice-400">{state.abbreviation}</span>
                   </div>
                   <div className="mt-auto flex items-center justify-between gap-3">
                     <span className="flex items-center gap-2 text-sm font-medium text-silver-300">
-                      <Briefcase className="w-4 h-4" style={{ color: profile?.accentTo }} aria-hidden="true" />
+                      <Briefcase className="h-4 w-4 text-ice-400" aria-hidden="true" />
                       {state.jobCount === 0
                         ? 'Career guide · 0 jobs'
                         : `${state.jobCount} ${state.jobCount === 1 ? 'job' : 'jobs'}`}

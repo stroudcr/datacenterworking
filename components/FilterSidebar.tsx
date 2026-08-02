@@ -13,10 +13,6 @@ interface FilterSidebarProps {
   isOpen?: boolean;
   onClose?: () => void;
   basePath?: string;
-  accent?: {
-    primary: string;
-    secondary: string;
-  };
 }
 
 export function FilterSidebar({
@@ -28,7 +24,6 @@ export function FilterSidebar({
   isOpen = true,
   onClose,
   basePath = '/',
-  accent,
 }: FilterSidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -109,7 +104,6 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
-                style={!category && accent ? { backgroundColor: accent.primary } : undefined}
               >
                 All Categories
               </button>
@@ -122,7 +116,6 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
-                  style={category === cat && accent ? { backgroundColor: accent.primary } : undefined}
                 >
                   {cat}
                 </button>
@@ -141,7 +134,6 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
-                style={!type && accent ? { backgroundColor: accent.secondary } : undefined}
               >
                 All Types
               </button>
@@ -154,7 +146,6 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
-                  style={type === jobType && accent ? { backgroundColor: accent.secondary } : undefined}
                 >
                   {jobType}
                 </button>
@@ -173,7 +164,6 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
-                style={!shift && accent ? { backgroundColor: accent.primary } : undefined}
               >
                 All Shifts
               </button>
@@ -186,7 +176,6 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
-                  style={shift === shiftReq && accent ? { backgroundColor: accent.primary } : undefined}
                 >
                   {shiftReq}
                 </button>
@@ -205,7 +194,6 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
-                style={!clearance && accent ? { backgroundColor: accent.secondary } : undefined}
               >
                 All Clearances
               </button>
@@ -218,7 +206,6 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
-                  style={clearance === clearanceLevel && accent ? { backgroundColor: accent.secondary } : undefined}
                 >
                   {clearanceLevel}
                 </button>
@@ -237,7 +224,6 @@ export function FilterSidebar({
                     ? 'bg-ice-500 text-white'
                     : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                 }`}
-                style={!certifications && accent ? { backgroundColor: accent.primary } : undefined}
               >
                 All Certifications
               </button>
@@ -250,7 +236,6 @@ export function FilterSidebar({
                       ? 'bg-ice-500 text-white'
                       : 'bg-white/5 text-silver-300 hover:bg-white/10 border border-white/10'
                   }`}
-                  style={certifications === cert && accent ? { backgroundColor: accent.primary } : undefined}
                 >
                   {cert}
                 </button>

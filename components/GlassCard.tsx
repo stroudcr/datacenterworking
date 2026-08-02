@@ -1,4 +1,4 @@
-import { CSSProperties, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import clsx from 'clsx';
 
 interface GlassCardProps {
@@ -6,10 +6,9 @@ interface GlassCardProps {
   className?: string;
   hover?: boolean;
   onClick?: () => void;
-  style?: CSSProperties;
 }
 
-export function GlassCard({ children, className, hover = false, onClick, style }: GlassCardProps) {
+export function GlassCard({ children, className, hover = false, onClick }: GlassCardProps) {
   return (
     <div
       className={clsx(
@@ -18,7 +17,6 @@ export function GlassCard({ children, className, hover = false, onClick, style }
         className
       )}
       onClick={onClick}
-      style={style}
     >
       {children}
     </div>

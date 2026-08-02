@@ -13,10 +13,6 @@ interface NewsletterProps {
   title?: string;
   description?: string;
   successDescription?: string;
-  accent?: {
-    primary: string;
-    secondary: string;
-  };
 }
 
 export function Newsletter({
@@ -26,7 +22,6 @@ export function Newsletter({
   title = 'Get Job Alerts',
   description = 'Subscribe to receive new job postings in your inbox',
   successDescription = "You'll receive job alerts for your selected categories.",
-  accent,
 }: NewsletterProps = {}) {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
@@ -85,10 +80,7 @@ export function Newsletter({
     <GlassCard>
       {showHeader && (
         <div className="flex items-start gap-4 mb-6">
-          <div
-            className="p-3 rounded-xl bg-gradient-to-br from-ice-500 to-ice-600"
-            style={accent ? { backgroundImage: `linear-gradient(135deg, ${accent.primary}, ${accent.secondary})` } : undefined}
-          >
+          <div className="p-3 rounded-xl bg-gradient-to-br from-ice-500 to-ice-600">
             <Mail className="w-6 h-6 text-white" />
           </div>
           <div>

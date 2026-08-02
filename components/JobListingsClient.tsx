@@ -18,10 +18,7 @@ interface JobListingsClientProps {
   initialCertifications?: string;
   initialSort?: string;
   basePath?: string;
-  accent?: {
-    primary: string;
-    secondary: string;
-  };
+  hideListHeader?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
 }
@@ -35,7 +32,7 @@ export function JobListingsClient({
   initialCertifications,
   initialSort,
   basePath = '/',
-  accent,
+  hideListHeader = false,
   emptyTitle = 'No jobs found',
   emptyDescription = 'Try adjusting your filters.',
 }: JobListingsClientProps) {
@@ -125,17 +122,18 @@ export function JobListingsClient({
           isOpen={isFilterOpen}
           onClose={() => setIsFilterOpen(false)}
           basePath={basePath}
-          accent={accent}
         />
 
         {/* Job Listings */}
         <div>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-white">
-              {category || type || shift || clearance || certifications || 'All Jobs'} ({filteredAndSortedJobs.length})
-            </h2>
-            <SortSelect basePath={basePath} />
-          </div>
+          {!hideListHeader && (
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-white">
+                {category || type || shift || clearance || certifications || 'All Jobs'} ({filteredAndSortedJobs.length})
+              </h2>
+              <SortSelect basePath={basePath} />
+            </div>
+          )}
 
           {filteredAndSortedJobs.length === 0 ? (
             <GlassCard className="text-center py-12">
@@ -145,7 +143,7 @@ export function JobListingsClient({
           ) : (
             <div className="grid grid-cols-1 gap-6">
               {filteredAndSortedJobs.map((job) => (
-                <JobCard key={job.id} job={job} accent={accent} />
+                <JobCard key={job.id} job={job} />
               ))}
             </div>
           )}

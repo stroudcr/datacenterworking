@@ -1,4 +1,4 @@
-import { geoPath } from 'd3-geo';
+import { geoAlbersUsa, geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import statesAtlas from 'us-atlas/states-10m.json';
 
@@ -14,15 +14,9 @@ const STATE_FIPS: Record<string, string> = {
 
 interface StateOutlineProps {
   abbreviation: string;
-  accentFrom: string;
-  accentTo: string;
 }
 
-export function StateOutline({
-  abbreviation,
-  accentFrom,
-  accentTo,
-}: StateOutlineProps) {
+export function StateOutline({ abbreviation }: StateOutlineProps) {
   const topology = statesAtlas as any;
   const stateGeometry = topology.objects.states.geometries.find(
     (geometry: { id: string }) => geometry.id === STATE_FIPS[abbreviation]
@@ -32,39 +26,28 @@ export function StateOutline({
 
   // us-atlas is derived from U.S. Census Bureau cartographic boundary files.
   const stateFeature = feature(topology, stateGeometry) as any;
-  const pathGenerator = geoPath();
+  const projection = geoAlbersUsa().fitExtent([[54, 44], [586, 276]], stateFeature);
+  const pathGenerator = geoPath(projection);
   const pathData = pathGenerator(stateFeature);
-  const [[x0, y0], [x1, y1]] = pathGenerator.bounds(stateFeature);
-  const width = Math.max(x1 - x0, 1);
-  const height = Math.max(y1 - y0, 1);
-  const padding = Math.max(width, height) * 0.08;
 
   return (
-    <div className="relative flex min-h-[230px] items-center justify-center md:min-h-[280px]" aria-hidden="true">
+    <div className="relative flex min-h-[220px] items-center justify-center md:min-h-[300px]" aria-hidden="true">
       <div
-        className="absolute inset-0 flex items-center justify-center text-[10rem] font-black tracking-[-0.12em] opacity-20 md:text-[15rem]"
-        style={{ color: accentTo }}
+        className="absolute inset-0 flex items-center justify-center text-[9rem] font-black tracking-[-0.12em] text-transparent opacity-60 md:text-[13rem]"
+        style={{ WebkitTextStroke: '2px rgba(56, 189, 248, 0.65)' }}
       >
         {abbreviation}
       </div>
       <svg
-        viewBox={`${x0 - padding} ${y0 - padding} ${width + padding * 2} ${height + padding * 2}`}
-        className="relative z-10 h-[225px] w-full overflow-visible drop-shadow-[0_0_24px_rgba(56,189,248,0.4)] md:h-[270px]"
+        viewBox="0 0 640 320"
+        className="relative z-10 h-[220px] w-full overflow-visible drop-shadow-[0_0_20px_rgba(56,189,248,0.48)] md:h-[290px]"
         preserveAspectRatio="xMidYMid meet"
       >
         <path
           d={pathData || undefined}
-          fill={`${accentTo}0a`}
-          stroke={accentTo}
-          strokeWidth={Math.max(width, height) / 150}
-          vectorEffect="non-scaling-stroke"
-          opacity="0.9"
-        />
-        <path
-          d={pathData || undefined}
-          fill={`${accentFrom}0a`}
-          stroke={accentFrom}
-          strokeWidth={Math.max(width, height) / 300}
+          fill="rgba(14, 165, 233, 0.08)"
+          stroke="#38bdf8"
+          strokeWidth="2.5"
           vectorEffect="non-scaling-stroke"
         />
       </svg>

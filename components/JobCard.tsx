@@ -27,17 +27,12 @@ interface JobCardProps {
   };
   isSaved?: boolean;
   showSaveButton?: boolean;
-  accent?: {
-    primary: string;
-    secondary: string;
-  };
 }
 
 export function JobCard({
   job,
   isSaved = false,
   showSaveButton = false,
-  accent,
 }: JobCardProps) {
   // Format salary or hourly rate range
   const displaySalary = (() => {
@@ -51,14 +46,7 @@ export function JobCard({
 
   return (
     <Link href={`/jobs/${job.slug}`}>
-      <GlassCard
-        hover
-        className="relative"
-        style={accent ? {
-          borderColor: `${accent.primary}55`,
-          boxShadow: `0 8px 32px ${accent.secondary}12`,
-        } : undefined}
-      >
+      <GlassCard hover className="relative">
         {job.isFeatured && (
           <div className="absolute bottom-3 right-3">
             <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold">
@@ -111,10 +99,7 @@ export function JobCard({
 
           {/* Category Badge */}
           <div className="flex items-center gap-2 flex-wrap">
-            <span
-              className="px-3 py-1 rounded-full glass text-xs text-ice-400 border border-ice-500/30"
-              style={accent ? { color: accent.primary, borderColor: `${accent.secondary}88` } : undefined}
-            >
+            <span className="px-3 py-1 rounded-full glass text-xs text-ice-400 border border-ice-500/30">
               {job.category}
             </span>
             {job.source === 'EXTERNAL_JSEARCH' && (
