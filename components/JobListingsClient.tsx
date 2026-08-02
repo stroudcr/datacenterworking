@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { Fragment, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { FilterSidebar } from '@/components/FilterSidebar';
 import { JobCard } from '@/components/JobCard';
 import { GlassCard } from '@/components/GlassCard';
 import { SortSelect } from '@/components/SortSelect';
-import { SlidersHorizontal } from 'lucide-react';
+import { ArrowRight, Bell, SlidersHorizontal } from 'lucide-react';
 import type { Job } from '@prisma/client';
 
 interface JobListingsClientProps {
@@ -142,8 +143,33 @@ export function JobListingsClient({
             </GlassCard>
           ) : (
             <div className="grid grid-cols-1 gap-6">
-              {filteredAndSortedJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+              {filteredAndSortedJobs.map((job, index) => (
+                <Fragment key={job.id}>
+                  <JobCard job={job} />
+                  {index === 9 ? (
+                    <aside
+                      aria-label="Job alerts"
+                      className="flex flex-col gap-3 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-ice-500/10 text-ice-400">
+                          <Bell className="h-4 w-4" aria-hidden="true" />
+                        </span>
+                        <div>
+                          <p className="font-medium text-silver-100">Want the next role to find you?</p>
+                          <p className="text-sm text-silver-400">Get new data center jobs delivered to your inbox.</p>
+                        </div>
+                      </div>
+                      <Link
+                        href="/job-alerts"
+                        className="group inline-flex items-center gap-1.5 self-start text-sm font-semibold text-ice-400 transition-colors hover:text-ice-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ice-400 focus-visible:ring-offset-2 focus-visible:ring-offset-silver-900 sm:self-auto"
+                      >
+                        Get job alerts
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                      </Link>
+                    </aside>
+                  ) : null}
+                </Fragment>
               ))}
             </div>
           )}

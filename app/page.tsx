@@ -1,7 +1,6 @@
 import { db } from '@/lib/db';
 import { JobCard } from '@/components/JobCard';
 import { SearchBar } from '@/components/SearchBar';
-import { Newsletter } from '@/components/Newsletter';
 import { JobListingsClient } from '@/components/JobListingsClient';
 import { ArrowRight, MapPin } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -195,12 +194,6 @@ export default async function Home({
         <div className="container mx-auto max-w-5xl rounded-2xl border border-ice-400/20 bg-ice-500/10 p-6 md:flex md:items-center md:justify-between">
           <div><p className="text-sm font-semibold uppercase tracking-wider text-ice-400">Hiring data center talent?</p><h2 className="mt-2 text-2xl font-bold text-white">Advertise directly to a focused industry audience.</h2><p className="mt-2 text-silver-300">Post one role today or talk with us about recurring and multi-location hiring.</p></div>
           <div className="mt-5 flex gap-3 md:mt-0 md:ml-8"><Link href="/employers"><Button variant="outline">For Employers</Button></Link><Link href="/post-job?plan=standard"><Button>Post a Job</Button></Link></div>
-        </div>
-      </section>
-
-      <section className="py-12 px-4">
-        <div className="container mx-auto max-w-2xl">
-          <Newsletter />
         </div>
       </section>
 

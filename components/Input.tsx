@@ -8,16 +8,17 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, fullWidth = false, className, ...props }, ref) => {
+  ({ label, error, fullWidth = false, className, id, ...props }, ref) => {
     return (
       <div className={clsx('flex flex-col gap-1', fullWidth && 'w-full')}>
         {label && (
-          <label className="text-sm font-medium text-silver-200">
+          <label htmlFor={id} className="text-sm font-medium text-silver-200">
             {label}
           </label>
         )}
         <input
           ref={ref}
+          id={id}
           className={clsx(
             'glass rounded-lg px-4 py-2.5 text-white',
             'placeholder:text-silver-500',

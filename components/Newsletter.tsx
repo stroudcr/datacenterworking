@@ -8,6 +8,7 @@ import { Mail, Check } from 'lucide-react';
 
 interface NewsletterProps {
   showHeader?: boolean;
+  headingLevel?: 'h2' | 'h3';
   buttonText?: string;
   categories?: string[];
   title?: string;
@@ -17,12 +18,14 @@ interface NewsletterProps {
 
 export function Newsletter({
   showHeader = true,
+  headingLevel = 'h3',
   buttonText = 'Subscribe to Alerts',
   categories = ['All'],
   title = 'Get Job Alerts',
   description = 'Subscribe to receive new job postings in your inbox',
   successDescription = "You'll receive job alerts for your selected categories.",
 }: NewsletterProps = {}) {
+  const Heading = headingLevel;
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -61,7 +64,7 @@ export function Newsletter({
   if (success) {
     return (
       <GlassCard>
-        <div className="text-center py-8">
+        <div className="py-8 text-center" role="status" aria-live="polite">
           <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-4">
             <Check className="w-8 h-8 text-green-400" />
           </div>
@@ -84,9 +87,9 @@ export function Newsletter({
             <Mail className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="text-2xl font-semibold text-white mb-2">
+            <Heading className="text-2xl font-semibold text-white mb-2">
               {title}
-            </h3>
+            </Heading>
             <p className="text-silver-400">
               {description}
             </p>
@@ -96,16 +99,20 @@ export function Newsletter({
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {error && (
-          <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm">
+          <div className="rounded-lg border border-red-500/50 bg-red-500/10 p-3 text-sm text-red-400" role="alert">
             {error}
           </div>
         )}
 
         <Input
+          id="job-alert-email"
           type="email"
+          label="Email address"
           placeholder="your@email.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          autoComplete="email"
+          inputMode="email"
           required
           fullWidth
         />

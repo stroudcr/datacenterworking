@@ -54,7 +54,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  href="/#newsletter"
+                  href="/job-alerts"
                   className="text-sm text-silver-300 hover:text-ice-400 transition-colors"
                 >
                   Email Alerts
