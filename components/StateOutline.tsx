@@ -32,15 +32,9 @@ export function StateOutline({ abbreviation }: StateOutlineProps) {
 
   return (
     <div className="relative flex min-h-[220px] items-center justify-center md:min-h-[300px]" aria-hidden="true">
-      <div
-        className="absolute inset-0 flex items-center justify-center text-[9rem] font-black tracking-[-0.12em] text-transparent opacity-60 md:text-[13rem]"
-        style={{ WebkitTextStroke: '2px rgba(56, 189, 248, 0.65)' }}
-      >
-        {abbreviation}
-      </div>
       <svg
         viewBox="0 0 640 320"
-        className="relative z-10 h-[220px] w-full overflow-visible drop-shadow-[0_0_20px_rgba(56,189,248,0.48)] md:h-[290px]"
+        className="h-[220px] w-full overflow-visible drop-shadow-[0_0_20px_rgba(56,189,248,0.48)] md:h-[290px]"
         preserveAspectRatio="xMidYMid meet"
       >
         <path
