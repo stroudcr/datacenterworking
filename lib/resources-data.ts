@@ -33,6 +33,250 @@ export interface Resource {
 
 export const resources: Resource[] = [
   {
+    id: '6',
+    slug: 'us-data-center-jobs-report-2026',
+    title: 'U.S. Data Center Jobs Report 2026: Hiring, Pay, and Hotspots',
+    description: 'See where U.S. data center jobs are growing in 2026, which roles lead hiring, what employers pay, and how AI infrastructure is reshaping the workforce.',
+    category: 'Industry Reports',
+    tags: ['Industry Trends', 'Job Search', 'Salary', 'Skills', 'Career Path'],
+    date: '2026-08-11T12:00:00.000Z',
+    readTime: '21 min read',
+    author: 'Work In Data Center Team',
+    featured: true,
+    content: `<h2>2026 Data Center Jobs Outlook: The Short Version</h2>
+
+<p>The U.S. data center jobs market is growing faster than the broader hiring market in 2026, but the opportunity is not evenly distributed. Demand is concentrated around large technology employers, a small group of infrastructure hubs, and occupations that keep physical facilities powered, cooled, connected, secured, and available around the clock.</p>
+
+<p>Indeed Hiring Lab reported in July 2026 that U.S. data center job postings had more than doubled over the previous two years. Data center-related openings increased from roughly two of every 1,000 U.S. postings in mid-2023 to six of every 1,000 in 2026. Over the same two-year period, total U.S. postings fell about 12%, and tech postings outside data centers fell 6%.</p>
+
+<p>Five findings define the market:</p>
+
+<ul>
+<li><strong>Hiring momentum is real:</strong> Data center postings more than doubled in two years even as overall postings declined.</li>
+<li><strong>The work is broader than traditional IT:</strong> Installation and maintenance roles represent about one-quarter of data center postings. Together with IT infrastructure, operations, and support, they account for half of advertised demand.</li>
+<li><strong>Entry-level technician hiring is expanding:</strong> LinkedIn found that data center technicians ranked among the five fastest-growing U.S. occupations for entry-level hiring in late 2025, rising 108% year over year.</li>
+<li><strong>Pay can carry an infrastructure premium:</strong> Indeed found that hourly installation and maintenance postings tied to data centers advertised a median $10-per-hour premium, or 42%, over comparable postings outside the sector.</li>
+<li><strong>Location matters enormously:</strong> Northern Virginia remains the largest infrastructure center, while Dallas-Fort Worth, Atlanta, Chicago, Columbus-area communities, Reno, Jackson, Hermiston, Tennessee, and West Texas show different forms of growth.</li>
+</ul>
+
+<p>The practical outlook is positive for technicians, electricians, HVAC specialists, network workers, commissioning professionals, construction teams, and operations leaders. It is less accurate to describe the trend as a universal technology hiring boom. The strongest demand is physical, site-based, skills-driven, and clustered around places where employers can secure power, land, fiber, and permits.</p>
+
+<h2>How We Built This U.S. Data Center Jobs Report</h2>
+
+<p>This report combines several datasets because no single official occupation called “data center worker” captures the whole labor market. A facility may employ hardware technicians, network specialists, critical facilities engineers, electricians, HVAC technicians, security personnel, logistics workers, construction managers, project controls professionals, and vendor teams. Many of those workers are classified under broader industries or occupations.</p>
+
+<p>The most current hiring signal comes from Indeed, which counts U.S. postings containing “data center,” “datacenter,” or “data-center” in the title or description. That method captures current demand but can include some jobs whose relationship to a facility is indirect. LinkedIn measures members, skills, and hiring activity across its platform. U.S. Census Bureau workforce data provide a narrower historical view built from industries associated with data processing, hosting, and related services.</p>
+
+<p>Industry economic-impact studies use broader definitions. A 2026 PwC study commissioned by the Data Center Coalition estimated 1,005,080 direct U.S. data center industry jobs in 2024 and 5.5 million jobs after indirect and induced effects. Those totals should not be compared directly with the Census Bureau's 501,000-worker estimate for 2023 because the underlying definitions, years, and economic models differ.</p>
+
+<p>For compensation context, this report uses Indeed's data-center-specific pay comparisons and the Bureau of Labor Statistics' May 2025 national wage estimates for adjacent occupations. BLS occupation figures cover the entire U.S. economy, not data centers alone. They are useful benchmarks, not promises of what a particular employer or market will pay.</p>
+
+<h2>Data Center Hiring Has More Than Doubled</h2>
+
+<p>The clearest 2026 labor-market signal is the divergence between data center hiring and the rest of the market. According to Indeed Hiring Lab, data center job postings more than doubled between June 2024 and June 2026. During approximately the same period, total U.S. postings declined around 12%, while non-data-center technology postings fell 6%.</p>
+
+<p>That contrast matters. A rising posting count during a broad hiring expansion can simply reflect the economy. A rising count while total and adjacent technology postings contract points to sector-specific demand. AI infrastructure is a major driver, but the hiring is not limited to people building AI models. It is showing up in the physical work required to construct and operate the computing environment.</p>
+
+<p>The share of all U.S. job postings tied to data centers tripled from about two per 1,000 in mid-2023 to six per 1,000 in 2026. The number remains small relative to the entire labor market, so this is a fast-growing specialty rather than a replacement for the technology sector as a whole.</p>
+
+<p>LinkedIn's research reinforces the entry-level side of the trend. Data center technician hiring rose 108% from October through December 2025 compared with the same period in 2024, placing the occupation among the five fastest-growing entry-level roles in the United States. This does not mean every applicant will find an easy path in. It means employers were adding early-career technicians much faster than a year earlier.</p>
+
+<h2>Who Is Driving Data Center Hiring?</h2>
+
+<p>Hiring is highly concentrated. Indeed found that the ten largest technology firms by market capitalization accounted for 71% of U.S. data center postings in 2026. That concentration gives major employers and their construction, operations, and staffing partners an outsized influence on where and when openings appear.</p>
+
+<p>A hyperscale campus also creates several layers of hiring. The owner or cloud provider may advertise technicians, engineers, managers, and security roles. A colocation provider may hire site operations and customer-support teams. General contractors and subcontractors recruit electricians, pipefitters, controls technicians, commissioning specialists, safety professionals, and project managers. Equipment vendors add field-service roles for UPS systems, generators, switchgear, chillers, controls, racks, and network hardware.</p>
+
+<p>Job seekers should therefore search by more than employer name. A large campus can create relevant openings at the operator, tenant, construction manager, trade contractor, staffing provider, equipment manufacturer, logistics company, security vendor, and maintenance partner. The company named on the building may represent only one part of the local workforce.</p>
+
+<h2>The Roles Leading Data Center Job Growth</h2>
+
+<p>Data center work is increasingly a blend of IT, skilled trades, industrial operations, and construction. Indeed found that installation and maintenance workers represented roughly one-quarter of data center postings in 2026. IT infrastructure, operations and support, plus installation and maintenance, together made up half of all postings.</p>
+
+<h3>Data Center Technicians and Hardware Operations</h3>
+
+<p>Technician roles cover server installation, rack-and-stack work, component replacement, cable tracing, inventory, diagnostics, remote hands, ticket documentation, and escalation. AI clusters increase the value of experience with GPUs, high-speed interconnects, dense rack layouts, firmware, telemetry, and strict handling procedures. Entry routes range from IT support and structured cabling to warehouse technology, electronics repair, and military communications.</p>
+
+<h3>Critical Facilities and Electrical Operations</h3>
+
+<p>Critical facilities teams operate and maintain the power and cooling systems that keep computing available. Common titles include critical facilities technician, data center facilities engineer, electrical technician, operating engineer, controls technician, and shift engineer. Deloitte found that data center postings for electrical technicians increased more than 180% between 2023 and 2025—the largest gain among the occupations in its analysis. Postings for power plant operators rose just over 56%.</p>
+
+<p>This demand reflects the equipment mix inside and around a modern site: utility feeds, substations, switchgear, uninterruptible power supplies, batteries, generators, chillers, pumps, cooling towers, air handlers, coolant distribution units, building controls, and monitoring systems. Employers need people who can follow procedures, recognize abnormal conditions, communicate clearly, and work safely around mission-critical systems.</p>
+
+<h3>Network, Fiber, and Connectivity Roles</h3>
+
+<p>Network technicians, fiber technicians, infrastructure engineers, and network support specialists install and troubleshoot the physical and logical connections between racks, buildings, carriers, and cloud regions. AI infrastructure adds demand for high-speed Ethernet, InfiniBand, optical transceivers, structured cabling, fiber inspection, and low-loss installation practices.</p>
+
+<h3>Construction, Commissioning, and Project Delivery</h3>
+
+<p>New campuses require construction managers, superintendents, schedulers, estimators, safety professionals, electricians, pipefitters, sheet-metal workers, controls contractors, quality teams, and commissioning agents. Private data center construction spending approached a $60 billion seasonally adjusted annual rate in May 2026, according to U.S. Census data cited by Indeed, after rising 23% over the prior year.</p>
+
+<p>These jobs often arrive before permanent site operations hiring. Commissioning sits between construction and operations: teams verify that electrical, mechanical, controls, and failover systems perform as designed before a facility enters service.</p>
+
+<h3>Security, Logistics, and Support</h3>
+
+<p>Facilities also depend on physical security, access control, asset logistics, inventory, shipping and receiving, environmental health and safety, procurement, compliance, and program support. These roles may not use “data center” in the title, which makes employer, location, and job-description searches important.</p>
+
+<h2>Data Center Salaries and the Infrastructure Pay Premium</h2>
+
+<p>Data center jobs do not uniformly pay more than every comparable technology job. Indeed found that these roles sit toward the lower end of the traditional tech salary range, particularly when compared with software engineering. The more useful comparison is between an infrastructure worker inside and outside the data center sector.</p>
+
+<p>For installation and maintenance postings that disclose hourly compensation, Indeed found a median data center premium of $10 per hour, or 42%, compared with non-data-center jobs in the same occupational group. Among postings disclosing annual pay, the median advertised premium was 12%.</p>
+
+<p>Current national wage benchmarks help frame the range of occupations involved. The Bureau of Labor Statistics reported these May 2025 mean annual wages across all U.S. industries:</p>
+
+<ul>
+<li><strong>Computer network support specialists:</strong> $81,870</li>
+<li><strong>Network and computer systems administrators:</strong> $103,680</li>
+<li><strong>Electricians:</strong> $71,490</li>
+<li><strong>HVAC and refrigeration mechanics and installers:</strong> $64,780</li>
+<li><strong>Facilities managers:</strong> $116,890</li>
+<li><strong>Construction managers:</strong> $124,360</li>
+</ul>
+
+<p>These are national occupational means, not data center salary averages. Actual compensation varies by shift, overtime, union agreement, clearance requirements, market, employer, experience, and specialization. Night-shift differentials, on-call pay, bonuses, equity, and overtime can make total compensation meaningfully different from the posted base rate.</p>
+
+<p>For a deeper breakdown by role and experience, see our <a href="/resources/data-center-technician-salary-guide-2025">data center technician salary guide</a>. Use it as a framework and verify every figure against current postings in your target location.</p>
+
+<h2>Where Data Center Jobs Are Growing in 2026</h2>
+
+<p>Infrastructure capacity is not the same thing as job-posting volume, but the two signals help identify markets with established operations or an active development pipeline. The strongest 2026 opportunities fall into mature hubs, expanding primary markets, and emerging build-out locations.</p>
+
+<h3>Northern Virginia and Washington, D.C.</h3>
+
+<p>Northern Virginia remains the country's largest data center market and its deepest concentration of specialized talent. CBRE reported 4,182 MW of wholesale inventory in Q1 2026, up 1,135.9 MW year over year, with vacancy at only 0.3%. LinkedIn estimated that Virginia held 13.5% of the U.S. data center workforce. Indeed found that data center roles represented 8% of all Washington-area postings year to date.</p>
+
+<p>The market supports technicians, critical facilities staff, construction teams, fiber and network specialists, security-cleared workers, vendors, and regional leadership. Power-delivery constraints and local permitting can shift development farther down Interstate 95 and toward adjacent markets, so searches should extend beyond Ashburn and Loudoun County. Browse current <a href="/states/virginia">data center jobs in Virginia</a>.</p>
+
+<h3>Dallas-Fort Worth and Texas</h3>
+
+<p>Dallas-Fort Worth became the third-largest U.S. colocation market in Q1 2026, according to CBRE. Inventory grew 43.7% year over year to 1,249.4 MW. Another 716.7 MW was under construction, and 88% of that pipeline was already preleased. LinkedIn placed Texas at 9.6% of the U.S. data center workforce.</p>
+
+<p>DFW combines an established operations base with construction and commissioning demand. West Texas is also emerging for AI training facilities because of land and energy availability, although project timing depends heavily on power strategy and interconnection. Browse <a href="/states/texas">data center jobs in Texas</a>.</p>
+
+<h3>Atlanta and Georgia</h3>
+
+<p>Atlanta's wholesale inventory reached 1,465.2 MW in Q1 2026, up 14.5% year over year, while vacancy fell to 1%. Georgia was also one of five states that collectively held more than 40% of U.S. data center employment in the Census Bureau's 2023 analysis. The metro's fiber routes, land, and East Coast location continue to attract large projects, though utility rules and regulatory scrutiny can affect schedules. Browse <a href="/states/georgia">data center jobs in Georgia</a>.</p>
+
+<h3>Chicago and Northern Illinois</h3>
+
+<p>Chicago inventory grew 37.7% year over year to 910.6 MW in Q1 2026, and vacancy declined to 2.2%. Development is moving west into power-accessible submarkets such as Elk Grove Village, Northlake, and Hoffman Estates. Extended utility timelines mean some announced capacity will take years to arrive, but the established market already supports operations, engineering, construction, and network roles. Browse <a href="/states/illinois">data center jobs in Illinois</a>.</p>
+
+<h3>Columbus, Reno, Jackson, and Hermiston</h3>
+
+<p>Indeed's posting data reveal a second map of opportunity beyond the largest capacity markets. Data center roles make up an unusually large share of local postings around Hermiston, Oregon; communities outside Columbus, Ohio; Jackson, Mississippi; and Reno, Nevada. In Columbus, Jackson, and Reno, the share of all postings coming from the ten largest technology employers moved from below 2.5% through the end of 2025 to above 10% in 2026.</p>
+
+<p>These smaller markets can offer concentrated opportunity, but they also create employer risk: when a few companies dominate local demand, hiring cycles, project delays, or contractor changes can move the market quickly. Explore jobs in <a href="/states/ohio">Ohio</a>, <a href="/states/oregon">Oregon</a>, <a href="/states/nevada">Nevada</a>, and <a href="/states/mississippi">Mississippi</a>.</p>
+
+<h3>Tennessee and Other Emerging Power Markets</h3>
+
+<p>CBRE identified Tennessee and West Texas as emerging North American markets in 2026. Data center demand represented 18% of Tennessee's industrial load in 2025 and is projected by the Tennessee Valley Authority to double by 2030. These markets may create substantial construction and infrastructure demand, but job seekers should distinguish active facilities and funded construction from early announcements. Browse <a href="/states/tennessee">data center jobs in Tennessee</a>.</p>
+
+<h2>Construction Jobs Versus Permanent Operations Jobs</h2>
+
+<p>One of the most important distinctions in any data center employment report is the difference between building a facility and operating it. Construction can require hundreds or more than 1,000 workers at peak, according to the Data Center Coalition, while a completed building may support dozens to hundreds of direct positions depending on its size, design, ownership model, tenants, and outsourcing strategy.</p>
+
+<p>That does not make construction employment less valuable. A multi-building campus can create years of work, and skilled trades often move from one project to the next within a growing region. It does mean that a headline construction number should not be presented as the permanent headcount of a completed facility.</p>
+
+<p>Permanent operations teams are usually smaller and more specialized. They cover hardware, networks, critical facilities, security, logistics, compliance, leadership, and vendor coordination across multiple shifts. Colocation sites may also host tenant employees and contractors who work inside the facility but are not counted in the operator's payroll.</p>
+
+<p>For job seekers, project stage is a useful search filter:</p>
+
+<ul>
+<li><strong>Site preparation and shell construction:</strong> civil, structural, safety, project management, scheduling, and construction trades.</li>
+<li><strong>Electrical and mechanical fit-out:</strong> electricians, pipefitters, controls, HVAC, equipment vendors, QA/QC, and commissioning.</li>
+<li><strong>IT deployment:</strong> rack installation, cabling, network deployment, asset logistics, hardware technicians, and integration.</li>
+<li><strong>Steady-state operations:</strong> critical facilities, data center technicians, network operations, security, logistics, customer support, and management.</li>
+</ul>
+
+<h2>How Many U.S. Data Center Jobs Are There?</h2>
+
+<p>The honest answer depends on what is counted. The Census Bureau reported that employment in data centers and related hosting industries grew from 306,000 in 2016 to 501,000 in 2023, an increase of more than 60%. Its analysis found that California held 17% of employment and Texas 10%; California, Texas, Florida, New York, and Georgia together accounted for more than 40%.</p>
+
+<p>PwC's broader 2026 economic-contribution study estimated 1,005,080 direct industry jobs in 2024. After supplier and household-spending effects, it estimated a total contribution of 5.5 million U.S. jobs, up 17% from 2023. The report calculated that every direct industry job supported more than 4.5 additional jobs elsewhere in the economy.</p>
+
+<p>Those figures answer different questions. The narrower Census series is better for tracking employment in specific data-hosting industries over time. The PwC model is designed to estimate the full direct, indirect, and induced economic footprint. Neither tells a candidate how many technician openings exist today; current job-posting datasets are better for that question.</p>
+
+<p>The safest conclusion is that the workforce is large, growing, and economically connected to construction, utilities, manufacturing, logistics, professional services, and local suppliers—but the number of permanent jobs physically inside any one facility is much smaller than national multiplier totals suggest.</p>
+
+<h2>Skills Employers Are Rewarding in 2026</h2>
+
+<p>The market favors workers who combine a solid primary trade or technical discipline with mission-critical operating habits.</p>
+
+<p><strong>For IT and hardware technicians:</strong> server components, troubleshooting, Linux basics, out-of-band management, ticketing, change control, structured cabling, fiber handling, inventory accuracy, and clear handoffs.</p>
+
+<p><strong>For network and fiber roles:</strong> Ethernet, IP addressing, VLANs, optics, connector inspection, loss testing, cable documentation, high-speed fabrics, and disciplined work around live production links.</p>
+
+<p><strong>For critical facilities roles:</strong> electrical one-lines, UPS systems, generators, batteries, switchgear, HVAC and refrigeration, controls, BMS/DCIM tools, alarms, preventive maintenance, and safe operating procedures.</p>
+
+<p><strong>For construction and commissioning:</strong> drawings, submittals, schedules, QA/QC, functional testing, issue tracking, safety programs, turnover documentation, and cross-discipline coordination.</p>
+
+<p><strong>For every track:</strong> procedural compliance, accurate documentation, incident communication, shift reliability, escalation judgment, and willingness to stop work when site conditions do not match the approved plan.</p>
+
+<p>AI infrastructure is raising the technical ceiling through liquid cooling, higher rack density, GPU systems, and faster networks, but employers still need dependable fundamentals. Review our guide to <a href="/resources/ai-ready-technician-skills-data-center-careers-2026">AI-ready data center skills</a> and our <a href="/resources/data-center-cable-management-best-practices-2026">cable management best practices</a> for practical examples.</p>
+
+<h2>Risks That Could Slow the Data Center Jobs Boom</h2>
+
+<p>The 2026 outlook is strong, not guaranteed. Power availability is the largest constraint in many markets. CBRE reported record-low vacancy even as North American inventory in the four largest markets grew 33% year over year, but it also documented long utility-interconnection timelines, zoning challenges, and community scrutiny.</p>
+
+<p>Hiring can lag an announcement by years. A company may secure land before it has power, permits, financing, or a final construction schedule. Candidates should give more weight to active construction, equipment installation, commissioning, and posted roles than to an early project announcement.</p>
+
+<p>Employer concentration is another risk. With 71% of 2026 postings tied to the ten largest technology firms in Indeed's analysis, a change in capital plans can affect an entire local market. Contractors and staffing providers may also ramp quickly for a deployment and reduce headcount after turnover.</p>
+
+<p>Finally, automation will change task mix. Remote monitoring, robotics, predictive maintenance, and software-defined infrastructure may reduce some routine work while increasing demand for technicians who can troubleshoot complex physical systems, interpret telemetry, and coordinate vendors. The most resilient career strategy is to build depth in a core discipline and add adjacent skills over time.</p>
+
+<h2>What the 2026 Report Means for Job Seekers</h2>
+
+<ol>
+<li><strong>Search by work, not only by title.</strong> Use terms such as critical facilities, commissioning, controls, deployment, infrastructure, fiber, remote hands, operations, and field service.</li>
+<li><strong>Map the employer ecosystem.</strong> Identify operators, hyperscalers, colocation providers, contractors, equipment vendors, staffing companies, and security partners in your target market.</li>
+<li><strong>Match the project stage.</strong> Construction experience fits a different hiring window than steady-state operations. Apply where your background maps to the work happening now.</li>
+<li><strong>Show evidence of reliability.</strong> Quantify assets supported, tickets closed, uptime maintained, incidents handled, cables installed, inspections completed, or preventive-maintenance work performed.</li>
+<li><strong>Build one credible specialization.</strong> Networking, electrical systems, HVAC, controls, Linux, hardware, fiber, safety, or commissioning will usually carry more weight than a long list of unrelated certificates.</li>
+<li><strong>Consider location flexibility.</strong> Smaller metros can offer concentrated opportunity, but research employer diversity, project certainty, housing, commute patterns, and shift requirements before relocating.</li>
+</ol>
+
+<p>If you are entering the field, start with our guides to <a href="/resources/how-to-get-a-data-center-job-with-no-experience-2026">getting a data center job with no experience</a> and choosing the <a href="/resources/best-data-center-certifications-2026">best data center certifications</a>. Then compare your skills with current <a href="/">data center job openings</a> rather than waiting until you meet every preferred qualification.</p>
+
+<h2>What the 2026 Report Means for Employers</h2>
+
+<p>Employers are competing across sector boundaries for many of the same people. Deloitte found that more than one-third of new power-company and data-center postings targeted a shared set of core occupations. In its 2025 AI Infrastructure Survey, 63% of data center executives identified a shortage of data-center-related skilled labor as their leading talent obstacle.</p>
+
+<p>Job descriptions should distinguish trainable site knowledge from truly required credentials. Clear pay ranges, shift schedules, physical requirements, career paths, and training commitments help qualified candidates evaluate the role. Partnerships with trade schools, community colleges, unions, military-transition programs, and adjacent industries can expand the pool beyond candidates who already hold a data center title.</p>
+
+<p>Retention matters as much as recruiting. Defined advancement routes from technician to senior technician, specialist, lead, or manager reduce the pressure to leave for growth. Cross-training should be structured and safe: broader understanding is valuable, but it does not replace authorization, licensing, or formal competency for electrical and mechanical work.</p>
+
+<h2>FAQ: U.S. Data Center Jobs in 2026</h2>
+
+<p><strong>Are data center jobs growing in 2026?</strong> Yes. Indeed reported that U.S. postings mentioning data centers more than doubled over the two years ending in June 2026, while total U.S. postings declined about 12%.</p>
+
+<p><strong>What data center jobs are most in demand?</strong> IT infrastructure, operations and support, installation, and maintenance together account for half of current postings. Technician, electrical, critical facilities, network, construction, controls, commissioning, and field-service roles are central to the build-out.</p>
+
+<p><strong>Do data center jobs pay well?</strong> Pay varies widely by occupation. Indeed found a 42% median hourly premium for data-center-related installation and maintenance postings compared with similar non-data-center roles, while also noting that data center positions generally pay less than many software jobs.</p>
+
+<p><strong>Which states have the most data center workers?</strong> Different datasets produce different rankings. LinkedIn identified Virginia, California, and Texas as holding more than one-third of the U.S. workforce. The Census Bureau found that California, Texas, Florida, New York, and Georgia together held more than 40% of employment in its narrower industry definition.</p>
+
+<p><strong>Where are new data center job hotspots?</strong> Major hubs include Northern Virginia, Dallas-Fort Worth, Atlanta, and Chicago. Current posting concentration also stands out around Columbus, Reno, Jackson, Hermiston, and Washington, D.C., while Tennessee and West Texas are emerging development markets.</p>
+
+<p><strong>Do data centers create permanent jobs or only construction jobs?</strong> They create both, but in different numbers and phases. Construction teams are much larger during the build. Permanent operations teams are smaller and support hardware, networks, power, cooling, security, logistics, and management over the facility's operating life.</p>
+
+<p><strong>Can I get a data center job without a four-year degree?</strong> Many technician, trade, installation, logistics, and operations roles do not require a bachelor's degree. Employers commonly value relevant hands-on experience, apprenticeships, certifications, safety training, documentation skills, and shift reliability.</p>
+
+<h2>Research Notes and Sources</h2>
+
+<p>This report was prepared using sources available on August 11, 2026. Hiring data and methodology come from Indeed Hiring Lab's <a href="https://hiringlab.indeed.com/2026/07/14/hiring-for-the-data-center-build-out/">Hiring for the Data Center Build-Out</a>. Workforce growth and geographic data come from LinkedIn Economic Graph's <a href="https://economicgraph.linkedin.com/content/dam/me/economicgraph/en-us/PDF/the-US-workforce-imperative.pdf">Skills and AI: The U.S. Workforce Imperative</a> and the U.S. Census Bureau's <a href="https://www.census.gov/library/stories/2025/01/data-centers.html">data center employment analysis</a>.</p>
+
+<p>Infrastructure-market data come from CBRE's <a href="https://www.cbre.com/insights/reports/global-data-center-trends-2026">Global Data Center Trends 2026</a>. Occupation demand and workforce-shortage findings come from Deloitte's <a href="https://www.deloitte.com/us/en/insights/industry/power-and-utilities/data-centers-power-companies-compete-for-workforce.html">data center and power workforce analysis</a>. Wage benchmarks use the Bureau of Labor Statistics' <a href="https://www.bls.gov/news.release/ocwage.t01.htm">May 2025 national occupation data</a>. Broader economic contribution estimates come from the Data Center Coalition and PwC <a href="https://www.centerofyourdigitalworld.org/2026-impact-study">2026 Impact Study</a>.</p>
+
+<p>Job-posting platforms describe advertised demand, not completed hires. Economic-impact models include categories and multiplier effects that are broader than people working inside a facility. Infrastructure capacity indicates market activity but is not a direct measure of open jobs. Figures should be interpreted within the scope and methodology of their original source.</p>
+
+<h2>The Bottom Line</h2>
+
+<p>The U.S. data center jobs outlook for 2026 is one of strong but uneven growth. Postings have more than doubled, early-career technician hiring has accelerated, and installation workers can command a meaningful sector premium. At the same time, most demand comes from a small group of employers and regions, and the largest construction headcounts do not become permanent operations teams after a facility opens.</p>
+
+<p>The opportunity is strongest for people who can connect a real discipline—hardware, networks, electrical systems, cooling, controls, construction, commissioning, security, or logistics—to the operating standards of critical infrastructure. Follow actual postings and project stages, build evidence of safe and reliable work, and look beyond the logo on the building to the full employer ecosystem supporting it.</p>`
+  },
+  {
     id: '5',
     slug: 'data-center-cable-management-best-practices-2026',
     title: 'Data Center Cable Management Best Practices (2026)',
