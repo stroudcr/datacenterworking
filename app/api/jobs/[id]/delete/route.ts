@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -30,6 +31,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       where: { id },
       data: { status: 'DELETED' },
     });
+    if (job.status === 'ACTIVE') invalidatePublicJobData({ slug: job.slug });
 
     // Redirect back to employer dashboard
     return NextResponse.redirect(new URL('/dashboard/employer', request.url));

@@ -8,10 +8,10 @@ import { JobCard } from '@/components/JobCard';
 import { GlassCard } from '@/components/GlassCard';
 import { SortSelect } from '@/components/SortSelect';
 import { ArrowRight, Bell, SlidersHorizontal } from 'lucide-react';
-import type { Job } from '@prisma/client';
+import type { PublicJobListing } from '@/lib/public-job-types';
 
 interface JobListingsClientProps {
-  jobs: Job[];
+  jobs: PublicJobListing[];
   initialCategory?: string;
   initialType?: string;
   initialShift?: string;
@@ -26,13 +26,7 @@ interface JobListingsClientProps {
 
 export function JobListingsClient({
   jobs,
-  initialCategory,
-  initialType,
-  initialShift,
-  initialClearance,
-  initialCertifications,
-  initialSort,
-  basePath = '/',
+  basePath,
   hideListHeader = false,
   emptyTitle = 'No jobs found',
   emptyDescription = 'Try adjusting your filters.',
@@ -41,13 +35,14 @@ export function JobListingsClient({
   const [sortTimestamp] = useState(() => Date.now());
   const searchParams = useSearchParams();
 
-  // Get current filters from URL (for instant updates)
-  const category = searchParams.get('category') || initialCategory;
-  const type = searchParams.get('type') || initialType;
-  const shift = searchParams.get('shift') || initialShift;
-  const clearance = searchParams.get('clearance') || initialClearance;
-  const certifications = searchParams.get('certifications') || initialCertifications;
-  const sort = searchParams.get('sort') || initialSort || 'latest';
+  // The URL is the source of truth so removing a filter cannot revive its stale
+  // server-rendered initial value after a native history update.
+  const category = searchParams.get('category') ?? undefined;
+  const type = searchParams.get('type') ?? undefined;
+  const shift = searchParams.get('shift') ?? undefined;
+  const clearance = searchParams.get('clearance') ?? undefined;
+  const certifications = searchParams.get('certifications') ?? undefined;
+  const sort = searchParams.get('sort') ?? 'latest';
 
   // Client-side filtering and sorting
   const filteredAndSortedJobs = useMemo(() => {

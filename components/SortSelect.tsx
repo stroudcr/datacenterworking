@@ -1,16 +1,17 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
-export function SortSelect({ basePath = '/' }: { basePath?: string }) {
-  const router = useRouter();
+export function SortSelect({ basePath }: { basePath?: string }) {
   const searchParams = useSearchParams();
   const currentSort = searchParams.get('sort') || 'latest';
 
   const handleChange = (value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
+    // Read the live URL so this update preserves all current filters and search.
+    const params = new URLSearchParams(window.location.search);
     params.set('sort', value);
-    router.replace(`${basePath}?${params.toString()}`, { scroll: false });
+    const pathname = basePath ?? window.location.pathname;
+    window.history.replaceState(null, '', `${pathname}?${params.toString()}`);
   };
 
   return (

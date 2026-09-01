@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession, clearAuthCookie, verifyPassword } from '@/lib/auth';
 import { z } from 'zod';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 const deleteAccountSchema = z.object({
   password: z.string().min(1, 'Password is required'),
@@ -60,6 +61,7 @@ export async function DELETE(request: NextRequest) {
     await db.user.delete({
       where: { id: session.userId },
     });
+    invalidatePublicJobData({ allDetails: true });
 
     // Clear auth cookie
     await clearAuthCookie();

@@ -86,7 +86,6 @@ export async function GET(request: NextRequest) {
           to: employerEmail,
           jobTitle: job.title,
           company: job.company,
-          viewCount: job.viewCount,
           applicationCount: job.applicationCount,
           jobUrl,
           managementUrl,

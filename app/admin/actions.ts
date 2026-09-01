@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 export async function adminDeleteJob(jobId: string) {
   try {
@@ -16,7 +17,7 @@ export async function adminDeleteJob(jobId: string) {
     // Find the job
     const job = await db.job.findUnique({
       where: { id: jobId },
-      select: { id: true, title: true },
+      select: { id: true, title: true, status: true, slug: true },
     });
 
     if (!job) {
@@ -28,6 +29,7 @@ export async function adminDeleteJob(jobId: string) {
       where: { id: jobId },
       data: { status: 'DELETED' },
     });
+    if (job.status === 'ACTIVE') invalidatePublicJobData({ slug: job.slug });
 
     // Revalidate the admin page to show updated list
     revalidatePath('/admin');

@@ -125,7 +125,6 @@ export async function POST(req: NextRequest) {
           to: recipient,
           jobTitle: 'Test Data Center Technician',
           company: 'Test Data Center Inc.',
-          viewCount: 125,
           applicationCount: 8,
           jobUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/jobs/test-job-slug`,
           managementUrl: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/jobs/manage/test-job-id?token=test-token`,

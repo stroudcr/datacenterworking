@@ -3,6 +3,7 @@ import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
 import { sendManagementLinkEmail, sendPaymentConfirmation } from '@/lib/email';
 import Stripe from 'stripe';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -66,6 +67,7 @@ export async function POST(request: NextRequest) {
         return { payment: updatedPayment, shouldNotify: claimed.count === 1 };
       });
       const { payment, shouldNotify } = result;
+      if (shouldNotify) invalidatePublicJobData({ slug: payment.job.slug });
 
       const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
                       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://www.workindatacenter.com');

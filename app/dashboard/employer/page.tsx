@@ -48,7 +48,6 @@ export default async function EmployerDashboard() {
 
   // Calculate stats
   const activeJobs = jobs.filter((j) => j.status === 'ACTIVE').length;
-  const totalViews = jobs.reduce((sum, j) => sum + j.viewCount, 0);
   const totalApplications = jobs.reduce((sum, j) => sum + j.applicationCount, 0);
   const featuredJobs = jobs.filter((j) => j.isFeatured && j.featuredUntil && new Date(j.featuredUntil) > new Date()).length;
 
@@ -78,7 +77,7 @@ export default async function EmployerDashboard() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <GlassCard>
             <div className="flex items-center gap-4">
               <div className="p-3 rounded-lg bg-ice-500/20">
@@ -87,18 +86,6 @@ export default async function EmployerDashboard() {
               <div>
                 <p className="text-sm text-silver-400">Active Jobs</p>
                 <p className="text-2xl font-bold text-white">{activeJobs}</p>
-              </div>
-            </div>
-          </GlassCard>
-
-          <GlassCard>
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-lg bg-purple-500/20">
-                <Eye className="w-6 h-6 text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm text-silver-400">Total Views</p>
-                <p className="text-2xl font-bold text-white">{totalViews}</p>
               </div>
             </div>
           </GlassCard>
@@ -191,10 +178,6 @@ export default async function EmployerDashboard() {
                         </div>
 
                         <div className="flex flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
-                          <div className="flex items-center gap-1.5 sm:gap-2 text-silver-300">
-                            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                            <span>{job.viewCount} views</span>
-                          </div>
                           <Link href={`/dashboard/employer/jobs/${job.id}/applicants`}>
                             <div className="flex items-center gap-1.5 sm:gap-2 text-ice-400 hover:text-ice-300 transition-colors cursor-pointer">
                               <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4" />

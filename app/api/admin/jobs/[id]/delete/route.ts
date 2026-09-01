@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -18,10 +19,12 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const { id } = await context.params;
 
     // Delete the job (soft delete)
-    await db.job.update({
+    const job = await db.job.update({
       where: { id },
       data: { status: 'DELETED' },
+      select: { slug: true },
     });
+    invalidatePublicJobData({ slug: job.slug });
 
     // Redirect back to admin panel
     return NextResponse.redirect(new URL('/admin', request.url));

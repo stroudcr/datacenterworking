@@ -1,37 +1,21 @@
 import { MetadataRoute } from 'next';
-import { db } from '@/lib/db';
 import { resources } from '@/lib/resources-data';
 import { getAllStates } from '@/lib/locations';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 import { employerPages } from '@/lib/employer-pages';
+import { getPublicJobStats, getPublicSitemapJobs } from '@/lib/public-job-data';
 
 // Cache sitemap for 1 hour to reduce database operations from frequent crawler requests
 export const revalidate = 3600;
+// Generate on first request so code-only deploys do not wake or depend on Neon.
+// The explicit public-job data cache still limits database refreshes to once per hour.
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const activeJobsWhere = {
-    status: 'ACTIVE' as const,
-    expiresAt: {
-      gte: new Date(),
-    },
-  };
-
-  // Fetch all active jobs for dynamic sitemap
-  const jobs = await db.job.findMany({
-    where: activeJobsWhere,
-    select: {
-      slug: true,
-      updatedAt: true,
-    },
-  });
-
-  const remoteJobCount = await db.job.count({
-    where: {
-      ...activeJobsWhere,
-      country: 'US',
-      isRemote: true,
-    },
-  });
+  const [jobs, { remoteJobCount }] = await Promise.all([
+    getPublicSitemapJobs(),
+    getPublicJobStats(),
+  ]);
 
   // Static pages
   const staticPages: MetadataRoute.Sitemap = [
@@ -106,7 +90,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Dynamic job pages
   const jobPages: MetadataRoute.Sitemap = jobs.map((job) => ({
     url: absoluteUrl(`/jobs/${job.slug}`),
-    lastModified: job.updatedAt,
+    lastModified: new Date(job.updatedAt),
     changeFrequency: 'weekly' as const,
     priority: 0.8,
   }));

@@ -1,4 +1,3 @@
-import { db } from '@/lib/db';
 import { JobCard } from '@/components/JobCard';
 import { SearchBar } from '@/components/SearchBar';
 import { JobListingsClient } from '@/components/JobListingsClient';
@@ -8,10 +7,11 @@ import { SITE_URL, absoluteUrl } from '@/lib/site-config';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 import { getStateAbbreviation, getStateFullName, getStateSlug } from '@/lib/locations';
-import { getActiveStateJobCounts } from '@/lib/job-location-counts';
+import { getPublicJobListings, getPublicJobStats } from '@/lib/public-job-data';
 
 // Cache this page for 60 seconds to reduce database operations
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 type HomeSearchParams = Record<string, string | string[] | undefined>;
 
@@ -62,44 +62,16 @@ export default async function Home({
   const clearance = params.clearance;
   const certifications = params.certifications;
 
-  const now = new Date();
-
-  // Base where clause for active jobs
-  const activeJobsWhere = {
-    status: 'ACTIVE' as const,
-    expiresAt: { gte: now },
-  };
-
-  // Fetch ALL active jobs for client-side filtering (cached for 60 seconds)
-  // Note: Removed server-side filters (category, type, shift, etc.) for instant filtering
-  const [jobs, stateJobCounts] = await Promise.all([
-    db.job.findMany({
-      where: {
-        ...activeJobsWhere,
-        ...(search && {
-          OR: [
-            { title: { contains: search, mode: 'insensitive' } },
-            { company: { contains: search, mode: 'insensitive' } },
-            { description: { contains: search, mode: 'insensitive' } },
-            { location: { contains: search, mode: 'insensitive' } },
-            ...(searchState
-              ? [
-                  { state: searchState },
-                  { locationStates: { has: searchState } },
-                ]
-              : []),
-          ],
-        }),
-      },
-      orderBy: { createdAt: 'desc' },
-      take: 150,
-    }),
-    getActiveStateJobCounts(now),
+  // These helpers share one persistent public snapshot. Query-string variants and
+  // dynamic session rendering therefore do not issue fresh database reads.
+  const [jobs, { stateJobCounts }] = await Promise.all([
+    getPublicJobListings(search, searchState),
+    getPublicJobStats(),
   ]);
 
   // Get featured jobs (filter from main query results to avoid separate DB call)
   const featuredJobs = jobs
-    .filter((job) => job.isFeatured && job.featuredUntil && job.featuredUntil >= now)
+    .filter((job) => job.isFeatured)
     .slice(0, 3);
 
   const leadingStates = Object.entries(stateJobCounts)

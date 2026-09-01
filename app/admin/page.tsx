@@ -275,7 +275,6 @@ export default async function AdminPanel() {
                         </td>
                         <td className="py-4 px-4">
                           <div className="text-sm text-silver-400">
-                            <div>{job.viewCount} views</div>
                             <div>{job.applicationCount} applies</div>
                           </div>
                         </td>

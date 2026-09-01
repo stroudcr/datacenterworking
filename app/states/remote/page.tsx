@@ -1,23 +1,17 @@
 import { Metadata } from 'next';
 import { Suspense } from 'react';
-import { db } from '@/lib/db';
 import { JobListingsClient } from '@/components/JobListingsClient';
 import { MapPin, Briefcase, Globe } from 'lucide-react';
 import { GlassCard } from '@/components/GlassCard';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
+import { getPublicJobStats, getPublicRemoteJobs } from '@/lib/public-job-data';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const remoteJobCount = await db.job.count({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      isRemote: true,
-    },
-  });
+  const { remoteJobCount } = await getPublicJobStats();
 
   return {
     title: 'Remote Data Center Jobs | Work From Anywhere',
@@ -48,35 +42,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RemoteJobsPage() {
-  // Fetch jobs explicitly marked as remote.
-  const jobs = await db.job.findMany({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      isRemote: true,
-    },
-    orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-    take: 150,
-  });
-
-  // Get job counts by category for remote jobs
-  const categoryCounts = await db.job.groupBy({
-    by: ['category'],
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      isRemote: true,
-    },
-    _count: {
-      id: true,
-    },
-  });
-
-  const topCategories = categoryCounts
-    .sort((a, b) => b._count.id - a._count.id)
-    .slice(0, 5);
+  const [jobs, { remoteCategoryCounts }] = await Promise.all([
+    getPublicRemoteJobs(),
+    getPublicJobStats(),
+  ]);
+  const topCategories = remoteCategoryCounts.slice(0, 5);
 
   // Structured data for breadcrumbs
   const breadcrumbSchema = {
@@ -228,7 +198,7 @@ export default async function RemoteJobsPage() {
                     key={cat.category}
                     className="px-3 py-1 bg-white/5 rounded-full text-sm text-gray-300 border border-white/10"
                   >
-                    {cat.category} ({cat._count.id})
+                    {cat.category} ({cat.count})
                   </span>
                 ))}
               </div>

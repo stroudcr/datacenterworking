@@ -21,7 +21,7 @@ interface JobCardProps {
     hourlyRateMin?: number | null;
     hourlyRateMax?: number | null;
     isFeatured: boolean;
-    createdAt: Date;
+    createdAt: Date | string;
     tags: string[];
     source?: string;
   };

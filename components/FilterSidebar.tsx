@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
 import { JOB_CATEGORIES, JOB_TYPES, SHIFT_REQUIREMENTS, SECURITY_CLEARANCE, CERTIFICATIONS } from '@/lib/constants';
 import { X } from 'lucide-react';
+
+const FILTER_KEYS = ['category', 'type', 'shift', 'clearance', 'certifications'] as const;
 
 interface FilterSidebarProps {
   category?: string;
@@ -23,15 +24,25 @@ export function FilterSidebar({
   certifications,
   isOpen = true,
   onClose,
-  basePath = '/',
+  basePath,
 }: FilterSidebarProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
   const activeFilterCount = [category, type, shift, clearance, certifications].filter(Boolean).length;
 
-  // Handle filter change - updates URL without page reload
-  const handleFilterChange = (filterKey: string, filterValue: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
+  const replaceSearchParams = (params: URLSearchParams) => {
+    const queryString = params.toString();
+    const pathname = basePath ?? window.location.pathname;
+    const newUrl = queryString ? `${pathname}?${queryString}` : pathname;
+
+    // Next.js syncs native history changes to useSearchParams without an RSC request.
+    window.history.replaceState(null, '', newUrl);
+  };
+
+  const handleFilterChange = (
+    filterKey: (typeof FILTER_KEYS)[number],
+    filterValue: string | null
+  ) => {
+    // Read the live URL so rapid changes cannot overwrite a preceding filter update.
+    const params = new URLSearchParams(window.location.search);
 
     if (filterValue) {
       params.set(filterKey, filterValue);
@@ -39,11 +50,13 @@ export function FilterSidebar({
       params.delete(filterKey);
     }
 
-    const queryString = params.toString();
-    const newUrl = queryString ? `${basePath}?${queryString}` : basePath;
+    replaceSearchParams(params);
+  };
 
-    // Use router.replace to update URL without reload or scroll jump
-    router.replace(newUrl, { scroll: false });
+  const handleClearFilters = () => {
+    const params = new URLSearchParams(window.location.search);
+    FILTER_KEYS.forEach((key) => params.delete(key));
+    replaceSearchParams(params);
   };
 
   return (
@@ -86,7 +99,7 @@ export function FilterSidebar({
           {/* Clear All Button */}
           {activeFilterCount > 0 && (
             <button
-              onClick={() => router.replace(basePath, { scroll: false })}
+              onClick={handleClearFilters}
               className="block w-full px-4 py-2 text-center text-sm font-medium text-ice-400 bg-white/5 rounded-lg hover:bg-white/10 transition-colors border border-white/10"
             >
               Clear All Filters

@@ -9,6 +9,10 @@ import { cache } from 'react';
 import Link from 'next/link';
 import { Building2, MapPin, DollarSign } from 'lucide-react';
 import { SITE_NAME, absoluteUrl } from '@/lib/site-config';
+import {
+  getPublicJobBySlug,
+  getPublicJobSlugByLegacyId,
+} from '@/lib/public-job-data';
 
 // Cache this page for 5 minutes
 export const revalidate = 300;
@@ -19,33 +23,13 @@ interface ApplyPageProps {
 
 // Cached job fetch function
 const getJobBySlug = cache(async (slug: string) => {
-  // Check if this is an old-style ID URL
   if (isLegacyId(slug)) {
-    const legacyJob = await db.job.findUnique({
-      where: { id: slug },
-      select: { slug: true },
-    });
-    return { isLegacy: true, redirectSlug: legacyJob?.slug };
+    const redirectSlug = await getPublicJobSlugByLegacyId(slug);
+    return { isLegacy: true as const, redirectSlug };
   }
 
-  // Fetch job by slug
-  const job = await db.job.findUnique({
-    where: { slug },
-    select: {
-      id: true,
-      title: true,
-      company: true,
-      companyLogo: true,
-      location: true,
-      salary: true,
-      type: true,
-      status: true,
-      expiresAt: true,
-      slug: true,
-    },
-  });
-
-  return { isLegacy: false, job };
+  const job = await getPublicJobBySlug(slug);
+  return { isLegacy: false as const, job };
 });
 
 // Generate metadata for SEO
@@ -126,14 +110,8 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
   }
 
   const { job } = result;
-  if (!job || job.status !== 'ACTIVE') {
+  if (!job) {
     notFound();
-  }
-
-  // Check if job is expired
-  const isExpired = new Date(job.expiresAt) < new Date();
-  if (isExpired) {
-    redirect(`/jobs/${slug}`);
   }
 
   // Check if user has already applied
@@ -144,6 +122,7 @@ export default async function ApplyPage({ params }: ApplyPageProps) {
         userId: session.userId,
       },
     },
+    select: { id: true },
   });
 
   if (existingApplication) {

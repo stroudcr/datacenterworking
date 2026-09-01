@@ -5,6 +5,7 @@ import { fetchJobs } from '@/lib/jobs-api/jsearch';
 import { getTopJobs, deduplicateJobs } from '@/lib/jobs-api/filter';
 import { mapJSearchJobs } from '@/lib/jobs-api/mapper';
 import { ImportStats } from '@/lib/jobs-api/types';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 export async function POST(request: NextRequest) {
   try {
@@ -84,6 +85,10 @@ export async function POST(request: NextRequest) {
         console.error(`Error importing job: ${job.title}`, error);
         stats.errors++;
       }
+    }
+
+    if (stats.totalImported > 0 || stats.totalUpdated > 0) {
+      invalidatePublicJobData({ allDetails: true });
     }
 
     console.log('Import complete:', stats);

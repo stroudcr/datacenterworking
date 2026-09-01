@@ -306,7 +306,6 @@ interface SendJobExpirationReminderParams {
   to: string;
   jobTitle: string;
   company: string;
-  viewCount: number;
   applicationCount: number;
   jobUrl: string;
   managementUrl?: string;
@@ -316,7 +315,6 @@ export async function sendJobExpirationReminder({
   to,
   jobTitle,
   company,
-  viewCount,
   applicationCount,
   jobUrl,
   managementUrl,
@@ -336,7 +334,6 @@ export async function sendJobExpirationReminder({
       react: JobExpirationReminder({
         jobTitle,
         company,
-        viewCount,
         applicationCount,
         jobUrl,
         managementUrl,

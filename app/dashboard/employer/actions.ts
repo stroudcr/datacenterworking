@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { getSession } from '@/lib/auth';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 export async function deleteJob(jobId: string) {
   try {
@@ -17,7 +18,7 @@ export async function deleteJob(jobId: string) {
     // Find the job and verify ownership
     const job = await db.job.findUnique({
       where: { id: jobId },
-      select: { userId: true, status: true },
+      select: { userId: true, status: true, slug: true },
     });
 
     if (!job) {
@@ -34,6 +35,7 @@ export async function deleteJob(jobId: string) {
       where: { id: jobId },
       data: { status: 'DELETED' },
     });
+    if (job.status === 'ACTIVE') invalidatePublicJobData({ slug: job.slug });
 
     // Revalidate the dashboard to show updated list
     revalidatePath('/dashboard/employer');

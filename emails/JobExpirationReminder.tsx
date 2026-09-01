@@ -16,7 +16,6 @@ import * as React from 'react';
 interface JobExpirationReminderProps {
   jobTitle: string;
   company: string;
-  viewCount: number;
   applicationCount: number;
   jobUrl: string;
   managementUrl?: string;
@@ -25,7 +24,6 @@ interface JobExpirationReminderProps {
 export const JobExpirationReminder = ({
   jobTitle,
   company,
-  viewCount,
   applicationCount,
   jobUrl,
   managementUrl,
@@ -56,11 +54,6 @@ export const JobExpirationReminder = ({
             <Heading style={h2}>Job Performance Summary:</Heading>
 
             <Section style={statsBox}>
-              <Section style={statItem}>
-                <Text style={statNumber}>{viewCount}</Text>
-                <Text style={statLabel}>Total Views</Text>
-              </Section>
-
               <Section style={statItem}>
                 <Text style={statNumber}>{applicationCount}</Text>
                 <Text style={statLabel}>Applications Received</Text>

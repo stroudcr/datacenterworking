@@ -9,8 +9,11 @@ import { Newsletter } from '@/components/Newsletter';
 import { StateCareerGuide } from '@/components/StateCareerGuide';
 import { StateOutline } from '@/components/StateOutline';
 import { SortSelect } from '@/components/SortSelect';
-import { db } from '@/lib/db';
 import { getAllStates, getStateAbbreviation, getStateFromSlug } from '@/lib/locations';
+import {
+  getPublicJobsForState,
+  getPublicJobStats,
+} from '@/lib/public-job-data';
 import {
   buildStateFaqs,
   getStateProfile,
@@ -26,6 +29,7 @@ interface StatePageProps {
 }
 
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateStaticParams() {
   return getAllStates().map((state) => ({ state: state.slug }));
@@ -39,14 +43,8 @@ export async function generateMetadata({ params, searchParams }: StatePageProps)
 
   const stateAbbr = getStateAbbreviation(stateName);
   if (!stateAbbr) return { title: 'State Not Found' };
-  const jobCount = await db.job.count({
-    where: {
-      status: 'ACTIVE',
-      expiresAt: { gte: new Date() },
-      country: 'US',
-      locationStates: { has: stateAbbr },
-    },
-  });
+  const { stateJobCounts } = await getPublicJobStats();
+  const jobCount = stateJobCounts[stateAbbr] ?? 0;
   const hasQueryParams = Object.values(query).some((value) =>
     Array.isArray(value) ? value.length > 0 : Boolean(value)
   );
@@ -80,28 +78,12 @@ export default async function StatePage({ params, searchParams }: StatePageProps
   const profile = getStateProfile(stateAbbr);
   if (!stateAbbr || !profile) notFound();
 
-  const now = new Date();
-  const where = {
-    status: 'ACTIVE' as const,
-    expiresAt: { gte: now },
-    country: 'US',
-    locationStates: { has: stateAbbr },
-  };
-  const [jobs, totalJobCount, categoryCounts] = await Promise.all([
-    db.job.findMany({
-      where,
-      orderBy: [{ isFeatured: 'desc' }, { createdAt: 'desc' }],
-      take: 150,
-    }),
-    db.job.count({ where }),
-    db.job.groupBy({
-      by: ['category'],
-      where,
-      _count: { id: true },
-      orderBy: { _count: { id: 'desc' } },
-      take: 6,
-    }),
+  const [jobs, stats] = await Promise.all([
+    getPublicJobsForState(stateAbbr),
+    getPublicJobStats(),
   ]);
+  const totalJobCount = stats.stateJobCounts[stateAbbr] ?? 0;
+  const categoryCounts = (stats.stateCategoryCounts[stateAbbr] ?? []).slice(0, 6);
   const activeCategories = categoryCounts.map((item) => item.category);
   const faqs = buildStateFaqs(profile, activeCategories);
   const possessiveName = possessiveStateName(stateName);

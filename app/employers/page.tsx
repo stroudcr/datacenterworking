@@ -8,6 +8,8 @@ import { getEmployerProof } from '@/lib/employer-proof';
 import { absoluteUrl } from '@/lib/site-config';
 import { PRICING } from '@/lib/constants';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'Hire Data Center Talent',
   description: 'Post data center jobs or discuss multi-role hiring with a focused data center job board.',

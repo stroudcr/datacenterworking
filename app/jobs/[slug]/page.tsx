@@ -4,7 +4,6 @@ import { getSession } from '@/lib/auth';
 import { GlassCard } from '@/components/GlassCard';
 import { Button } from '@/components/Button';
 import { SaveJobButton } from '@/components/SaveJobButton';
-import { ViewTracker } from '@/components/ViewTracker';
 import { ApplyButton } from '@/components/ApplyButton';
 import { TrackedApplyLink } from '@/components/TrackedApplyLink';
 import {
@@ -23,6 +22,10 @@ import { isLegacyId } from '@/lib/slugify';
 import type { Metadata } from 'next';
 import { cache } from 'react';
 import { SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
+import {
+  getPublicJobBySlug,
+  getPublicJobSlugByLegacyId,
+} from '@/lib/public-job-data';
 
 // This page reads cookie-backed session state, so it must use one consistent
 // rendering mode for generated, newly created, and unknown job slugs.
@@ -46,33 +49,16 @@ function getSchemaEmploymentType(type: string) {
   return 'OTHER';
 }
 
-// Cached job fetch function to deduplicate queries between metadata and page render
-// This ensures we only query the database once per request, not twice
+// React cache deduplicates metadata/page work within a request. The public data
+// helpers also persist safe, explicit fields across requests.
 const getJobBySlug = cache(async (slug: string) => {
-  // Check if this is an old-style ID URL
   if (isLegacyId(slug)) {
-    const legacyJob = await db.job.findUnique({
-      where: { id: slug },
-      select: { slug: true },
-    });
-    return { isLegacy: true, redirectSlug: legacyJob?.slug };
+    const redirectSlug = await getPublicJobSlugByLegacyId(slug);
+    return { isLegacy: true as const, redirectSlug };
   }
 
-  // Fetch job by slug with all needed data
-  const job = await db.job.findUnique({
-    where: { slug },
-    include: {
-      user: {
-        select: {
-          name: true,
-          email: true,
-          company: true,
-        },
-      },
-    },
-  });
-
-  return { isLegacy: false, job };
+  const job = await getPublicJobBySlug(slug);
+  return { isLegacy: false as const, job };
 });
 
 // Generate metadata for SEO
@@ -150,7 +136,7 @@ export default async function JobPage({ params }: JobPageProps) {
   }
 
   const { job } = result;
-  if (!job || job.status !== 'ACTIVE' || job.expiresAt <= new Date()) {
+  if (!job) {
     notFound();
   }
 
@@ -159,7 +145,7 @@ export default async function JobPage({ params }: JobPageProps) {
   // Optimized: Fetch savedJob and application status in parallel if user is logged in
   let isSaved = false;
   let hasApplied = false;
-  if (session) {
+  if (session?.role === 'JOB_SEEKER') {
     const [savedJob, application] = await Promise.all([
       db.savedJob.findUnique({
         where: {
@@ -168,6 +154,7 @@ export default async function JobPage({ params }: JobPageProps) {
             userId: session.userId,
           },
         },
+        select: { id: true },
       }),
       db.application.findUnique({
         where: {
@@ -176,14 +163,12 @@ export default async function JobPage({ params }: JobPageProps) {
             userId: session.userId,
           },
         },
+        select: { id: true },
       }),
     ]);
     isSaved = !!savedJob;
     hasApplied = !!application;
   }
-
-  // Note: View count increment moved to client-side component for non-blocking behavior
-  // This prevents the database write from delaying page render
 
   const isRemote = job.isRemote;
   const jobTitle = job.title.trim();
@@ -195,8 +180,8 @@ export default async function JobPage({ params }: JobPageProps) {
     '@type': 'JobPosting',
     title: jobTitle,
     description: job.description,
-    datePosted: job.createdAt.toISOString(),
-    validThrough: job.expiresAt.toISOString(),
+    datePosted: job.createdAt,
+    validThrough: job.expiresAt,
     employmentType: getSchemaEmploymentType(job.type),
     url: absoluteUrl(`/jobs/${job.slug}`),
     hiringOrganization: {
@@ -308,9 +293,6 @@ export default async function JobPage({ params }: JobPageProps) {
 
   return (
     <>
-      {/* Track page view asynchronously */}
-      <ViewTracker jobId={job.id} />
-
       {/* JSON-LD Structured Data for SEO */}
       <script
         type="application/ld+json"
@@ -522,9 +504,6 @@ export default async function JobPage({ params }: JobPageProps) {
               </h3>
               <div className="space-y-2 text-silver-300">
                 <p className="font-medium text-white">{companyName}</p>
-                {job.user?.company && job.user.company !== companyName && (
-                  <p className="text-sm">Posted by: {job.user.company}</p>
-                )}
               </div>
             </GlassCard>
 

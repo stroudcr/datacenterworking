@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { parseLocation } from '@/lib/locations';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 interface RouteContext {
   params: Promise<{ jobId: string }>;
@@ -107,6 +108,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       where: { id: jobId },
       data: allowedUpdates,
     });
+    if (job.status === 'ACTIVE') invalidatePublicJobData({ slug: job.slug });
 
     return NextResponse.json({ job: updatedJob });
   } catch (error: any) {
@@ -149,6 +151,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       where: { id: jobId },
       data: { status: 'DELETED' },
     });
+    if (job.status === 'ACTIVE') invalidatePublicJobData({ slug: job.slug });
 
     return NextResponse.json({ success: true });
   } catch (error: any) {

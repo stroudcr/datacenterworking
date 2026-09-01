@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { verifyCronRequest } from '@/lib/cron';
+import { invalidatePublicJobData } from '@/lib/public-job-data';
 
 /**
  * Cron job to clean up expired jobs and reset featured flags
@@ -55,6 +56,8 @@ export async function GET(request: NextRequest) {
 
     featuredReset = featuredResetResult.count;
     console.log(`Reset featured flag on ${featuredReset} jobs`);
+
+    if (jobsExpired > 0 || featuredReset > 0) invalidatePublicJobData();
 
     return NextResponse.json({
       success: true,

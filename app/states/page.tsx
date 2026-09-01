@@ -1,14 +1,14 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { db } from '@/lib/db';
 import { getAllStates } from '@/lib/locations';
 import { GlassCard } from '@/components/GlassCard';
 import { ArrowRight, MapPin, Briefcase } from 'lucide-react';
 import { SITE_URL, absoluteUrl } from '@/lib/site-config';
-import { getActiveStateJobCounts } from '@/lib/job-location-counts';
+import { getPublicJobStats } from '@/lib/public-job-data';
 
 // Revalidate every 60 seconds
 export const revalidate = 60;
+export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -29,27 +29,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function StatesPage() {
   const allStates = getAllStates();
-  const now = new Date();
-
-  const [stateJobCounts, remoteJobCount, totalJobs] = await Promise.all([
-    getActiveStateJobCounts(now),
-    db.job.count({
-      where: {
-        status: 'ACTIVE',
-        expiresAt: { gte: now },
-        country: 'US',
-        isRemote: true,
-      },
-    }),
-    db.job.count({
-      where: {
-        status: 'ACTIVE',
-        expiresAt: { gte: now },
-        country: 'US',
-        locationStates: { isEmpty: false },
-      },
-    }),
-  ]);
+  const {
+    stateJobCounts,
+    remoteJobCount,
+    totalLocatedJobs: totalJobs,
+  } = await getPublicJobStats();
 
   // Add job counts to states
   const statesWithCounts = allStates.map((state) => ({

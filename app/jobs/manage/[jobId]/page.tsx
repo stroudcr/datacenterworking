@@ -117,19 +117,7 @@ export default function ManageJobPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <GlassCard>
-            <div className="flex items-center gap-3">
-              <div className="p-3 rounded-lg bg-purple-500/20">
-                <Eye className="w-5 h-5 text-purple-400" />
-              </div>
-              <div>
-                <p className="text-sm text-silver-400">Views</p>
-                <p className="text-2xl font-bold text-white">{job.viewCount}</p>
-              </div>
-            </div>
-          </GlassCard>
-
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <GlassCard>
             <div className="flex items-center gap-3">
               <div className="p-3 rounded-lg bg-green-500/20">

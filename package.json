@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "vercel-build": "PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1 prisma migrate deploy && prisma generate && next build",
+    "vercel-build": "if [ \"${SKIP_DB_MIGRATIONS:-0}\" != \"1\" ]; then PRISMA_SCHEMA_DISABLE_ADVISORY_LOCK=1 prisma migrate deploy; fi && prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
