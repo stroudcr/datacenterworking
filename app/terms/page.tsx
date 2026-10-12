@@ -1,7 +1,7 @@
 import { GlassCard } from '@/components/GlassCard';
 import { Scale, AlertTriangle, Info } from 'lucide-react';
 import Link from 'next/link';
-import { absoluteUrl } from '@/lib/site-config';
+import { SITE_EMAIL, absoluteUrl } from '@/lib/site-config';
 
 export const metadata = {
   title: 'Terms of Service',
@@ -17,7 +17,7 @@ export const metadata = {
 };
 
 export default function TermsPage() {
-  const lastUpdated = 'January 26, 2025';
+  const lastUpdated = 'October 11, 2026';
 
   return (
     <div className="min-h-screen">
@@ -234,7 +234,7 @@ export default function TermsPage() {
 
               <h3 className="text-lg font-semibold text-white">DMCA Compliance</h3>
               <p>
-                If you believe your copyright has been infringed, please contact us at <a href="mailto:support@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">support@workindatacenter.com</a> with details of the alleged infringement.
+                If you believe your copyright has been infringed, please contact us at <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a> with details of the alleged infringement.
               </p>
             </div>
           </section>
@@ -364,7 +364,7 @@ export default function TermsPage() {
 
               <h3 className="text-lg font-semibold text-white">Informal Resolution</h3>
               <p>
-                Before filing any formal dispute, you agree to contact us at <a href="mailto:support@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">support@workindatacenter.com</a> to seek an informal resolution.
+                Before filing any formal dispute, you agree to contact us at <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a> to seek an informal resolution.
               </p>
 
               <h3 className="text-lg font-semibold text-white">Jurisdiction</h3>
@@ -430,7 +430,7 @@ export default function TermsPage() {
               <div className="glass rounded-lg p-6 mt-4">
                 <p className="text-white font-semibold mb-2">Work In Data Center</p>
                 <p className="text-silver-400 text-sm mb-3">Owned and operated by WellDiem Company</p>
-                <p>Email: <a href="mailto:support@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">support@workindatacenter.com</a></p>
+                <p>Email: <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a></p>
                 <p className="mt-3">
                   Or visit our <Link href="/contact" className="text-ice-400 hover:text-ice-300 underline">Contact Page</Link>
                 </p>

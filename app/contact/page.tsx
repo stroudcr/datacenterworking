@@ -16,6 +16,7 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import Link from 'next/link';
+import { SITE_EMAIL } from '@/lib/site-config';
 
 const inquiryTypes = [
   { value: 'general', label: 'General Question' },
@@ -238,10 +239,10 @@ export default function ContactPage() {
                   <div>
                     <h3 className="text-lg font-semibold text-white mb-1">Email Support</h3>
                     <a
-                      href="mailto:workindatacenter@welldiem.com"
+                      href={`mailto:${SITE_EMAIL}`}
                       className="text-ice-400 hover:text-ice-300 transition-colors text-sm"
                     >
-                      workindatacenter@welldiem.com
+                      {SITE_EMAIL}
                     </a>
                   </div>
                 </div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { SITE_EMAIL } from '@/lib/site-config';
 
 export function Footer() {
   return (
@@ -22,6 +23,12 @@ export function Footer() {
             <p className="text-sm text-silver-400 mt-2">
               Connecting top talent with leading data center employers.
             </p>
+            <a
+              href={`mailto:${SITE_EMAIL}`}
+              className="mt-3 inline-block break-all text-sm text-silver-300 hover:text-ice-400 transition-colors"
+            >
+              {SITE_EMAIL}
+            </a>
           </div>
 
           {/* For Job Seekers */}

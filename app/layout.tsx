@@ -6,7 +6,7 @@ import { HeaderSkeleton } from '@/components/HeaderSkeleton';
 import { Footer } from '@/components/Footer';
 import { Analytics } from '@vercel/analytics/next';
 import { AttributionCapture } from '@/components/AttributionCapture';
-import { SITE_DESCRIPTION, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
+import { SITE_DESCRIPTION, SITE_EMAIL, SITE_NAME, SITE_URL, absoluteUrl } from '@/lib/site-config';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -77,7 +77,7 @@ export default function RootLayout({
     url: SITE_URL,
     logo: absoluteUrl('/images/NavLogo.png'),
     description: 'Premium job board connecting data center professionals with top employers across operations, engineering, IT infrastructure, and more.',
-    email: 'info@workindatacenter.com',
+    email: SITE_EMAIL,
     foundingDate: '2024',
     slogan: 'Find Your Next Data Center Job',
     knowsAbout: [

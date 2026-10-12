@@ -1,7 +1,7 @@
 import { GlassCard } from '@/components/GlassCard';
 import { Shield, Eye, Lock, AlertTriangle, Info, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import { absoluteUrl } from '@/lib/site-config';
+import { SITE_EMAIL, absoluteUrl } from '@/lib/site-config';
 
 export const metadata = {
   title: 'Privacy Policy',
@@ -17,7 +17,7 @@ export const metadata = {
 };
 
 export default function PrivacyPage() {
-  const lastUpdated = 'January 26, 2025';
+  const lastUpdated = 'October 11, 2026';
 
   return (
     <div className="min-h-screen">
@@ -332,7 +332,7 @@ export default function PrivacyPage() {
                   </p>
                   <ul className="space-y-3 text-silver-300">
                     <li>
-                      <span className="text-white font-semibold">Email:</span> <a href="mailto:privacy@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">privacy@workindatacenter.com</a> or <a href="mailto:support@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">support@workindatacenter.com</a>
+                      <span className="text-white font-semibold">Email:</span> <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a>
                     </li>
                     <li>
                       <span className="text-white font-semibold">Contact Form:</span> Visit our <Link href="/contact" className="text-ice-400 hover:text-ice-300 underline">Contact Page</Link>
@@ -390,7 +390,7 @@ export default function PrivacyPage() {
                 We do not knowingly collect personal information from anyone under 18. If we become aware that we have collected personal information from a child under 18, we will take steps to delete that information promptly.
               </p>
               <p>
-                If you believe we have collected information from a child under 18, please contact us at <a href="mailto:privacy@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">privacy@workindatacenter.com</a>.
+                If you believe we have collected information from a child under 18, please contact us at <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a>.
               </p>
             </div>
           </section>
@@ -441,7 +441,7 @@ export default function PrivacyPage() {
                 We do not share your personal information with third parties for their direct marketing purposes.
               </p>
               <p>
-                If you have questions about this, please contact us at <a href="mailto:privacy@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">privacy@workindatacenter.com</a>.
+                If you have questions about this, please contact us at <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a>.
               </p>
             </div>
           </section>
@@ -484,10 +484,7 @@ export default function PrivacyPage() {
                   <div>
                     <p className="text-silver-400 text-sm">Email</p>
                     <p>
-                      <a href="mailto:privacy@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">privacy@workindatacenter.com</a>
-                    </p>
-                    <p className="mt-1">
-                      <a href="mailto:support@workindatacenter.com" className="text-ice-400 hover:text-ice-300 underline">support@workindatacenter.com</a>
+                      <a href={`mailto:${SITE_EMAIL}`} className="text-ice-400 hover:text-ice-300 underline">{SITE_EMAIL}</a>
                     </p>
                   </div>
                   <div>
